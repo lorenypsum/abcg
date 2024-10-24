@@ -8,12 +8,62 @@
 
   <title>Meu portfolio</title>
   <style>
+    /* Definindo cores suaves */
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f5f5f5; /* Cinza claro */
+      color: #333;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    /* Centralizando e estilizando o conteúdo */
+    .container {
+      background-color: #ffffff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    /* Título grande e amigável */
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      color: #555;
+    }
+
+    /* Estilos dos links */
+    a {
+      display: inline-block;
+      margin: 10px 0;
+      padding: 10px 20px;
+      font-size: 1.2rem;
+      color: #ffffff;
+      background-color: #87a2fb; /* Azul suave */
+      text-decoration: none;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+    }
+
+    /* Mudança de cor ao passar o mouse */
+    a:hover {
+      background-color: #6c88d4; /* Azul um pouco mais escuro */
+    }
   </style>
 </head>
 
 <body>
-  <a href="firstapp/">firstapp</a>
-  <a href="helloworld/">helloworld</a>
+  <div class="container">
+    <h1>Meu Portfolio</h1>
+    <a href="firstapp/">First App</a>
+    <br>
+    <a href="helloworld/">Hello World</a>
+  </div>
 </body>
 
 </html>
