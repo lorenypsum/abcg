@@ -6,64 +6,189 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Meu portfolio</title>
+  <title>Meu Portfólio</title>
   <style>
-    /* Definindo cores suaves */
+    /* Definindo as cores cappuccino */
+    :root {
+      --cafe-com-leite: #d7b8a0;
+      --creme: #f7ebe8;
+      --off-white: #f7f7f7;
+      --cafe: #6b4f4f;
+      --cappuccino-espuma: #f0d9d0;
+      --rosa-fofo: #ffc5d9;
+      --texto: #403737;
+    }
+
+    /* Estilos gerais */
     body {
-      font-family: 'Arial', sans-serif;
-      background-color: #f5f5f5; /* Cinza claro */
-      color: #333;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--creme);
+      color: var(--texto);
       margin: 0;
       padding: 0;
       display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
+      flex-direction: column;
+      min-height: 100vh;
     }
 
-    /* Centralizando e estilizando o conteúdo */
-    .container {
-      background-color: #ffffff;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    header {
+      background-color: var(--cafe-com-leite);
+      padding: 20px;
       text-align: center;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
 
-    /* Título grande e amigável */
-    h1 {
+    header h1 {
       font-size: 2.5rem;
-      margin-bottom: 20px;
-      color: #555;
+      margin: 0;
+      color: var(--off-white);
     }
 
-    /* Estilos dos links */
-    a {
-      display: inline-block;
-      margin: 10px 0;
-      padding: 10px 20px;
-      font-size: 1.2rem;
-      color: #ffffff;
-      background-color: #87a2fb; /* Azul suave */
+    /* Layout da seção de projetos - 3 colunas por linha */
+    .projects {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      /* 3 colunas por linha */
+      gap: 20px;
+      padding: 40px;
+      flex-grow: 1;
+    }
+
+    /* Estilo dos cartões de projetos */
+    .project-card {
+      background-color: var(--cappuccino-espuma);
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      text-align: center;
+      transition: transform 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .project-card:hover {
+      transform: translateY(-5px);
+    }
+
+    /* Estilos da imagem */
+    .project-card img {
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      transition: opacity 0.3s ease;
+    }
+
+    .project-card img:hover {
+      opacity: 0.9;
+    }
+
+    .project-card > a {
       text-decoration: none;
-      border-radius: 5px;
-      transition: background-color 0.3s ease;
+      color: var(--cafe);
+      font-weight: bold;
+      font-size: 1.2rem;
     }
 
-    /* Mudança de cor ao passar o mouse */
-    a:hover {
-      background-color: #6c88d4; /* Azul um pouco mais escuro */
+    .project-card a:hover {
+      color: var(--creme);
+    }
+
+    /* Footer simples */
+    footer {
+      background-color: var(--cafe-com-leite);
+      text-align: center;
+      padding: 15px;
+      color: var(--creme);
+    }
+
+    /* Responsividade - 1 ou 2 colunas em telas menores */
+    @media (max-width: 900px) {
+      .projects {
+        grid-template-columns: repeat(2, 1fr);
+        /* 2 colunas por linha em tablets */
+      }
+    }
+
+    @media (max-width: 600px) {
+      .projects {
+        grid-template-columns: 1fr;
+        /* 1 coluna por linha em telas pequenas */
+      }
+
+      header h1 {
+        font-size: 2rem;
+      }
+
+      .projects {
+        padding: 20px;
+      }
     }
   </style>
 </head>
 
 <body>
-  <div class="container">
-    <h1>Meu Portfolio</h1>
-    <a href="firstapp/">First App</a>
-    <br>
-    <a href="helloworld/">Hello World</a>
-  </div>
+  <header>
+    <h1>Loren Ypsum: Portfólio de Projetos</h1>
+  </header>
+
+  <section class="projects">
+    <!-- Cartões de projeto com imagens -->
+    <div class="project-card">
+      <a href="helloworld/">
+        <img src="images/helloworldgl.png" alt="Hello World Project Image">
+      </a>
+      <a href="helloworld/">Hello World</a>
+      <p>Exemplo "helloWorld" disponível na seção 1.5: <a href="https://hbatagelo.github.io/cg/abcg.html">hbatagelo</a></p>
+    </div>
+
+    <div class="project-card">
+      <a href="firstapp/">
+        <img src="images/firstappgl.png" alt="First App Image">
+      </a>
+      <a href="firstapp/">First App</a>
+      <p> Exemplo "firstApp" disponível na seção 2.3: <a href="https://hbatagelo.github.io/cg/abcg.html">hbatagelo</a></p>
+    </div>
+
+    <div class="project-card">
+      <a href="project3/">
+        <img src="https://via.placeholder.com/250x150.png?text=Project+3" alt="Project 3 Image">
+      </a>
+      <a href="project3/">Jogo da Velha</a>
+      <p>Exemplo "TicTacToe" disponível na seção 2.4: <a href="https://hbatagelo.github.io/cg/abcg.html">hbatagelo</a></p>
+    </div>
+
+    <div class="project-card">
+      <a href="project4/">
+        <img src="https://via.placeholder.com/250x150.png?text=Project+4" alt="Project 4 Image">
+      </a>
+      <a href="project4/">Project 4</a>
+      <p>Descrição do quarto projeto</p>
+    </div>
+
+    <div class="project-card">
+      <a href="project5/">
+        <img src="https://via.placeholder.com/250x150.png?text=Project+5" alt="Project 5 Image">
+      </a>
+      <a href="project5/">Project 5</a>
+      <p>Descrição do quinto projeto</p>
+    </div>
+
+    <div class="project-card">
+      <a href="project6/">
+        <img src="https://via.placeholder.com/250x150.png?text=Project+6" alt="Project 6 Image">
+      </a>
+      <a href="project6/">Project 6</a>
+      <p>Descrição do sexto projeto</p>
+    </div>
+
+    <!-- Mais projetos podem ser adicionados aqui -->
+  </section>
+
+  <footer>
+    <p>Loren Ypsum. Portfólio de Computação Gráfica. 2024</p>
+  </footer>
 </body>
 
 </html>
