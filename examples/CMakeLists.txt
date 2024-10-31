@@ -3,4 +3,6 @@
 #add_subdirectory(tictactoe)
 #add_subdirectory(sierpinski)
 #add_subdirectory(coloredtriangles)
-add_subdirectory(attentiontraining)
+#add_subdirectory(regularpolygons)
+#add_subdirectory(attentiontraining)
+add_subdirectory(asteroids)
