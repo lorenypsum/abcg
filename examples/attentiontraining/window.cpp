@@ -86,7 +86,7 @@ void Window::onEvent(SDL_Event const &event) {
         1.0f - event.button.y / static_cast<float>(m_viewportSize.y) * 2.0f};
 
     if (m_targetObject.checkClickOnTarget(clickPos)) {
-      m_score += 5; // Ganha 5 pontos ao clicar no alvo correto
+      m_score += 1; // Ganha 5 pontos ao clicar no alvo correto
     } else if (m_distractionObjects.checkClickOnDistraction(clickPos)) {
       --m_lives; // Perde uma vida ao clicar em um objeto de distração
       updateLivesDisplay();
@@ -135,7 +135,7 @@ void Window::checkGameStatus() {
   } else if (m_lives <= 0) {
     m_gameOver = true;
     m_gameData.m_state = GameState::GameOver;
-  } else if (m_score >= 50) {
+  } else if (m_score >= 10) {
     m_gameOver = true;
     m_gameData.m_state = GameState::Win;
   } else {
@@ -156,6 +156,7 @@ void Window::resetGame() {
   m_score = 0;
   m_lives = 10;
   m_gameOver = false;
+  m_gameData.m_state = GameState::Playing;
   m_lastReload = std::chrono::steady_clock::now();
   initializeGameObjects();
 }
