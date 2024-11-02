@@ -64,8 +64,10 @@ void Window::onPaintUI() {
       ImGui::Text("Score: %d Lives: %d", m_score, m_lives);
     } else if (m_gameData.m_state == GameState::GameOver) {
       ImGui::Text("Game Over!");
+      resetGame();
     } else if (m_gameData.m_state == GameState::Win) {
       ImGui::Text("*You Win!*");
+      resetGame();
     } else if (m_gameData.m_state == GameState::Start) {
       ImGui::Text("Pegue Bananas!");
     } else {
@@ -156,7 +158,9 @@ void Window::resetGame() {
   m_score = 0;
   m_lives = 10;
   m_gameOver = false;
-  m_gameData.m_state = GameState::Playing;
+  m_gameData.m_state = GameState::Start; // Começar do início
+
+  // Recria os objetos e reinicia o tempo de recarga
   m_lastReload = std::chrono::steady_clock::now();
   initializeGameObjects();
 }
