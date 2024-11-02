@@ -83,7 +83,7 @@ void TargetObjects::create(GLuint program, int quantity) {
 
     // Inicializa as propriedades do objeto (posição e escala)
     obj.m_translation =
-        glm::vec2(m_randomDist(m_randomEngine), m_randomDist(m_randomEngine));
+        glm::vec2(m_randomDist(m_randomEngine) + 0.2f, m_randomDist(m_randomEngine));
     obj.m_scale = 1.0f;
 
     m_targets.push_back(obj);

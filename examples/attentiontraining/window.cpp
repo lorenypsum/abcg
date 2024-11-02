@@ -18,6 +18,13 @@ void Window::onCreate() {
        .stage = abcg::ShaderStage::Fragment},
   });
 
+  // Load a new font
+  auto const filename{assetsPath + "Inconsolata-Medium.ttf"};
+  m_font = ImGui::GetIO().Fonts->AddFontFromFileTTF(filename.c_str(), 60.0f);
+  if (m_font == nullptr) {
+    throw abcg::RuntimeError("Cannot load font file");
+  }
+
   // Inicializa texturas
   m_targetTexture =
       m_targetObject.loadTexture(assetsPath + "/textures/banana.png");
@@ -41,21 +48,33 @@ void Window::onPaint() {
 
 // Renderiza a interface do usuário, exibindo score e vidas
 void Window::onPaintUI() {
-  ImGui::Begin("Game UI");
-  ImGui::Text("Score: %d", m_score);
-  ImGui::Text("Lives: %d", m_lives);
+  abcg::OpenGLWindow::onPaintUI();
+  {
+    auto const size{ImVec2(800, 600)};
+    auto const position{ImVec2(200.0f, 1.0f)};
+    ImGui::SetNextWindowPos(position);
+    ImGui::SetNextWindowSize(size);
+    ImGuiWindowFlags const flags{ImGuiWindowFlags_NoBackground |
+                                 ImGuiWindowFlags_NoTitleBar |
+                                 ImGuiWindowFlags_NoInputs};
+    ImGui::Begin(" ", nullptr, flags);
+    ImGui::PushFont(m_font);
 
-  if (m_gameOver) {
-    if (m_lives <= 0) {
-      ImGui::Text("Game Over! You lost.");
+    if (m_gameData.m_state == GameState::Playing) {
+      ImGui::Text("Score: %d Lives: %d", m_score, m_lives);
+    } else if (m_gameData.m_state == GameState::GameOver) {
+      ImGui::Text("Game Over!");
+    } else if (m_gameData.m_state == GameState::Win) {
+      ImGui::Text("*You Win!*");
+    } else if (m_gameData.m_state == GameState::Start) {
+      ImGui::Text("Pegue Bananas!");
     } else {
-      ImGui::Text("Congratulations! You won!");
+      ImGui::Text("...");
     }
-    if (ImGui::Button("Play Again"))
-      resetGame();
-  }
 
-  ImGui::End();
+    ImGui::PopFont();
+    ImGui::End();
+  }
 }
 
 // Trata eventos de clique do mouse para interagir com os objetos
@@ -82,8 +101,6 @@ void Window::onUpdate() {
                           currentTime - m_lastReload)
                           .count();
 
-
-  
   // Recarrega objetos a cada 3 segundos
   if (elapsedTime >= 2.0f && !m_gameOver) {
     --m_lives;
@@ -91,7 +108,6 @@ void Window::onUpdate() {
     updateLivesDisplay();
     m_lastReload = currentTime;
   }
-
   checkGameStatus();
 }
 
@@ -114,12 +130,16 @@ void Window::initializeGameObjects() {
 
 // Verifica o status do jogo e atualiza a flag de game over se necessário
 void Window::checkGameStatus() {
-  if (m_lives <= 0) {
+  if (m_score == 0 && m_lives == 10) {
+    m_gameData.m_state = GameState::Start;
+  } else if (m_lives <= 0) {
     m_gameOver = true;
     m_gameData.m_state = GameState::GameOver;
   } else if (m_score >= 50) {
     m_gameOver = true;
     m_gameData.m_state = GameState::Win;
+  } else {
+    m_gameData.m_state = GameState::Playing;
   }
 }
 

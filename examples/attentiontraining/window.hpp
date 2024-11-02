@@ -41,7 +41,8 @@ private:
   // Objetos de distração e alvo
   DistractionObjects m_distractionObjects;
   TargetObjects m_targetObject;
-
+  
+  ImFont *m_font{};
   std::default_random_engine m_randomEngine; // Gerador de números aleatórios
   std::chrono::steady_clock::time_point
       m_lastReload;             // Marca do último recarregamento de objetos
