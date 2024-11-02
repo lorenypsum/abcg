@@ -29,7 +29,8 @@ public:
   void destroy();
   void update(float deltaTime);
   bool checkClickOnDistraction(glm::vec2 clickPos);
-
+  void removeDistraction(std::list<DistractionObject>::iterator it);
+  
 private:
   GLuint m_program{};
   GLint m_translationLoc{};

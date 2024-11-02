@@ -4,7 +4,7 @@
 
 GLuint TargetObjects::loadTexture(std::string filepath) {
   GLuint textureID;
-  int width, height, channels;
+  //int width, height, channels;
 
   // Carregar a imagem usando stb_image
   SDL_Surface *surface = IMG_Load(filepath.c_str());

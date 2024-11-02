@@ -54,13 +54,12 @@ void DistractionObjects::create(GLuint program, int quantity) {
 
     // Define os vértices do objeto (um quadrado simples)
     GLfloat vertices[] = {
-    //   Posição     | Coord. Textura
-    -0.1f, -0.1f, 0.0f, 1.0f, // Inferior esquerdo (Y invertido)
-    0.1f,  -0.1f, 1.0f, 1.0f, // Inferior direito (Y invertido)
-    -0.1f, 0.1f,  0.0f, 0.0f, // Superior esquerdo (Y invertido)
-    0.1f,  0.1f,  1.0f, 0.0f   // Superior direito (Y invertido)
-};
-
+        //   Posição     | Coord. Textura
+        -0.1f, -0.1f, 0.0f, 1.0f, // Inferior esquerdo (Y invertido)
+        0.1f,  -0.1f, 1.0f, 1.0f, // Inferior direito (Y invertido)
+        -0.1f, 0.1f,  0.0f, 0.0f, // Superior esquerdo (Y invertido)
+        0.1f,  0.1f,  1.0f, 0.0f  // Superior direito (Y invertido)
+    };
 
     glGenBuffers(1, &obj.m_VBO);
     glBindBuffer(GL_ARRAY_BUFFER, obj.m_VBO);
@@ -119,24 +118,43 @@ void DistractionObjects::destroy() {
 }
 
 void DistractionObjects::update(float deltaTime) {
-  for (auto &obj : m_distractions) {
-    obj.m_translation += obj.m_velocity * deltaTime * 100.0f;
+  for (auto it = m_distractions.begin(); it != m_distractions.end();) {
+    it->m_translation += it->m_velocity * deltaTime * 100.0f;
 
-    // Mantém os objetos dentro dos limites da tela
-    if (obj.m_translation.x > 1.0f || obj.m_translation.x < -1.0f)
-      obj.m_velocity.x *= -1.0f;
-    if (obj.m_translation.y > 1.0f || obj.m_translation.y < -1.0f)
-      obj.m_velocity.y *= -1.0f;
+    if (it->m_translation.x > 1.0f || it->m_translation.x < -1.0f)
+      it->m_velocity.x *= -1.0f;
+    if (it->m_translation.y > 1.0f || it->m_translation.y < -1.0f)
+      it->m_velocity.y *= -1.0f;
+
+    ++it; // Incrementa o iterador
+  }
+
+  // Verifica se a lista está vazia e recria objetos
+  if (m_distractions.empty()) {
+    create(m_program,
+           3); // Aqui você pode definir o número de objetos que deseja criar
   }
 }
 
 bool DistractionObjects::checkClickOnDistraction(glm::vec2 clickPos) {
-  for (auto &distraction : m_distractions) {
-    if (distraction.checkClick(clickPos)) {
+  for (auto it = m_distractions.begin(); it != m_distractions.end(); ++it) {
+    if (it->checkClick(clickPos)) {
+      removeDistraction(it); // Remove o objeto clicado
+
+      // Verifica se a lista está vazia e recria objetos
+      if (m_distractions.empty()) {
+        create(m_program, 3); // Novamente, defina o número de objetos
+      }
       return true; // Retorna verdadeiro se o clique foi em uma distração
     }
   }
   return false; // Retorna falso se o clique não foi em nenhuma distração
+}
+
+void DistractionObjects::removeDistraction(
+    std::list<DistractionObject>::iterator it) {
+  glDeleteTextures(1, &it->m_texture); // Liberar a textura
+  m_distractions.erase(it);            // Remove o objeto da lista
 }
 
 bool DistractionObjects::DistractionObject::checkClick(
