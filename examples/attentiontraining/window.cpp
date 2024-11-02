@@ -82,8 +82,6 @@ void Window::onUpdate() {
                           currentTime - m_lastReload)
                           .count();
 
-
-  
   // Recarrega objetos a cada 3 segundos
   if (elapsedTime >= 2.0f && !m_gameOver) {
     --m_lives;
