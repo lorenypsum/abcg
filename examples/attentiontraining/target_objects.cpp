@@ -40,10 +40,46 @@ void TargetObjects::create(GLuint program, int quantity) {
   // Carregar a textura para o objeto de distração
   for (int i = 0; i < quantity; ++i) {
     TargetObject obj;
-    obj.m_texture =
-        loadTexture(assetsPath + "/textures/banana.png"); // Exemplo de caminho
+    obj.m_texture = loadTexture(
+        (assetsPath + "/textures/banana.png").c_str()); // Exemplo de caminho
 
-    // Inicializar VAO e VBO aqui (não mostrado)
+    // Inicializa o VAO e o VBO para o objeto
+    glGenVertexArrays(1, &obj.m_VAO);
+    glBindVertexArray(obj.m_VAO);
+
+    // Define os vértices do objeto (um quadrado simples)
+    GLfloat vertices[] = {
+        //   Posição     | Coord. Textura
+        -0.1f, -0.1f, 0.0f, 0.0f, // Inferior esquerdo
+        0.1f,  -0.1f, 1.0f, 0.0f, // Inferior direito
+        -0.1f, 0.1f,  0.0f, 1.0f, // Superior esquerdo
+        0.1f,  0.1f,  1.0f, 1.0f  // Superior direito
+    };
+
+    glGenBuffers(1, &obj.m_VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, obj.m_VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    // Configura os atributos de posição
+    GLint posAttrib = glGetAttribLocation(m_program, "inPosition");
+    glEnableVertexAttribArray(posAttrib);
+    glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float),
+                          nullptr);
+
+    // Configura os atributos de coordenada de textura
+    GLint texCoordAttrib = glGetAttribLocation(m_program, "inTexCoord");
+    glEnableVertexAttribArray(texCoordAttrib);
+    glVertexAttribPointer(texCoordAttrib, 2, GL_FLOAT, GL_FALSE,
+                          4 * sizeof(float),
+                          reinterpret_cast<void *>(2 * sizeof(float)));
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+
+    // Inicializa as propriedades do objeto (posição e escala)
+    obj.m_translation =
+        glm::vec2(m_randomDist(m_randomEngine), m_randomDist(m_randomEngine));
+    obj.m_scale = 0.1f;
 
     m_targets.push_back(obj);
   }
@@ -52,9 +88,18 @@ void TargetObjects::create(GLuint program, int quantity) {
 void TargetObjects::paint() {
   glUseProgram(m_program);
   for (auto &obj : m_targets) {
-    glBindTexture(GL_TEXTURE_2D, obj.m_texture); // Ativar a textura do objeto
-    // Renderizar o objeto (não mostrado, deve incluir código para desenhar
-    // usando VAO e VBO)
+    glBindTexture(GL_TEXTURE_2D, obj.m_texture); 
+// Configura as transformações de escala e translação
+        GLint translationLoc = glGetUniformLocation(m_program, "translation");
+        GLint scaleLoc = glGetUniformLocation(m_program, "scale");
+        glUniform2fv(translationLoc, 1, &obj.m_translation[0]);
+        glUniform1f(scaleLoc, obj.m_scale);
+
+        // Liga o VAO e desenha o objeto
+        glBindVertexArray(obj.m_VAO);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+        glBindVertexArray(0);
   }
   glUseProgram(0);
 }

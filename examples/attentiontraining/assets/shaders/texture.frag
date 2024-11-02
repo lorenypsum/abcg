@@ -1,11 +1,14 @@
-#version 300 es
+#version 450 core
 
-precision mediump float;
+in vec2 fragTexCoord;      // Coordenadas de textura passadas pelo vertex shader
+out vec4 outColor;         // Cor de saída para o fragment shader
 
-in vec4 fragColor;
+uniform sampler2D textureSampler; // Amostrador de textura
 
-out vec4 outColor;
+void main() {
+    // Amostra a cor da textura usando as coordenadas passadas do vertex shader
+    outColor = texture(textureSampler, fragTexCoord);
+}
 
-void main() { outColor = fragColor; }
 
 

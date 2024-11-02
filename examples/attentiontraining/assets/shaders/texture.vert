@@ -1,22 +1,26 @@
-#version 300 es
+#version 450 core
 
 layout(location = 0) in vec2 inPosition;
+layout(location = 1) in vec2 inTexCoord;
 
-uniform vec4 color;
-uniform float rotation;
-uniform float scale;
+out vec2 fragTexCoord;
+
 uniform vec2 translation;
-
-out vec4 fragColor;
+uniform float scale;
+uniform float rotation;
 
 void main() {
-  float sinAngle = sin(rotation);
-  float cosAngle = cos(rotation);
-  vec2 rotated = vec2(inPosition.x * cosAngle - inPosition.y * sinAngle,
-                      inPosition.x * sinAngle + inPosition.y * cosAngle);
-
-  vec2 newPosition = rotated * scale + translation;
-  gl_Position = vec4(newPosition, 0, 1);
-  fragColor = color;
+    // Aplicar rotação
+    mat2 rotationMatrix = mat2(cos(rotation), -sin(rotation),
+                               sin(rotation), cos(rotation));
+    
+    vec2 transformedPosition = (rotationMatrix * inPosition * scale) + translation;
+    
+    // Define a posição final do vértice
+    gl_Position = vec4(transformedPosition, 0.0, 1.0);
+    
+    fragTexCoord = inTexCoord;
 }
+
+
 

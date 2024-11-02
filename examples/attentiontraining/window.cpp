@@ -1,10 +1,10 @@
 #include "window.hpp"
-#include <imgui.h>
+#include "gamedata.hpp"
 #include <chrono>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
+#include <imgui.h>
 #include <random>
-#include "gamedata.hpp"
 
 // Inicializa o jogo e configura o programa de shaders
 void Window::onCreate() {
@@ -12,17 +12,22 @@ void Window::onCreate() {
   auto const assetsPath{abcg::Application::getAssetsPath()};
 
   m_program = abcg::createOpenGLProgram({
-      {.source = assetsPath + "/shaders/texture.vert", .stage = abcg::ShaderStage::Vertex},
-      {.source = assetsPath + "/shaders/texture.frag", .stage = abcg::ShaderStage::Fragment},
+      {.source = assetsPath + "/shaders/texture.vert",
+       .stage = abcg::ShaderStage::Vertex},
+      {.source = assetsPath + "/shaders/texture.frag",
+       .stage = abcg::ShaderStage::Fragment},
   });
 
   // Inicializa texturas
-  m_targetTexture = m_targetObject.loadTexture(assetsPath + "/textures/banana.png");
-  m_distractionTexture = m_distractionObjects.loadTexture(assetsPath + "/textures/basket_yellow.png");
+  m_targetTexture =
+      m_targetObject.loadTexture(assetsPath + "/textures/banana.png");
+  m_distractionTexture = m_distractionObjects.loadTexture(
+      assetsPath + "/textures/basket_yellow.png");
 
   // Configura estado inicial
   resetGame();
-  m_randomEngine.seed(std::chrono::steady_clock::now().time_since_epoch().count());
+  m_randomEngine.seed(
+      std::chrono::steady_clock::now().time_since_epoch().count());
 }
 
 // Desenha os objetos de distração e o alvo
@@ -37,7 +42,6 @@ void Window::onPaint() {
 // Renderiza a interface do usuário, exibindo score e vidas
 void Window::onPaintUI() {
   ImGui::Begin("Game UI");
-
   ImGui::Text("Score: %d", m_score);
   ImGui::Text("Lives: %d", m_lives);
 
@@ -47,7 +51,8 @@ void Window::onPaintUI() {
     } else {
       ImGui::Text("Congratulations! You won!");
     }
-    if (ImGui::Button("Play Again")) resetGame();
+    if (ImGui::Button("Play Again"))
+      resetGame();
   }
 
   ImGui::End();
@@ -55,14 +60,16 @@ void Window::onPaintUI() {
 
 // Trata eventos de clique do mouse para interagir com os objetos
 void Window::onEvent(SDL_Event const &event) {
-  if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT) {
-    glm::vec2 clickPos{event.button.x / static_cast<float>(m_viewportSize.x) * 2.0f - 1.0f,
-                       1.0f - event.button.y / static_cast<float>(m_viewportSize.y) * 2.0f};
+  if (event.type == SDL_MOUSEBUTTONDOWN &&
+      event.button.button == SDL_BUTTON_LEFT) {
+    glm::vec2 clickPos{
+        event.button.x / static_cast<float>(m_viewportSize.x) * 2.0f - 1.0f,
+        1.0f - event.button.y / static_cast<float>(m_viewportSize.y) * 2.0f};
 
     if (m_targetObject.checkClickOnTarget(clickPos)) {
-      m_score += 5;  // Ganha 5 pontos ao clicar no alvo correto
+      m_score += 5; // Ganha 5 pontos ao clicar no alvo correto
     } else if (m_distractionObjects.checkClickOnDistraction(clickPos)) {
-      --m_lives;     // Perde uma vida ao clicar em um objeto de distração
+      --m_lives; // Perde uma vida ao clicar em um objeto de distração
       updateLivesDisplay();
     }
   }
@@ -71,18 +78,18 @@ void Window::onEvent(SDL_Event const &event) {
 // Atualiza o jogo a cada frame, verifica e atualiza o status do jogo
 void Window::onUpdate() {
   auto currentTime = std::chrono::steady_clock::now();
-  float elapsedTime = std::chrono::duration_cast<std::chrono::seconds>(currentTime - m_lastReload).count();
+  float elapsedTime = std::chrono::duration_cast<std::chrono::seconds>(
+                          currentTime - m_lastReload)
+                          .count();
 
+
+  
   // Recarrega objetos a cada 3 segundos
-  if (elapsedTime >= 3.0f) {
+  if (elapsedTime >= 2.0f && !m_gameOver) {
+    --m_lives;
+    m_distractionObjects.update(elapsedTime);
+    updateLivesDisplay();
     m_lastReload = currentTime;
-    initializeGameObjects();
-
-    // Reduz uma vida se o alvo não foi clicado a tempo
-    if (m_score == 0) {
-      --m_lives;
-      updateLivesDisplay();
-    }
   }
 
   checkGameStatus();
@@ -127,7 +134,7 @@ void Window::updateLivesDisplay() {
 // Reinicia o jogo para o estado inicial
 void Window::resetGame() {
   m_score = 0;
-  m_lives = 3;
+  m_lives = 10;
   m_gameOver = false;
   m_lastReload = std::chrono::steady_clock::now();
   initializeGameObjects();

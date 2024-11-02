@@ -34,9 +34,8 @@ private:
   GLuint m_objectsProgram; // Programa de shader para renderizar objetos
   GameData m_gameData;     // Dados do jogo (estado, vidas, etc.)           //
                            // Objeto cena que contém os elementos do jogo
-
   int m_score{0};         // Pontuação do jogador
-  int m_lives{3};         // Vidas do jogador
+  int m_lives{10};         // Vidas do jogador
   bool m_gameOver{false}; // Flag que indica se o jogo acabou
 
   // Objetos de distração e alvo
