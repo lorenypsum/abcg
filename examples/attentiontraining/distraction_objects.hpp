@@ -30,6 +30,7 @@ public:
   void update(float deltaTime);
   bool checkClickOnDistraction(glm::vec2 clickPos);
   void removeDistraction(std::list<DistractionObject>::iterator it);
+  bool isEmpty() const;
   
 private:
   GLuint m_program{};

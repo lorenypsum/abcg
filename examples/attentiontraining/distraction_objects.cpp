@@ -38,15 +38,16 @@ void DistractionObjects::create(GLuint program, int quantity) {
   destroy();
   m_program = program;
   auto const assetsPath{abcg::Application::getAssetsPath()};
+  
   // Carregar a textura para o objeto de distração
   for (int i = 0; i < quantity; ++i) {
     DistractionObject obj;
     obj.m_texture =
-        loadTexture((assetsPath + "/textures/basket_yellow.png").c_str());
+        loadTexture((assetsPath + "/textures/potatochip_yellow.png").c_str());
 
     // Adicione uma velocidade aleatória para movimento
-    obj.m_velocity = glm::vec2(m_randomDist(m_randomEngine) * 0.001f,
-                               m_randomDist(m_randomEngine) * 0.001f);
+    obj.m_velocity = glm::vec2(m_randomDist(m_randomEngine) * 0.005f,
+                               m_randomDist(m_randomEngine) * 0.005f);
 
     // Inicializa o VAO e o VBO para o objeto
     glGenVertexArrays(1, &obj.m_VAO);
