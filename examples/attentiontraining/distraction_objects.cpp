@@ -4,7 +4,6 @@
 
 GLuint DistractionObjects::loadTexture(std::string filepath) {
   GLuint textureID;
-  // int width, height, channels;
 
   // Carregar a imagem usando stb_image
   SDL_Surface *surface = IMG_Load(filepath.c_str());
@@ -43,11 +42,11 @@ void DistractionObjects::create(GLuint program, int quantity) {
   for (int i = 0; i < quantity; ++i) {
     DistractionObject obj;
     obj.m_texture =
-        loadTexture((assetsPath + "/textures/potatochip_yellow.png").c_str());
+        loadTexture((assetsPath + "/textures/potatochip_yellow.png").c_str()); // Carrega a textura
 
     // Adicione uma velocidade aleatória para movimento
-    obj.m_velocity = glm::vec2(m_randomDist(m_randomEngine) * 0.005f,
-                               m_randomDist(m_randomEngine) * 0.005f);
+    obj.m_velocity = glm::vec2(m_randomDist(m_randomEngine) * 0.001f,
+                               m_randomDist(m_randomEngine) * 0.001f);
 
     // Inicializa o VAO e o VBO para o objeto
     glGenVertexArrays(1, &obj.m_VAO);

@@ -4,7 +4,6 @@
 
 GLuint TargetObjects::loadTexture(std::string filepath) {
   GLuint textureID;
-  //int width, height, channels;
 
   // Carregar a imagem usando stb_image
   SDL_Surface *surface = IMG_Load(filepath.c_str());
@@ -13,35 +12,41 @@ GLuint TargetObjects::loadTexture(std::string filepath) {
               << " Error: " << IMG_GetError() << std::endl;
     return -1;
   }
-  unsigned char *data = static_cast<unsigned char *>(surface->pixels);
-  if (data) {
-    glGenTextures(1, &textureID);
-    glBindTexture(GL_TEXTURE_2D, textureID);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, surface->w, surface->h, 0, GL_RGB,
-                 GL_UNSIGNED_BYTE, data);
-    glGenerateMipmap(GL_TEXTURE_2D);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                    GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    SDL_free(surface);
-  } else {
-    // Lidar com erro de carregamento
-    std::cerr << "Failed to load texture: " << filepath << std::endl;
-  }
+
+  // Define o formato da textura com base no canal alfa
+  GLenum format = surface->format->BytesPerPixel == 4 ? GL_RGBA : GL_RGB;
+
+  // Gera e configura a textura
+  glGenTextures(1, &textureID);
+  glBindTexture(GL_TEXTURE_2D, textureID);
+  glTexImage2D(GL_TEXTURE_2D, 0, format, surface->w, surface->h, 0, format,
+               GL_UNSIGNED_BYTE, surface->pixels);
+  glGenerateMipmap(GL_TEXTURE_2D);
+
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                  GL_LINEAR_MIPMAP_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+  SDL_FreeSurface(surface); // Libera a superfície após carregamento
   return textureID;
 }
 
 void TargetObjects::create(GLuint program, int quantity) {
+  destroy();
   m_program = program;
-
   auto const assetsPath{abcg::Application::getAssetsPath()};
+
   // Carregar a textura para o objeto de distração
   for (int i = 0; i < quantity; ++i) {
     TargetObject obj;
     obj.m_texture = loadTexture(
-        (assetsPath + "/textures/banana.png").c_str()); // Exemplo de caminho
+        (assetsPath + "/textures/banana.png").c_str()); // Carrega a textura
+
+    // Adicione uma velocidade aleatória para movimento
+    obj.m_velocity = glm::vec2(m_randomDist(m_randomEngine) * 0.005f,
+                               m_randomDist(m_randomEngine) * 0.005f);
 
     // Inicializa o VAO e o VBO para o objeto
     glGenVertexArrays(1, &obj.m_VAO);
@@ -50,10 +55,10 @@ void TargetObjects::create(GLuint program, int quantity) {
     // Define os vértices do objeto (um quadrado simples)
     GLfloat vertices[] = {
         //   Posição     | Coord. Textura
-        -0.1f, -0.1f, 0.0f, 0.0f, // Inferior esquerdo
-        0.1f,  -0.1f, 1.0f, 0.0f, // Inferior direito
-        -0.1f, 0.1f,  0.0f, 1.0f, // Superior esquerdo
-        0.1f,  0.1f,  1.0f, 1.0f  // Superior direito
+        -0.1f, -0.1f, 0.0f, 1.0f, // Inferior esquerdo (Y invertido)
+        0.1f,  -0.1f, 1.0f, 1.0f, // Inferior direito (Y invertido)
+        -0.1f, 0.1f,  0.0f, 0.0f, // Superior esquerdo (Y invertido)
+        0.1f,  0.1f,  1.0f, 0.0f  // Superior direito (Y invertido)
     };
 
     glGenBuffers(1, &obj.m_VBO);
@@ -79,7 +84,7 @@ void TargetObjects::create(GLuint program, int quantity) {
     // Inicializa as propriedades do objeto (posição e escala)
     obj.m_translation =
         glm::vec2(m_randomDist(m_randomEngine), m_randomDist(m_randomEngine));
-    obj.m_scale = 0.1f;
+    obj.m_scale = 1.0f;
 
     m_targets.push_back(obj);
   }
@@ -88,18 +93,20 @@ void TargetObjects::create(GLuint program, int quantity) {
 void TargetObjects::paint() {
   glUseProgram(m_program);
   for (auto &obj : m_targets) {
-    glBindTexture(GL_TEXTURE_2D, obj.m_texture); 
-// Configura as transformações de escala e translação
-        GLint translationLoc = glGetUniformLocation(m_program, "translation");
-        GLint scaleLoc = glGetUniformLocation(m_program, "scale");
-        glUniform2fv(translationLoc, 1, &obj.m_translation[0]);
-        glUniform1f(scaleLoc, obj.m_scale);
+    glBindTexture(GL_TEXTURE_2D, obj.m_texture);
 
-        // Liga o VAO e desenha o objeto
-        glBindVertexArray(obj.m_VAO);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    // Enviar translação, rotação e escala para o shader
+    GLint translationLoc = glGetUniformLocation(m_program, "translation");
+    GLint scaleLoc = glGetUniformLocation(m_program, "scale");
+    GLint rotationLoc = glGetUniformLocation(m_program, "rotation");
+    glUniform2fv(translationLoc, 1, &obj.m_translation[2]);
+    glUniform1f(scaleLoc, obj.m_scale);
+    glUniform1f(rotationLoc, obj.m_rotation);
 
-        glBindVertexArray(0);
+    // Renderizar o objeto
+    glBindVertexArray(obj.m_VAO);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glBindVertexArray(0);
   }
   glUseProgram(0);
 }
@@ -110,20 +117,53 @@ void TargetObjects::destroy() {
   }
 }
 
+void TargetObjects::update(float deltaTime) {
+  for (auto it = m_targets.begin(); it != m_targets.end();) {
+    it->m_translation += it->m_velocity * deltaTime * 100.0f;
+
+    if (it->m_translation.x > 1.0f || it->m_translation.x < -1.0f)
+      it->m_velocity.x *= -1.0f;
+    if (it->m_translation.y > 1.0f || it->m_translation.y < -1.0f)
+      it->m_velocity.y *= -1.0f;
+
+    ++it; // Incrementa o iterador
+  }
+  // Verifica se a lista está vazia e recria objetos
+  if (m_targets.empty()) {
+    create(m_program,
+           1); // Aqui você pode definir o número de objetos que deseja criar
+  }
+}
+
 bool TargetObjects::checkClickOnTarget(glm::vec2 clickPos) {
-  for (auto &target : m_targets) {
-    if (target.checkClick(clickPos)) {
+  for (auto it = m_targets.begin(); it != m_targets.end(); ++it) {
+    if (it->checkClick(clickPos)) {
+      removeTarget(it); // Remove o objeto clicado
+      // Verifica se a lista está vazia e recria objetos
+      if (m_targets.empty()) {
+        create(m_program, 1); // Novamente, defina o número de objetos
+      }
       return true; // Retorna verdadeiro se o clique foi em uma distração
     }
   }
   return false; // Retorna falso se o clique não foi em nenhuma distração
 }
 
-bool TargetObjects::TargetObject::checkClick(glm::vec2 const &clickPos) const {
-  // Calculate the distance from the click position to the target's center
-  glm::vec2 diff = clickPos - m_translation;
-  float distance = glm::length(diff);
+void TargetObjects::removeTarget(std::list<TargetObject>::iterator it) {
+  glDeleteTextures(1, &it->m_texture); // Liberar a textura
+  m_targets.erase(it);                 // Remove o objeto da lista
+}
 
-  // Check if the click is within the target's radius
-  return distance <= m_scale;
+bool TargetObjects::TargetObject::checkClick(glm::vec2 const &clickPos) const {
+  // Calcular os limites do objeto
+  float halfSize = m_scale * 0.5f;
+  glm::vec2 minBounds = m_translation - glm::vec2(halfSize);
+  glm::vec2 maxBounds = m_translation + glm::vec2(halfSize);
+
+  // Verificar se a posição do clique está dentro dos limites do objeto
+  if (clickPos.x >= minBounds.x && clickPos.x <= maxBounds.x &&
+      clickPos.y >= minBounds.y && clickPos.y <= maxBounds.y) {
+    return true;
+  }
+  return false;
 }
