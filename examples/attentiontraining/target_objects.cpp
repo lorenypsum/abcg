@@ -82,8 +82,13 @@ void TargetObjects::create(GLuint program, int quantity) {
     glBindVertexArray(0);
 
     // Inicializa as propriedades do objeto (posição e escala)
+    float areaX = 0.4f; // Largura da área de aparição em X
+    float areaY = 0.4f; // Altura da área de aparição em Y
+
+    // Inicializa as propriedades do objeto (posição e escala)
     obj.m_translation =
-        glm::vec2(m_randomDist(m_randomEngine) + 0.2f, m_randomDist(m_randomEngine));
+        glm::vec2(m_randomDist(m_randomEngine) * areaX - areaX / 2.0f,
+                  m_randomDist(m_randomEngine) * areaY - areaY / 2.0f);
     obj.m_scale = 1.0f;
 
     m_targets.push_back(obj);
