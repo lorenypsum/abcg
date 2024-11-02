@@ -63,10 +63,14 @@ void Window::onCreate() {
 
   // Create program to render the other objects
   m_objectsProgram =
-      abcg::createOpenGLProgram({{.source = assetsPath + "objects.vert",
+      abcg::createOpenGLProgram({{.source = assetsPath + "shaders/" + "objects.vert",
                                   .stage = abcg::ShaderStage::Vertex},
                                  {.source = assetsPath + "objects.frag",
                                   .stage = abcg::ShaderStage::Fragment}});
+
+  abcg::glClearColor(0, 0, 0, 1);
+
+  
 
   abcg::glClearColor(0, 0, 0, 1);
 
