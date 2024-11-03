@@ -161,7 +161,7 @@ void TargetObjects::removeTarget(std::list<TargetObject>::iterator it) {
 
 bool TargetObjects::TargetObject::checkClick(glm::vec2 const &clickPos) const {
   // Calcular os limites do objeto
-  float halfSize = m_scale * 0.5f;
+  float halfSize = m_scale * 0.1f;
   glm::vec2 minBounds = m_translation - glm::vec2(halfSize);
   glm::vec2 maxBounds = m_translation + glm::vec2(halfSize);
 
