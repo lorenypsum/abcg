@@ -40,57 +40,8 @@ void Background::paint() const {
 void Background::drawSky() const {
   std::vector<glm::vec2> skyVertices = {
       {-1.0f, 1.0f}, {1.0f, 1.0f}, {1.0f, 0.0f}, {-1.0f, 0.0f}};
-  std::vector<glm::vec3> skyColors = {{0.5f, 0.8f, 1.0f},
-                                      {0.5f, 0.8f, 1.0f},
-                                      {0.5f, 0.8f, 1.0f},
-                                      {0.5f, 0.8f, 1.0f}};
-
-  GLuint VBO, VAO;
-  glGenVertexArrays(1, &VAO);
-  glGenBuffers(1, &VBO);
-
-  glBindVertexArray(VAO);
-  glBindBuffer(GL_ARRAY_BUFFER, VBO);
-  glBufferData(GL_ARRAY_BUFFER, skyVertices.size() * sizeof(glm::vec2),
-               skyVertices.data(), GL_STATIC_DRAW);
-
-  // Enviar dados da cor ao shader
-  GLuint colorBuffer;
-  glGenBuffers(1, &colorBuffer);
-  glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
-  glBufferData(GL_ARRAY_BUFFER, skyColors.size() * sizeof(glm::vec3),
-               skyColors.data(), GL_STATIC_DRAW);
-
-  GLint posAttrib = glGetAttribLocation(m_program, "aPos");
-  glEnableVertexAttribArray(posAttrib);
-  glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
-
-  GLint colorAttrib = glGetAttribLocation(m_program, "aColor");
-  glEnableVertexAttribArray(colorAttrib);
-  glVertexAttribPointer(colorAttrib, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-
-  glDrawArrays(GL_QUADS, 0, 4);
-
-  glDisableVertexAttribArray(posAttrib);
-  glDisableVertexAttribArray(colorAttrib);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-  glBindVertexArray(0);
-
-  // Limpeza
-  glDeleteBuffers(1, &VBO);
-  glDeleteBuffers(1, &colorBuffer);
-  glDeleteVertexArrays(1, &VAO);
-}
-
-void Background::drawGround() const {
-  // Define os vértices do chão
-  std::vector<glm::vec2> groundVertices = {
-      {-1.0f, 0.0f}, {1.0f, 0.0f}, {1.0f, -1.0f}, {-1.0f, -1.0f}};
-  // Define as cores dos vértices do chão (verde)
-  std::vector<glm::vec3> groundColors = {{0.3f, 0.6f, 0.3f},
-                                         {0.3f, 0.6f, 0.3f},
-                                         {0.3f, 0.6f, 0.3f},
-                                         {0.3f, 0.6f, 0.3f}};
+  std::vector<glm::vec3> skyColors = {
+      {0.5f, 0.8f, 1.0f}, {0.5f, 0.8f, 1.0f}, {0.5f, 0.8f, 1.0f}, {0.5f, 0.8f, 1.0f}};
 
   GLuint VBO, VAO, colorBuffer;
   glGenVertexArrays(1, &VAO);
@@ -101,16 +52,55 @@ void Background::drawGround() const {
 
   // Carrega os vértices no VBO
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
-  glBufferData(GL_ARRAY_BUFFER, groundVertices.size() * sizeof(glm::vec2),
-               groundVertices.data(), GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, skyVertices.size() * sizeof(glm::vec2), skyVertices.data(), GL_STATIC_DRAW);
   GLint posAttrib = glGetAttribLocation(m_program, "aPos");
   glEnableVertexAttribArray(posAttrib);
   glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
 
   // Carrega as cores no colorBuffer
   glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
-  glBufferData(GL_ARRAY_BUFFER, groundColors.size() * sizeof(glm::vec3),
-               groundColors.data(), GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, skyColors.size() * sizeof(glm::vec3), skyColors.data(), GL_STATIC_DRAW);
+  GLint colorAttrib = glGetAttribLocation(m_program, "aColor");
+  glEnableVertexAttribArray(colorAttrib);
+  glVertexAttribPointer(colorAttrib, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+
+  // Desenha o céu
+  glDrawArrays(GL_QUADS, 0, 4);
+
+  // Limpeza
+  glDisableVertexAttribArray(posAttrib);
+  glDisableVertexAttribArray(colorAttrib);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glBindVertexArray(0);
+  glDeleteBuffers(1, &VBO);
+  glDeleteBuffers(1, &colorBuffer);
+  glDeleteVertexArrays(1, &VAO);
+}
+
+
+void Background::drawGround() const {
+  std::vector<glm::vec2> groundVertices = {
+      {-1.0f, 0.0f}, {1.0f, 0.0f}, {1.0f, -1.0f}, {-1.0f, -1.0f}};
+  std::vector<glm::vec3> groundColors = {
+      {0.3f, 0.6f, 0.3f}, {0.3f, 0.6f, 0.3f}, {0.3f, 0.6f, 0.3f}, {0.3f, 0.6f, 0.3f}};
+
+  GLuint VBO, VAO, colorBuffer;
+  glGenVertexArrays(1, &VAO);
+  glGenBuffers(1, &VBO);
+  glGenBuffers(1, &colorBuffer);
+
+  glBindVertexArray(VAO);
+
+  // Carrega os vértices no VBO
+  glBindBuffer(GL_ARRAY_BUFFER, VBO);
+  glBufferData(GL_ARRAY_BUFFER, groundVertices.size() * sizeof(glm::vec2), groundVertices.data(), GL_STATIC_DRAW);
+  GLint posAttrib = glGetAttribLocation(m_program, "aPos");
+  glEnableVertexAttribArray(posAttrib);
+  glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+
+  // Carrega as cores no colorBuffer
+  glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
+  glBufferData(GL_ARRAY_BUFFER, groundColors.size() * sizeof(glm::vec3), groundColors.data(), GL_STATIC_DRAW);
   GLint colorAttrib = glGetAttribLocation(m_program, "aColor");
   glEnableVertexAttribArray(colorAttrib);
   glVertexAttribPointer(colorAttrib, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
@@ -127,6 +117,7 @@ void Background::drawGround() const {
   glDeleteBuffers(1, &colorBuffer);
   glDeleteVertexArrays(1, &VAO);
 }
+
 
 void Background::drawMountain(float x, float y, float size) const {
   // Define os vértices da montanha (um triângulo)
