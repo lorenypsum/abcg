@@ -64,8 +64,10 @@ void Window::onPaintUI() {
       ImGui::Text("Score: %d Time: %d", m_score, m_gametime);
     } else if (m_gameData.m_state == GameState::GameOver) {
       ImGui::Text("Your Score: %d", m_score);
+      --m_restartDelay;
     } else if (m_gameData.m_state == GameState::Win) {
       ImGui::Text("Congratulations! New Record: %d", m_score);
+      --m_restartDelay;
     } else if (m_gameData.m_state == GameState::Start) {
       ImGui::Text("Pegue Bananas!");
     } else {
@@ -104,10 +106,14 @@ void Window::onUpdate() {
   // Recarrega objetos a cada 3 segundos
   if (elapsedTime >= 1.0f && m_gameData.m_state == GameState::Playing) {
     --m_gametime;
-    checkGameStatus();
     m_distractionObjects.update(elapsedTime);
-    updateTimeDisplay();
     m_lastReload = currentTime;
+    checkGameStatus();
+    updateTimeDisplay();
+  } else if (m_gameOver && m_gameData.m_state != GameState::Playing) {
+    if (m_restartDelay < 0) {
+      //resetGame();
+    }
   }
   checkGameStatus();
 }
@@ -129,20 +135,31 @@ void Window::initializeGameObjects() {
   m_distractionObjects.create(m_program, 3);
 }
 
-// Verifica o status do jogo e atualiza a flag de game over se necessário
+// Verifica o status do jogo e atualiza o estado conforme necessário
 void Window::checkGameStatus() {
-  if (m_score > 0) {
-    m_gameData.m_state = GameState::Playing;
-  } else if (m_gametime <= 0 && m_lastScore <= m_score) {
-    m_gameOver = true;  
-    m_gameData.m_state = GameState::Win;
-  } else if (m_gametime <= 0) {
-    m_lastScore = m_score;
-    m_gameOver = true;
-    m_gameData.m_state = GameState::GameOver;
-  }
-  else {
+  // Estado inicial, somente se o tempo está no valor inicial e pontuação for
+  // zero
+  if (m_gametime == 30 && m_score == 0 &&
+      m_gameData.m_state != GameState::Playing) {
+    m_gameOver = false;
     m_gameData.m_state = GameState::Start;
+  }
+  // Verifica se o tempo terminou e define o estado de Game Over ou Vitória
+  else if (m_gametime <= 0) {
+    if (m_score > m_lastScore) {
+      m_lastScore = m_score;
+      m_gameData.m_state = GameState::Win; // Estado de vitória
+      m_gameOver = true;
+    } else {
+      m_gameData.m_state = GameState::GameOver; // Estado de game over
+      m_gameOver = true;
+    }
+  }
+  // Define o estado como "Playing" se o jogo ainda está em andamento
+  else if (m_gametime > 0 && m_gameData.m_state != GameState::Win &&
+           m_gameData.m_state != GameState::GameOver && m_score > 0) {
+    m_gameOver = false;
+    m_gameData.m_state = GameState::Playing;
   }
 }
 
@@ -159,6 +176,7 @@ void Window::resetGame() {
   m_score = 0;
   m_gametime = 30;
   m_gameOver = false;
+  m_restartDelay = 40;
   m_gameData.m_state = GameState::Start; // Começar do início
 
   // Recria os objetos e reinicia o tempo de recarga
