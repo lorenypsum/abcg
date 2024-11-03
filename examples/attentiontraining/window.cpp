@@ -18,6 +18,9 @@ void Window::onCreate() {
        .stage = abcg::ShaderStage::Fragment},
   });
 
+  // Inicializa o cenário
+  m_background.create();
+
   // Load a new font
   auto const filename{assetsPath + "Inconsolata-Medium.ttf"};
   m_font = ImGui::GetIO().Fonts->AddFontFromFileTTF(filename.c_str(), 60.0f);
@@ -40,6 +43,9 @@ void Window::onCreate() {
 // Desenha os objetos de distração e o alvo
 void Window::onPaint() {
   abcg::glClear(GL_COLOR_BUFFER_BIT);
+
+  // Desenha o cenário
+  m_background.paint();
 
   // Renderiza objetos
   m_targetObject.paint();
@@ -126,6 +132,7 @@ void Window::onDestroy() {
   abcg::glDeleteProgram(m_program);
   m_targetObject.destroy();
   m_distractionObjects.destroy();
+  m_background.destroy();
 }
 
 // Inicializa os objetos do jogo em posições aleatórias
