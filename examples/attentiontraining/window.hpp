@@ -20,10 +20,10 @@ protected:
   void onUpdate() override;
 
 public:
-   // Funções de inicialização e controle
+  // Funções de inicialização e controle
   void initializeGameObjects();
   void checkGameStatus();
-  void updateLivesDisplay();
+  void updateTimeDisplay();
   void resetGame();
 
 private:
@@ -34,19 +34,20 @@ private:
   GLuint m_objectsProgram; // Programa de shader para renderizar objetos
   GameData m_gameData;     // Dados do jogo (estado, vidas, etc.)           //
                            // Objeto cena que contém os elementos do jogo
-  int m_score{0};         // Pontuação do jogador
-  int m_lives{10};         // Vidas do jogador
-  bool m_gameOver{false}; // Flag que indica se o jogo acabou
+  int m_score{0};          // Pontuação do jogador
+  int m_lastScore{0};      // Pontuação anterior
+  int m_gametime{30};      // Tempo de jogo
+  bool m_gameOver{false};  // Flag que indica se o jogo acabou
 
   // Objetos de distração e alvo
   DistractionObjects m_distractionObjects;
   TargetObjects m_targetObject;
-  
+
   ImFont *m_font{};
   std::default_random_engine m_randomEngine; // Gerador de números aleatórios
   std::chrono::steady_clock::time_point
-      m_lastReload;             // Marca do último recarregamento de objetos
-  glm::ivec2 m_viewportSize;    // Tamanho da janelaC
+      m_lastReload;          // Marca do último recarregamento de objetos
+  glm::ivec2 m_viewportSize; // Tamanho da janelaC
 };
 
 #endif
