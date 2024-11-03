@@ -102,8 +102,9 @@ void Window::onUpdate() {
                           .count();
 
   // Recarrega objetos a cada 3 segundos
-  if (elapsedTime >= 1.0f && !m_gameOver) {
+  if (elapsedTime >= 1.0f && m_gameData.m_state == GameState::Playing) {
     --m_gametime;
+    checkGameStatus();
     m_distractionObjects.update(elapsedTime);
     updateTimeDisplay();
     m_lastReload = currentTime;
@@ -130,17 +131,18 @@ void Window::initializeGameObjects() {
 
 // Verifica o status do jogo e atualiza a flag de game over se necessário
 void Window::checkGameStatus() {
-  if (m_gametime == 30) {
-    m_gameData.m_state = GameState::Start;
-  } else if (m_gametime <= 0 && m_lastScore >= m_score) {
+  if (m_score > 0) {
+    m_gameData.m_state = GameState::Playing;
+  } else if (m_gametime <= 0 && m_lastScore <= m_score) {
     m_gameOver = true;  
-    m_gameData.m_state = GameState::GameOver;
-  } else if (m_gametime <=0 && m_lastScore < m_score) {
-    m_lastScore = m_score;
     m_gameData.m_state = GameState::Win;
+  } else if (m_gametime <= 0) {
+    m_lastScore = m_score;
+    m_gameOver = true;
+    m_gameData.m_state = GameState::GameOver;
   }
   else {
-    m_gameData.m_state = GameState::Playing;
+    m_gameData.m_state = GameState::Start;
   }
 }
 
