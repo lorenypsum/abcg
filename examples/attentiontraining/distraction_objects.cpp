@@ -160,7 +160,7 @@ void DistractionObjects::removeDistraction(
 bool DistractionObjects::DistractionObject::checkClick(
     glm::vec2 const &clickPos) const {
   // Calcular os limites do objeto
-  float halfSize = m_scale * 0.5f;
+  float halfSize = m_scale * 0.1f;
   glm::vec2 minBounds = m_translation - glm::vec2(halfSize);
   glm::vec2 maxBounds = m_translation + glm::vec2(halfSize);
 
