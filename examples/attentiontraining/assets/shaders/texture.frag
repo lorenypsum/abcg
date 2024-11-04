@@ -1,4 +1,6 @@
-#version 450 core
+#version 300 es
+
+precision mediump float;
 
 in vec2 fragTexCoord;      // Coordenadas de textura passadas pelo vertex shader
 out vec4 outColor;         // Cor de saída para o fragment shader

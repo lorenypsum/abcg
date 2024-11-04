@@ -1,4 +1,6 @@
-#version 330 core
+#version 300 es
+
+precision mediump float;
 
 in vec3 vertexColor; // Recebe a cor do vertex shader
 out vec4 FragColor; // Cor final do fragmento

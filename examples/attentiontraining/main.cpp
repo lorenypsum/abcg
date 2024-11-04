@@ -8,7 +8,7 @@ int main(int argc, char **argv) {
     Window window;
     window.setOpenGLSettings({});
     window.setWindowSettings({
-        .width = 800,
+        .width = 1200,
         .height = 600,
         .title = "Caça ao Objeto",
     });
