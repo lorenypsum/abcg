@@ -1,7 +1,23 @@
 #include "background.hpp"
+#include <cstdint>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <vector>
+
+glm::vec3 hexToVec3(uint32_t hexValue) {
+  float red = ((hexValue >> 16) & 0xFF) / 255.0f;
+  float green = ((hexValue >> 8) & 0xFF) / 255.0f;
+  float blue = (hexValue & 0xFF) / 255.0f;
+
+  return glm::vec3(red, green, blue);
+}
+
+glm::vec3 limegreen = hexToVec3(0xA4B509);
+glm::vec3 darkpastelgreen = hexToVec3(0x6F8E74);
+glm::vec3 lightpastelgreen = hexToVec3(0xC4D5C5);
+glm::vec3 brown = hexToVec3(0x444003);
+glm::vec3 lightbrown = hexToVec3(0x8A7D62);
+glm::vec3 lightblue = hexToVec3(0xB4DEF5);
 
 void Background::create() {
   auto const assetsPath{abcg::Application::getAssetsPath()};
@@ -24,26 +40,34 @@ void Background::paint() const {
   glUseProgram(m_program);
 
   // Desenha o céu
-  drawSky();
+  drawSky(0.0f, lightblue);
 
   // Desenha o chão
-  drawGround();
+  // drawGround();
 
   // Desenha montanhas no cenário
-  drawMountain(-0.8f, -0.2f, 0.4f);
-  drawMountain(0.0f, -0.2f, 0.6f);
-  drawMountain(0.7f, -0.2f, 0.5f);
+  drawMountain(-0.8f, -0.2f, 0.4f, 0.1f, lightpastelgreen);
+  drawMountain(-0.3f, -0.2f, 0.6f, 0.3f, lightpastelgreen);
+  drawMountain(0.3f, -0.2f, 0.6f, 0.3f, lightpastelgreen);
+  drawMountain(0.7f, -0.2f, 0.5f, 0.2f, lightpastelgreen);
+
+  // Desenha montanhas no cenário
+  drawMountain(-0.8f, -0.2f, 0.4f, 0.0f, darkpastelgreen);
+  drawMountain(0.0f, -0.2f, 0.6f, 0.2f, darkpastelgreen);
+  drawMountain(0.7f, -0.2f, 0.5f, 0.0f, darkpastelgreen);
+
+  // Desenha o chão
+  drawGround(0.0f, limegreen);
 
   glUseProgram(0); // Desativa o programa do shader após desenhar
 }
 
-void Background::drawSky() const {
-  std::vector<glm::vec2> skyVertices = {
-      {-1.0f, 1.0f}, {1.0f, 1.0f}, {-1.0f, 0.0f}, {1.0f, 0.0f}};
-  std::vector<glm::vec3> skyColors = {{0.5f, 0.8f, 1.0f},
-                                      {0.5f, 0.8f, 1.0f},
-                                      {0.5f, 0.8f, 1.0f},
-                                      {0.5f, 0.8f, 1.0f}};
+void Background::drawSky(float heightOffset, glm::vec3 color) const {
+  std::vector<glm::vec2> skyVertices = {{-1.0f, 1.0f},
+                                        {1.0f, 1.0f},
+                                        {-1.0f, 0.0f + heightOffset},
+                                        {1.0f, 0.0f + heightOffset}};
+  std::vector<glm::vec3> skyColors = {{color}, {color}, {color}, {color}};
 
   GLuint VBO, VAO, colorBuffer;
   glGenVertexArrays(1, &VAO);
@@ -81,13 +105,12 @@ void Background::drawSky() const {
   glDeleteVertexArrays(1, &VAO);
 }
 
-void Background::drawGround() const {
-  std::vector<glm::vec2> groundVertices = {
-      {-1.0f, 0.0f}, {1.0f, 0.0f}, {-1.0f, -1.0f}, {1.0f, -1.0f}};
-  std::vector<glm::vec3> groundColors = {{0.3f, 0.6f, 0.3f},
-                                         {0.3f, 0.6f, 0.3f},
-                                         {0.3f, 0.6f, 0.3f},
-                                         {0.3f, 0.6f, 0.3f}};
+void Background::drawGround(float heightOffset, glm::vec3 color) const {
+  std::vector<glm::vec2> groundVertices = {{-1.0f, 0.0f},
+                                           {1.0f, 0.0f},
+                                           {-1.0f, -1.0f + heightOffset},
+                                           {1.0f, -1.0f + heightOffset}};
+  std::vector<glm::vec3> groundColors = {{color}, {color}, {color}, {color}};
 
   GLuint VBO, VAO, colorBuffer;
   glGenVertexArrays(1, &VAO);
@@ -125,13 +148,17 @@ void Background::drawGround() const {
   glDeleteVertexArrays(1, &VAO);
 }
 
-void Background::drawMountain(float x, float y, float size) const {
+void Background::drawMountain(float x, float y, float size, float heightOffset,
+                              glm::vec3 color) const {
+  // Alinha a montanha ao início do chão (y = 0.0f)
+  y = 0.4f + heightOffset;
+
   // Define os vértices da montanha (um triângulo)
   std::vector<glm::vec2> mountainVertices = {
       {x, y}, {x - size, y - size}, {x + size, y - size}};
+
   // Define as cores dos vértices da montanha (cinza)
-  std::vector<glm::vec3> mountainColors = {
-      {0.5f, 0.5f, 0.5f}, {0.5f, 0.5f, 0.5f}, {0.5f, 0.5f, 0.5f}};
+  std::vector<glm::vec3> mountainColors = {color, color, color};
 
   GLuint VBO, VAO, colorBuffer;
   glGenVertexArrays(1, &VAO);

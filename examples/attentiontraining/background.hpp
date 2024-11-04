@@ -12,9 +12,10 @@ public:
 
 private:
   GLuint m_program{};
-  void drawSky() const;
-  void drawGround() const;
-  void drawMountain(float x, float y, float size) const;
+  void drawSky(float heightOffset, glm::vec3 color) const;
+  void drawGround(float heightOffset, glm::vec3 color) const;
+  //void drawMountain(float x, float y, float size, float heightOffset) const;
+  void drawMountain(float x, float y, float size, float heightOffset, glm::vec3 color) const;
 };
 
 #endif
