@@ -41,12 +41,12 @@ void DistractionObjects::create(GLuint program, int quantity) {
   // Carregar a textura para o objeto de distração
   for (int i = 0; i < quantity; ++i) {
     DistractionObject obj;
-    obj.m_texture = loadTexture((assetsPath + "/textures/potatochip_yellow.png")
+    obj.m_texture = loadTexture((assetsPath + "/textures/brownpigeon.png")
                                     .c_str()); // Carrega a textura
 
     // Adicione uma velocidade aleatória para movimento
-    obj.m_velocity = glm::vec2(m_randomDist(m_randomEngine) * 0.001f,
-                               m_randomDist(m_randomEngine) * 0.001f);
+    obj.m_velocity = glm::vec2(m_randomDist(m_randomEngine) * 0.005f,
+                               m_randomDist(m_randomEngine) * 0.005f);
 
     // Inicializa o VAO e o VBO para o objeto
     glGenVertexArrays(1, &obj.m_VAO);
@@ -84,7 +84,7 @@ void DistractionObjects::create(GLuint program, int quantity) {
     // Inicializa as propriedades do objeto (posição e escala)
     obj.m_translation =
         glm::vec2(m_randomDist(m_randomEngine), m_randomDist(m_randomEngine));
-    obj.m_scale = 1.0f;
+    obj.m_scale = 0.5f;
 
     m_distractions.push_back(obj);
   }

@@ -42,7 +42,7 @@ void TargetObjects::create(GLuint program, int quantity) {
   for (int i = 0; i < quantity; ++i) {
     TargetObject obj;
     obj.m_texture = loadTexture(
-        (assetsPath + "/textures/banana.png").c_str()); // Carrega a textura
+        (assetsPath + "/textures/whitepigeon.png").c_str()); // Carrega a textura
 
     // Adicione uma velocidade aleatória para movimento
     obj.m_velocity = glm::vec2(m_randomDist(m_randomEngine) * 0.005f,
@@ -89,7 +89,7 @@ void TargetObjects::create(GLuint program, int quantity) {
     obj.m_translation =
         glm::vec2(m_randomDist(m_randomEngine) * areaX - areaX / 2.0f,
                   m_randomDist(m_randomEngine) * areaY - areaY / 2.0f);
-    obj.m_scale = 1.0f;
+    obj.m_scale = 0.5f;
 
     m_targets.push_back(obj);
   }

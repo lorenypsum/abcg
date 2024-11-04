@@ -30,9 +30,9 @@ void Window::onCreate() {
 
   // Inicializa texturas
   m_targetTexture =
-      m_targetObject.loadTexture(assetsPath + "/textures/banana.png");
+      m_targetObject.loadTexture(assetsPath + "/textures/whitepigeon.png");
   m_distractionTexture = m_distractionObjects.loadTexture(
-      assetsPath + "/textures/basket_yellow.png");
+      assetsPath + "/textures/brownpigeon.png");
 
   // Configura estado inicial
   resetGame();
@@ -75,7 +75,7 @@ void Window::onPaintUI() {
       ImGui::Text("Congratulations! New Record: %d", m_score);
       --m_restartDelay;
     } else if (m_gameData.m_state == GameState::Start) {
-      ImGui::Text("Pegue Bananas!");
+      ImGui::Text("Pegue o Pombo Branco!");
     } else {
       ImGui::Text("...");
     }
