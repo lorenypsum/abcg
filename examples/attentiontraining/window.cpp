@@ -118,7 +118,7 @@ void Window::onUpdate() {
     updateTimeDisplay();
   } else if (m_gameOver && m_gameData.m_state != GameState::Playing) {
     if (m_restartDelay < 0) {
-      //resetGame();
+      resetGame();
     }
   }
   checkGameStatus();
@@ -139,7 +139,7 @@ void Window::onDestroy() {
 void Window::initializeGameObjects() {
   // Recarrega a posição do alvo e dos objetos de distração
   m_targetObject.create(m_program, 1);
-  m_distractionObjects.create(m_program, 3);
+  m_distractionObjects.create(m_program, 6);
 }
 
 // Verifica o status do jogo e atualiza o estado conforme necessário

@@ -133,8 +133,8 @@ void DistractionObjects::update(float deltaTime) {
 
   // Verifica se a lista está vazia e recria objetos
   if (m_distractions.empty()) {
-    create(m_program,
-           3); // Aqui você pode definir o número de objetos que deseja criar
+    // Define o número de objetos que deseja criar
+    create(m_program, 6); 
   }
 }
 
@@ -145,7 +145,7 @@ bool DistractionObjects::checkClickOnDistraction(glm::vec2 clickPos) {
 
       // Verifica se a lista está vazia e recria objetos
       if (m_distractions.empty()) {
-        create(m_program, 3); // Novamente, defina o número de objetos
+        create(m_program, 6); // Novamente, defina o número de objetos
       }
       return true; // Retorna verdadeiro se o clique foi em uma distração
     }
