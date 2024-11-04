@@ -16,6 +16,7 @@ glm::vec3 limegreen = hexToVec3(0xA4B509);
 glm::vec3 darkpastelgreen = hexToVec3(0x6F8E74);
 glm::vec3 lightpastelgreen = hexToVec3(0xC4D5C5);
 glm::vec3 brown = hexToVec3(0x444003);
+glm::vec3 aquablue = hexToVec3(0x03ABB3);
 glm::vec3 lightbrown = hexToVec3(0x8A7D62);
 glm::vec3 lightblue = hexToVec3(0xB4DEF5);
 
@@ -42,9 +43,6 @@ void Background::paint() const {
   // Desenha o céu
   drawSky(0.0f, lightblue);
 
-  // Desenha o chão
-  // drawGround();
-
   // Desenha montanhas no cenário
   drawMountain(-0.8f, -0.2f, 0.4f, 0.1f, lightpastelgreen);
   drawMountain(-0.3f, -0.2f, 0.6f, 0.3f, lightpastelgreen);
@@ -55,9 +53,14 @@ void Background::paint() const {
   drawMountain(-0.8f, -0.2f, 0.4f, 0.0f, darkpastelgreen);
   drawMountain(0.0f, -0.2f, 0.6f, 0.2f, darkpastelgreen);
   drawMountain(0.7f, -0.2f, 0.5f, 0.0f, darkpastelgreen);
-
   // Desenha o chão
   drawGround(0.0f, limegreen);
+
+  // Desenha o chão
+  drawGround(0.3f, aquablue);
+
+   // Desenha o chão
+  drawGround(0.9f, limegreen);
 
   glUseProgram(0); // Desativa o programa do shader após desenhar
 }
@@ -65,8 +68,8 @@ void Background::paint() const {
 void Background::drawSky(float heightOffset, glm::vec3 color) const {
   std::vector<glm::vec2> skyVertices = {{-1.0f, 1.0f},
                                         {1.0f, 1.0f},
-                                        {-1.0f, 0.0f + heightOffset},
-                                        {1.0f, 0.0f + heightOffset}};
+                                        {-1.0f, 0.0f + (heightOffset)},
+                                        {1.0f, 0.0f + (heightOffset)}};
   std::vector<glm::vec3> skyColors = {{color}, {color}, {color}, {color}};
 
   GLuint VBO, VAO, colorBuffer;
@@ -108,8 +111,8 @@ void Background::drawSky(float heightOffset, glm::vec3 color) const {
 void Background::drawGround(float heightOffset, glm::vec3 color) const {
   std::vector<glm::vec2> groundVertices = {{-1.0f, 0.0f},
                                            {1.0f, 0.0f},
-                                           {-1.0f, -1.0f + heightOffset},
-                                           {1.0f, -1.0f + heightOffset}};
+                                           {-1.0f, -1.0f + (heightOffset)},
+                                           {1.0f, -1.0f + (heightOffset)}};
   std::vector<glm::vec3> groundColors = {{color}, {color}, {color}, {color}};
 
   GLuint VBO, VAO, colorBuffer;
