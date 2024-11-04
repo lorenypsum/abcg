@@ -87,22 +87,34 @@ void Window::onPaintUI() {
   }
 }
 
-// Trata eventos de clique do mouse para interagir com os objetos
+// Trata eventos de clique do mouse e toques no touchpad para interagir com os objetos
 void Window::onEvent(SDL_Event const &event) {
+  glm::vec2 clickPos;
+
   // Verifica se o evento é um clique do mouse
-  if (event.type == SDL_MOUSEBUTTONDOWN &&
-      event.button.button == SDL_BUTTON_LEFT) {
-    // Converte a posição do clique para coordenadas normalizadas
-    glm::vec2 clickPos{
-        event.button.x / static_cast<float>(m_viewportSize.x) * 2.0f - 1.0f,
-        1.0f - event.button.y / static_cast<float>(m_viewportSize.y) * 2.0f};
-    // Verifica se o clique foi em um objeto de distração ou no alvo
-    if (m_targetObject.checkClickOnTarget(clickPos)) {
-      m_score += 1; // Ganha 5 pontos ao clicar no alvo correto
-    } else if (m_distractionObjects.checkClickOnDistraction(clickPos)) {
-      m_score -= 1; // Perde uma vida ao clicar em um objeto de distração
-      updateTimeDisplay(); // Atualiza a exibição de tempo
-    }
+  if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT) {
+    clickPos = {
+      event.button.x / static_cast<float>(m_viewportSize.x) * 2.0f - 1.0f,
+      1.0f - event.button.y / static_cast<float>(m_viewportSize.y) * 2.0f
+    };
+
+  } else if (event.type == SDL_FINGERDOWN) {
+    // Converte as coordenadas do toque em um valor normalizado
+    clickPos = {
+      event.tfinger.x * 2.0f - 1.0f,  // SDL_FINGERDOWN usa valores normalizados de 0 a 1
+      1.0f - event.tfinger.y * 2.0f
+    };
+  } else {
+    // Se não for um evento de interesse, retorna
+    return;
+  }
+
+  // Verifica se o clique/toque foi em um objeto de distração ou no alvo
+  if (m_targetObject.checkClickOnTarget(clickPos)) {
+    m_score += 1; // Ganha um ponto ao clicar no alvo correto
+  } else if (m_distractionObjects.checkClickOnDistraction(clickPos)) {
+    m_score -= 1; // Perde um ponto ao clicar em um objeto de distração
+    updateTimeDisplay(); // Atualiza a exibição de tempo
   }
 }
 
@@ -175,7 +187,7 @@ void Window::checkGameStatus() {
   }
 }
 
-// Atualiza a exibição de vidas na interface do usuário
+// Atualiza a exibição de tempo na interface do usuário
 void Window::updateTimeDisplay() {
   if (m_gametime <= 0) {
     m_gameOver = true;
