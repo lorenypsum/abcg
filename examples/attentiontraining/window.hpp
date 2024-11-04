@@ -25,7 +25,6 @@ public:
   // Funções de inicialização e atualização do jogo
   void initializeGameObjects();
   void checkGameStatus();
-  void updateTimeDisplay();
   void resetGame();
   void startGame();
 
@@ -41,8 +40,7 @@ private:
   int m_lastScore{0};     // Pontuação anterior
   int m_newScore{0};      // Nova pontuação
   int m_gametime{30};     // Tempo de jogo
-  int m_restartDelay{40}; // Tempo de espera antes de reiniciar o jogo
-  bool m_gameOver{false}; // Flag que indica se o jogo acabou
+  int m_restartDelay{10}; // Tempo de espera antes de reiniciar o jogo
 
   // Objetos de distração e alvo
   DistractionObjects m_distractionObjects;
