@@ -82,8 +82,8 @@ void TargetObjects::create(GLuint program, int quantity) {
     glBindVertexArray(0);
 
     // Inicializa as propriedades do objeto (posição e escala)
-    float areaX = 0.4f; // Largura da área de aparição em X
-    float areaY = 0.4f; // Altura da área de aparição em Y
+    float areaX = 0.7f; // Largura da área de aparição em X
+    float areaY = 0.7f; // Altura da área de aparição em Y
 
     // Inicializa as propriedades do objeto (posição e escala)
     obj.m_translation =

@@ -57,7 +57,7 @@ void Window::onPaintUI() {
   abcg::OpenGLWindow::onPaintUI();
   {
     auto const size{ImVec2(800, 600)};
-    auto const position{ImVec2(200.0f, 1.0f)};
+    auto const position{ImVec2(170.0f, 1.0f)};
     ImGui::SetNextWindowPos(position);
     ImGui::SetNextWindowSize(size);
     ImGuiWindowFlags const flags{ImGuiWindowFlags_NoBackground |
