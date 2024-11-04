@@ -111,9 +111,9 @@ void Window::onEvent(SDL_Event const &event) {
   if (m_targetObject.checkClickOnTarget(clickPos)) {
     m_score += 1; // Ganha um ponto ao clicar no alvo correto
   } else if (m_distractionObjects.checkClickOnDistraction(clickPos)) {
-    m_score -= 1; // Perde um ponto ao clicar em um objeto de distração
+    m_score -= 1;        // Perde um ponto ao clicar em um objeto de distração
+    updateTimeDisplay(); // Atualiza a exibição de tempo
   }
-  checkGameStatus(); // Atualiza a exibição de tempo
 }
 
 // Atualiza o jogo a cada frame, verifica e atualiza o status do jogo
@@ -124,20 +124,13 @@ void Window::onUpdate() {
                           currentTime - m_lastReload)
                           .count();
 
-  // Verifica se o tempo de recarga foi atingido e atualiza o jogo
-  if (elapsedTime >= 1.0f) {
-    if (m_gameData.m_state == GameState::Playing) {
-      --m_gametime;                             // Decrementa o tempo restante
-      m_distractionObjects.update(elapsedTime); // Atualiza objetos de distração
-      m_lastReload = currentTime;               // Atualiza o tempo de recarga
-    } else if (m_gameData.m_state == GameState::GameOver ||
-               m_gameData.m_state == GameState::Win) {
-      --m_restartDelay; // Decrementa o tempo de espera
-      if (m_restartDelay < 0) {
-        resetGame(); // Reinicia o jogo
-        return;
-      }
-    }
+  // Recarrega objetos a cada 3 segundos
+  if (elapsedTime >= 1.0f && m_gameData.m_state == GameState::Playing) {
+    --m_gametime;                             // Decrementa o tempo restante
+    m_distractionObjects.update(elapsedTime); // Atualiza objetos de distração
+    m_lastReload = currentTime;               // Atualiza o tempo de recarga
+    checkGameStatus();                        // Verifica o status do jogo
+    updateTimeDisplay();                      // Atualiza a exibição de tempo
   }
   checkGameStatus(); // Verifica o status do jogo
 }
@@ -163,7 +156,9 @@ void Window::initializeGameObjects() {
 // Verifica o status do jogo e atualiza o estado conforme necessário
 void Window::checkGameStatus() {
   // Estado inicial, somente se o tempo está no valor inicial e pontuação for 0
-  if (m_gametime == 30 && m_score == 0) {
+  if (m_gametime == 30 && m_score == 0 &&
+      m_gameData.m_state != GameState::Playing) {
+    m_gameOver = false;
     m_gameData.m_state = GameState::Start;
   }
   // Verifica se o tempo terminou e define o estado de Game Over ou Vitória
@@ -172,37 +167,53 @@ void Window::checkGameStatus() {
       m_lastScore = m_score;
       m_newScore = m_score;
       m_gameData.m_state = GameState::Win; // Estado de vitória
+      m_gameOver = true;
     } else {
       m_newScore = m_score;
       m_gameData.m_state = GameState::GameOver; // Estado de game over
+      m_gameOver = true;
     }
   }
   // Define o estado como "Playing" se o jogo ainda está em andamento
-  else if (m_gametime > 0 && m_score > 0) {
+  else if (m_gametime > 0 && m_gameData.m_state != GameState::Win &&
+           m_gameData.m_state != GameState::GameOver && m_score > 0) {
+    m_gameOver = false;
     m_gameData.m_state = GameState::Playing;
+  }
+}
+
+// Atualiza a exibição de tempo na interface do usuário
+void Window::updateTimeDisplay() {
+  if (m_gametime <= 0) {
+    m_newScore = m_score;
+    m_gameOver = true;
+    m_gameData.m_state = GameState::GameOver;
   }
 }
 
 // Reinicia o jogo para o estado inicial
 void Window::resetGame() {
-
-  m_lastScore = 0;
+  if (m_restartDelay < 0) {
     m_score = 0;
-  m_newScore = 0;
-  m_gametime = 30;
-  m_restartDelay = 10;
-  m_gameData.m_state =
-      GameState::Start; // Começa do estado Start
-                        // Recria os objetos e reinicia o tempo de recarga
-  m_lastReload = std::chrono::steady_clock::now();
-  initializeGameObjects();
+    m_lastScore = 0;
+    m_newScore = 0;
+    m_gametime = 30;
+    m_gameOver = false;
+    m_restartDelay = 40;
+    m_gameData.m_state =
+        GameState::Start; // Começa do estado Start
+                          // Recria os objetos e reinicia o tempo de recarga
+    m_lastReload = std::chrono::steady_clock::now();
+    initializeGameObjects();
+  }
 }
 
 // Reinicia o jogo para o estado inicial
 void Window::startGame() {
   m_score = 0;
   m_gametime = 30;
-  m_restartDelay = 10;
+  m_gameOver = false;
+  m_restartDelay = 40;
   m_gameData.m_state = GameState::Start; // Começa do estado Start
 
   // Recria os objetos e reinicia o tempo de recarga
