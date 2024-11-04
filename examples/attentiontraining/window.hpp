@@ -27,6 +27,7 @@ public:
   void checkGameStatus();
   void updateTimeDisplay();
   void resetGame();
+  void startGame();
 
 private:
   // Programa de shader
@@ -38,6 +39,7 @@ private:
 
   int m_score{0};         // Pontuação do jogador
   int m_lastScore{0};     // Pontuação anterior
+  int m_newScore{0};      // Nova pontuação
   int m_gametime{30};     // Tempo de jogo
   int m_restartDelay{40}; // Tempo de espera antes de reiniciar o jogo
   bool m_gameOver{false}; // Flag que indica se o jogo acabou

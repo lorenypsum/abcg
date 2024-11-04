@@ -35,7 +35,7 @@ void Window::onCreate() {
       assetsPath + "/textures/brownpigeon.png");
 
   // Configura estado inicial
-  resetGame();
+  startGame();
   m_randomEngine.seed(
       std::chrono::steady_clock::now().time_since_epoch().count());
 }
@@ -71,11 +71,9 @@ void Window::onPaintUI() {
     if (m_gameData.m_state == GameState::Playing) {
       ImGui::Text("Score: %d Time: %d", m_score, m_gametime);
     } else if (m_gameData.m_state == GameState::GameOver) {
-      ImGui::Text("Your Score: %d", m_score);
-      --m_restartDelay;
+      ImGui::Text("Your Score: %d", m_newScore);
     } else if (m_gameData.m_state == GameState::Win) {
-      ImGui::Text("Congratulations! New Record: %d", m_score);
-      --m_restartDelay;
+      ImGui::Text("Congratulations! New Record: %d", m_newScore);
     } else if (m_gameData.m_state == GameState::Start) {
       ImGui::Text("Pegue o Pombo Branco!");
     } else {
@@ -87,23 +85,23 @@ void Window::onPaintUI() {
   }
 }
 
-// Trata eventos de clique do mouse e toques no touchpad para interagir com os objetos
+// Trata eventos de clique do mouse e toques no touchpad para interagir com os
+// objetos
 void Window::onEvent(SDL_Event const &event) {
   glm::vec2 clickPos;
 
   // Verifica se o evento é um clique do mouse
-  if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT) {
+  if (event.type == SDL_MOUSEBUTTONDOWN &&
+      event.button.button == SDL_BUTTON_LEFT) {
     clickPos = {
-      event.button.x / static_cast<float>(m_viewportSize.x) * 2.0f - 1.0f,
-      1.0f - event.button.y / static_cast<float>(m_viewportSize.y) * 2.0f
-    };
+        event.button.x / static_cast<float>(m_viewportSize.x) * 2.0f - 1.0f,
+        1.0f - event.button.y / static_cast<float>(m_viewportSize.y) * 2.0f};
 
   } else if (event.type == SDL_FINGERDOWN) {
     // Converte as coordenadas do toque em um valor normalizado
-    clickPos = {
-      event.tfinger.x * 2.0f - 1.0f,  // SDL_FINGERDOWN usa valores normalizados de 0 a 1
-      1.0f - event.tfinger.y * 2.0f
-    };
+    clickPos = {event.tfinger.x * 2.0f -
+                    1.0f, // SDL_FINGERDOWN usa valores normalizados de 0 a 1
+                1.0f - event.tfinger.y * 2.0f};
   } else {
     // Se não for um evento de interesse, retorna
     return;
@@ -113,7 +111,7 @@ void Window::onEvent(SDL_Event const &event) {
   if (m_targetObject.checkClickOnTarget(clickPos)) {
     m_score += 1; // Ganha um ponto ao clicar no alvo correto
   } else if (m_distractionObjects.checkClickOnDistraction(clickPos)) {
-    m_score -= 1; // Perde um ponto ao clicar em um objeto de distração
+    m_score -= 1;        // Perde um ponto ao clicar em um objeto de distração
     updateTimeDisplay(); // Atualiza a exibição de tempo
   }
 }
@@ -133,10 +131,6 @@ void Window::onUpdate() {
     m_lastReload = currentTime;               // Atualiza o tempo de recarga
     checkGameStatus();                        // Verifica o status do jogo
     updateTimeDisplay();                      // Atualiza a exibição de tempo
-  } else if (m_gameOver && m_gameData.m_state != GameState::Playing) {
-    if (m_restartDelay < 0) {
-      //resetGame(); // Reinicia o jogo -- comentado porque o jogo reinicia com bugs e não aparece mensagem de pontuação direito
-    }
   }
   checkGameStatus(); // Verifica o status do jogo
 }
@@ -171,14 +165,15 @@ void Window::checkGameStatus() {
   else if (m_gametime <= 0) {
     if (m_score > m_lastScore) {
       m_lastScore = m_score;
+      m_newScore = m_score;
       m_gameData.m_state = GameState::Win; // Estado de vitória
       m_gameOver = true;
     } else {
+      m_newScore = m_score;
       m_gameData.m_state = GameState::GameOver; // Estado de game over
       m_gameOver = true;
     }
   }
-
   // Define o estado como "Playing" se o jogo ainda está em andamento
   else if (m_gametime > 0 && m_gameData.m_state != GameState::Win &&
            m_gameData.m_state != GameState::GameOver && m_score > 0) {
@@ -190,6 +185,7 @@ void Window::checkGameStatus() {
 // Atualiza a exibição de tempo na interface do usuário
 void Window::updateTimeDisplay() {
   if (m_gametime <= 0) {
+    m_newScore = m_score;
     m_gameOver = true;
     m_gameData.m_state = GameState::GameOver;
   }
@@ -197,6 +193,23 @@ void Window::updateTimeDisplay() {
 
 // Reinicia o jogo para o estado inicial
 void Window::resetGame() {
+  if (m_restartDelay < 0) {
+    m_score = 0;
+    m_lastScore = 0;
+    m_newScore = 0;
+    m_gametime = 30;
+    m_gameOver = false;
+    m_restartDelay = 40;
+    m_gameData.m_state =
+        GameState::Start; // Começa do estado Start
+                          // Recria os objetos e reinicia o tempo de recarga
+    m_lastReload = std::chrono::steady_clock::now();
+    initializeGameObjects();
+  }
+}
+
+// Reinicia o jogo para o estado inicial
+void Window::startGame() {
   m_score = 0;
   m_gametime = 30;
   m_gameOver = false;
