@@ -123,7 +123,7 @@ void Background::drawGround(float heightOffset, glm::vec3 color) const {
                                            {1.0f, 0.0f},
                                            {-1.0f, -1.0f + (heightOffset)},
                                            {1.0f, -1.0f + (heightOffset)}};
-  std::vector<glm::vec3> groundColors = {{color}, {color}, {color}, {color}};
+  std::vector<glm::vec3> groundColors = {{lightbrown}, {lightbrown}, {color}, {color}};
 
   // Cria e configura os buffers de vértices e cores
   GLuint VBO, VAO, colorBuffer;
@@ -172,7 +172,7 @@ void Background::drawMountain(float x, float y, float size, float heightOffset,
       {x, y}, {x - size, y - size}, {x + size, y - size}};
 
   // Define as cores dos vértices da montanha (cinza)
-  std::vector<glm::vec3> mountainColors = {color, color, color};
+  std::vector<glm::vec3> mountainColors = {color, darkpastelgreen, color};
 
   // Cria e configura os buffers de vértices e cores
   GLuint VBO, VAO, colorBuffer;
