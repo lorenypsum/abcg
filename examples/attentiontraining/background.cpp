@@ -4,6 +4,7 @@
 #include <glm/vec3.hpp>
 #include <vector>
 
+// Converte um valor hexadecimal em um vetor de 3 componentes
 glm::vec3 hexToVec3(uint32_t hexValue) {
   float red = ((hexValue >> 16) & 0xFF) / 255.0f;
   float green = ((hexValue >> 8) & 0xFF) / 255.0f;
@@ -12,6 +13,7 @@ glm::vec3 hexToVec3(uint32_t hexValue) {
   return glm::vec3(red, green, blue);
 }
 
+// Cores usadas no cenário
 glm::vec3 limegreen = hexToVec3(0xA4B509);
 glm::vec3 darkpastelgreen = hexToVec3(0x6F8E74);
 glm::vec3 lightpastelgreen = hexToVec3(0xC4D5C5);
@@ -20,6 +22,7 @@ glm::vec3 aquablue = hexToVec3(0x03ABB3);
 glm::vec3 lightbrown = hexToVec3(0x8A7D62);
 glm::vec3 lightblue = hexToVec3(0xB4DEF5);
 
+// Inicializa o cenário
 void Background::create() {
   auto const assetsPath{abcg::Application::getAssetsPath()};
 
@@ -37,46 +40,51 @@ void Background::create() {
   }
 }
 
+// Desenha o cenário
 void Background::paint() const {
   glUseProgram(m_program);
 
   // Desenha o céu
   drawSky(0.0f, lightblue);
 
-  // Desenha montanhas no cenário
+  // Desenha montanhas de fundo no cenário
   drawMountain(-0.8f, -0.2f, 0.4f, 0.1f, lightpastelgreen);
   drawMountain(-0.3f, -0.2f, 0.6f, 0.3f, lightpastelgreen);
   drawMountain(0.3f, -0.2f, 0.6f, 0.3f, lightpastelgreen);
   drawMountain(0.7f, -0.2f, 0.5f, 0.2f, lightpastelgreen);
 
-  // Desenha montanhas no cenário
+  // Desenha montanhas de frente no cenário
   drawMountain(-0.8f, -0.2f, 0.4f, 0.0f, darkpastelgreen);
   drawMountain(0.0f, -0.2f, 0.6f, 0.2f, darkpastelgreen);
   drawMountain(0.7f, -0.2f, 0.5f, 0.0f, darkpastelgreen);
+
   // Desenha o chão
   drawGround(0.0f, limegreen);
 
-  // Desenha o chão
+  // Desenha o rio
   drawGround(0.3f, aquablue);
 
-   // Desenha o chão
+  // Desenha o chão
   drawGround(0.9f, limegreen);
 
-  glUseProgram(0); // Desativa o programa do shader após desenhar
+  // Desativa o programa do shader após desenhar
+  glUseProgram(0);
 }
 
+// Desenha o céu
 void Background::drawSky(float heightOffset, glm::vec3 color) const {
+  // Define os vértices do céu
   std::vector<glm::vec2> skyVertices = {{-1.0f, 1.0f},
                                         {1.0f, 1.0f},
                                         {-1.0f, 0.0f + (heightOffset)},
                                         {1.0f, 0.0f + (heightOffset)}};
   std::vector<glm::vec3> skyColors = {{color}, {color}, {color}, {color}};
 
+  // Cria e configura os buffers de vértices e cores
   GLuint VBO, VAO, colorBuffer;
   glGenVertexArrays(1, &VAO);
   glGenBuffers(1, &VBO);
   glGenBuffers(1, &colorBuffer);
-
   glBindVertexArray(VAO);
 
   // Carrega os vértices no VBO
@@ -108,18 +116,20 @@ void Background::drawSky(float heightOffset, glm::vec3 color) const {
   glDeleteVertexArrays(1, &VAO);
 }
 
+// Desenha o chão
 void Background::drawGround(float heightOffset, glm::vec3 color) const {
+  // Define os vértices do chão
   std::vector<glm::vec2> groundVertices = {{-1.0f, 0.0f},
                                            {1.0f, 0.0f},
                                            {-1.0f, -1.0f + (heightOffset)},
                                            {1.0f, -1.0f + (heightOffset)}};
   std::vector<glm::vec3> groundColors = {{color}, {color}, {color}, {color}};
 
+  // Cria e configura os buffers de vértices e cores
   GLuint VBO, VAO, colorBuffer;
   glGenVertexArrays(1, &VAO);
   glGenBuffers(1, &VBO);
   glGenBuffers(1, &colorBuffer);
-
   glBindVertexArray(VAO);
 
   // Carrega os vértices no VBO
@@ -151,6 +161,7 @@ void Background::drawGround(float heightOffset, glm::vec3 color) const {
   glDeleteVertexArrays(1, &VAO);
 }
 
+// Desenha uma montanha
 void Background::drawMountain(float x, float y, float size, float heightOffset,
                               glm::vec3 color) const {
   // Alinha a montanha ao início do chão (y = 0.0f)
@@ -163,11 +174,11 @@ void Background::drawMountain(float x, float y, float size, float heightOffset,
   // Define as cores dos vértices da montanha (cinza)
   std::vector<glm::vec3> mountainColors = {color, color, color};
 
+  // Cria e configura os buffers de vértices e cores
   GLuint VBO, VAO, colorBuffer;
   glGenVertexArrays(1, &VAO);
   glGenBuffers(1, &VBO);
   glGenBuffers(1, &colorBuffer);
-
   glBindVertexArray(VAO);
 
   // Carrega os vértices no VBO
@@ -199,4 +210,5 @@ void Background::drawMountain(float x, float y, float size, float heightOffset,
   glDeleteVertexArrays(1, &VAO);
 }
 
+// Destroi o cenário
 void Background::destroy() { glDeleteProgram(m_program); }

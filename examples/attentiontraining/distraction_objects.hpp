@@ -22,7 +22,6 @@ public:
     glm::vec2 m_translation{};
     glm::vec2 m_velocity{};
   };
-  // Método para carregar textura
   GLuint loadTexture(std::string filepath);
   void create(GLuint program, int quantity);
   void paint();
@@ -31,7 +30,7 @@ public:
   bool checkClickOnDistraction(glm::vec2 clickPos);
   void removeDistraction(std::list<DistractionObject>::iterator it);
   bool isEmpty() const;
-  
+
 private:
   GLuint m_program{};
   GLint m_translationLoc{};

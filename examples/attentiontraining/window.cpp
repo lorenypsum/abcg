@@ -10,7 +10,7 @@
 void Window::onCreate() {
   // Carrega o shader program para renderização dos objetos
   auto const assetsPath{abcg::Application::getAssetsPath()};
-
+  // Cria o programa de shader
   m_program = abcg::createOpenGLProgram({
       {.source = assetsPath + "/shaders/texture.vert",
        .stage = abcg::ShaderStage::Vertex},
@@ -21,7 +21,7 @@ void Window::onCreate() {
   // Inicializa o cenário
   m_background.create();
 
-  // Load a new font
+  // Carrega a fonte
   auto const filename{assetsPath + "Inconsolata-Medium.ttf"};
   m_font = ImGui::GetIO().Fonts->AddFontFromFileTTF(filename.c_str(), 60.0f);
   if (m_font == nullptr) {
@@ -54,8 +54,10 @@ void Window::onPaint() {
 
 // Renderiza a interface do usuário, exibindo score e vidas
 void Window::onPaintUI() {
+  // Renderiza a interface do usuário
   abcg::OpenGLWindow::onPaintUI();
   {
+    // Configura a janela de interface do usuário
     auto const size{ImVec2(800, 600)};
     auto const position{ImVec2(170.0f, 1.0f)};
     ImGui::SetNextWindowPos(position);
@@ -65,7 +67,7 @@ void Window::onPaintUI() {
                                  ImGuiWindowFlags_NoInputs};
     ImGui::Begin(" ", nullptr, flags);
     ImGui::PushFont(m_font);
-
+    // Exibe a pontuação e o tempo restante
     if (m_gameData.m_state == GameState::Playing) {
       ImGui::Text("Score: %d Time: %d", m_score, m_gametime);
     } else if (m_gameData.m_state == GameState::GameOver) {
@@ -79,7 +81,7 @@ void Window::onPaintUI() {
     } else {
       ImGui::Text("...");
     }
-
+    // Finaliza a janela de interface do usuário
     ImGui::PopFont();
     ImGui::End();
   }
@@ -87,23 +89,26 @@ void Window::onPaintUI() {
 
 // Trata eventos de clique do mouse para interagir com os objetos
 void Window::onEvent(SDL_Event const &event) {
+  // Verifica se o evento é um clique do mouse
   if (event.type == SDL_MOUSEBUTTONDOWN &&
       event.button.button == SDL_BUTTON_LEFT) {
+    // Converte a posição do clique para coordenadas normalizadas
     glm::vec2 clickPos{
         event.button.x / static_cast<float>(m_viewportSize.x) * 2.0f - 1.0f,
         1.0f - event.button.y / static_cast<float>(m_viewportSize.y) * 2.0f};
-
+    // Verifica se o clique foi em um objeto de distração ou no alvo
     if (m_targetObject.checkClickOnTarget(clickPos)) {
       m_score += 1; // Ganha 5 pontos ao clicar no alvo correto
     } else if (m_distractionObjects.checkClickOnDistraction(clickPos)) {
       m_score -= 1; // Perde uma vida ao clicar em um objeto de distração
-      updateTimeDisplay();
+      updateTimeDisplay(); // Atualiza a exibição de tempo
     }
   }
 }
 
 // Atualiza o jogo a cada frame, verifica e atualiza o status do jogo
 void Window::onUpdate() {
+  // Calcula o tempo decorrido desde o último recarregamento
   auto currentTime = std::chrono::steady_clock::now();
   float elapsedTime = std::chrono::duration_cast<std::chrono::seconds>(
                           currentTime - m_lastReload)
@@ -111,17 +116,17 @@ void Window::onUpdate() {
 
   // Recarrega objetos a cada 3 segundos
   if (elapsedTime >= 1.0f && m_gameData.m_state == GameState::Playing) {
-    --m_gametime;
-    m_distractionObjects.update(elapsedTime);
-    m_lastReload = currentTime;
-    checkGameStatus();
-    updateTimeDisplay();
+    --m_gametime;                             // Decrementa o tempo restante
+    m_distractionObjects.update(elapsedTime); // Atualiza objetos de distração
+    m_lastReload = currentTime;               // Atualiza o tempo de recarga
+    checkGameStatus();                        // Verifica o status do jogo
+    updateTimeDisplay();                      // Atualiza a exibição de tempo
   } else if (m_gameOver && m_gameData.m_state != GameState::Playing) {
     if (m_restartDelay < 0) {
-      resetGame();
+      resetGame(); // Reinicia o jogo
     }
   }
-  checkGameStatus();
+  checkGameStatus(); // Verifica o status do jogo
 }
 
 // Ajusta o tamanho do viewport ao redimensionar a janela
@@ -144,8 +149,7 @@ void Window::initializeGameObjects() {
 
 // Verifica o status do jogo e atualiza o estado conforme necessário
 void Window::checkGameStatus() {
-  // Estado inicial, somente se o tempo está no valor inicial e pontuação for
-  // zero
+  // Estado inicial, somente se o tempo está no valor inicial e pontuação for 0
   if (m_gametime == 30 && m_score == 0 &&
       m_gameData.m_state != GameState::Playing) {
     m_gameOver = false;
@@ -162,6 +166,7 @@ void Window::checkGameStatus() {
       m_gameOver = true;
     }
   }
+
   // Define o estado como "Playing" se o jogo ainda está em andamento
   else if (m_gametime > 0 && m_gameData.m_state != GameState::Win &&
            m_gameData.m_state != GameState::GameOver && m_score > 0) {
@@ -184,7 +189,7 @@ void Window::resetGame() {
   m_gametime = 30;
   m_gameOver = false;
   m_restartDelay = 40;
-  m_gameData.m_state = GameState::Start; // Começar do início
+  m_gameData.m_state = GameState::Start; // Começa do estado Start
 
   // Recria os objetos e reinicia o tempo de recarga
   m_lastReload = std::chrono::steady_clock::now();

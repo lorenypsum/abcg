@@ -2,10 +2,12 @@
 #include <SDL_image.h>
 #include <iostream>
 
+// Carrega a textura do objeto alvo
 GLuint TargetObjects::loadTexture(std::string filepath) {
+  // Variável para armazenar o ID da textura
   GLuint textureID;
 
-  // Carregar a imagem usando stb_image
+  // Carrega a imagem usando stb_image
   SDL_Surface *surface = IMG_Load(filepath.c_str());
   if (!surface) {
     std::cerr << "Failed to load texture: " << filepath
@@ -22,29 +24,34 @@ GLuint TargetObjects::loadTexture(std::string filepath) {
   glTexImage2D(GL_TEXTURE_2D, 0, format, surface->w, surface->h, 0, format,
                GL_UNSIGNED_BYTE, surface->pixels);
   glGenerateMipmap(GL_TEXTURE_2D);
-
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
                   GL_LINEAR_MIPMAP_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-  SDL_FreeSurface(surface); // Libera a superfície após carregamento
+  // Libera a superfície após carregamento
+  SDL_FreeSurface(surface);
   return textureID;
 }
 
+// Cria objetos de alvo
 void TargetObjects::create(GLuint program, int quantity) {
+  // Limpa a lista de objetos de distração
   destroy();
+
+  // Define o programa de shader
   m_program = program;
+
+  // Define o número de objetos que deseja criar
   auto const assetsPath{abcg::Application::getAssetsPath()};
 
-  // Carregar a textura para o objeto de distração
+  // Carrega a textura para o objeto de distração
   for (int i = 0; i < quantity; ++i) {
     TargetObject obj;
-    obj.m_texture = loadTexture(
-        (assetsPath + "/textures/whitepigeon.png").c_str()); // Carrega a textura
+    obj.m_texture = loadTexture((assetsPath + "/textures/whitepigeon.png")
+                                    .c_str()); // Carrega a textura
 
-    // Adicione uma velocidade aleatória para movimento
+    // Adiciona uma velocidade aleatória para movimento
     obj.m_velocity = glm::vec2(m_randomDist(m_randomEngine) * 0.005f,
                                m_randomDist(m_randomEngine) * 0.005f);
 
@@ -61,6 +68,7 @@ void TargetObjects::create(GLuint program, int quantity) {
         0.1f,  0.1f,  1.0f, 0.0f  // Superior direito (Y invertido)
     };
 
+    // Cria e configura o VBO
     glGenBuffers(1, &obj.m_VBO);
     glBindBuffer(GL_ARRAY_BUFFER, obj.m_VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
@@ -77,7 +85,7 @@ void TargetObjects::create(GLuint program, int quantity) {
     glVertexAttribPointer(texCoordAttrib, 2, GL_FLOAT, GL_FALSE,
                           4 * sizeof(float),
                           reinterpret_cast<void *>(2 * sizeof(float)));
-
+    // Desabilita o VBO e o VAO
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
@@ -91,12 +99,15 @@ void TargetObjects::create(GLuint program, int quantity) {
                   m_randomDist(m_randomEngine) * areaY - areaY / 2.0f);
     obj.m_scale = 0.5f;
 
+    // Adiciona o objeto à lista
     m_targets.push_back(obj);
   }
 }
-
+// Renderiza os objetos de alvo
 void TargetObjects::paint() {
+  // Ativa o programa de shader
   glUseProgram(m_program);
+  // Renderiza cada objeto de alvo
   for (auto &obj : m_targets) {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -115,19 +126,22 @@ void TargetObjects::paint() {
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     glBindVertexArray(0);
   }
+  // Desativa o programa de shader
   glUseProgram(0);
 }
 
+// Libera recursos dos objetos de alvo
 void TargetObjects::destroy() {
   for (auto &obj : m_targets) {
     glDeleteTextures(1, &obj.m_texture); // Liberar a textura
   }
 }
 
+// Atualiza a posição dos objetos de alvo
 void TargetObjects::update(float deltaTime) {
+  // Atualiza a posição de cada objeto
   for (auto it = m_targets.begin(); it != m_targets.end();) {
     it->m_translation += it->m_velocity * deltaTime * 100.0f;
-
     if (it->m_translation.x > 1.0f || it->m_translation.x < -1.0f)
       it->m_velocity.x *= -1.0f;
     if (it->m_translation.y > 1.0f || it->m_translation.y < -1.0f)
@@ -137,40 +151,49 @@ void TargetObjects::update(float deltaTime) {
   }
   // Verifica se a lista está vazia e recria objetos
   if (m_targets.empty()) {
-    create(m_program,
-           1); // Aqui você pode definir o número de objetos que deseja criar
+    // Define o número de objetos a ser criado
+    create(m_program, 1);
   }
 }
 
+// Verifica se o clique foi em um objeto de alvo
 bool TargetObjects::checkClickOnTarget(glm::vec2 clickPos) {
+  // Verifica cada objeto de alvo
   for (auto it = m_targets.begin(); it != m_targets.end(); ++it) {
     if (it->checkClick(clickPos)) {
       removeTarget(it); // Remove o objeto clicado
       // Verifica se a lista está vazia e recria objetos
       if (m_targets.empty()) {
-        create(m_program, 1); // Novamente, defina o número de objetos
+        // Define o número de objetos novaemente
+        create(m_program, 1);
       }
-      return true; // Retorna verdadeiro se o clique foi em uma distração
+      // Retorna verdadeiro se o clique foi em uma distração
+      return true;
     }
   }
-  return false; // Retorna falso se o clique não foi em nenhuma distração
+  // Retorna falso se o clique não foi em nenhuma distração
+  return false;
 }
 
+// Remove um objeto de alvo da lista
 void TargetObjects::removeTarget(std::list<TargetObject>::iterator it) {
   glDeleteTextures(1, &it->m_texture); // Liberar a textura
   m_targets.erase(it);                 // Remove o objeto da lista
 }
 
+// Verifica se a lista de objetos de alvo está vazia
 bool TargetObjects::TargetObject::checkClick(glm::vec2 const &clickPos) const {
-  // Calcular os limites do objeto
+  // Calcula os limites do objeto
   float halfSize = m_scale * 0.1f;
   glm::vec2 minBounds = m_translation - glm::vec2(halfSize);
   glm::vec2 maxBounds = m_translation + glm::vec2(halfSize);
 
-  // Verificar se a posição do clique está dentro dos limites do objeto
+  // Verifica se a posição do clique está dentro dos limites do objeto
   if (clickPos.x >= minBounds.x && clickPos.x <= maxBounds.x &&
       clickPos.y >= minBounds.y && clickPos.y <= maxBounds.y) {
+    // Retorna verdadeiro se o clique foi em uma distração
     return true;
   }
+  // Retorna falso se o clique não foi em nenhuma distração
   return false;
 }

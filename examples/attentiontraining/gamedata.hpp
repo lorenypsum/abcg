@@ -3,12 +3,12 @@
 
 #include <bitset>
 
-enum class GameState { Playing, GameOver, Win, Start }; // Adicionando o estado de início
+// Estados do jogo
+enum class GameState { Playing, GameOver, Win, Start };
 
+// Estado inicial do jogo
 struct GameData {
-  GameState m_state{GameState::Start}; // Estado inicial do jogo
+  GameState m_state{GameState::Start};
 };
 
 #endif
-
-

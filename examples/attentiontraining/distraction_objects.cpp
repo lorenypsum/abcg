@@ -2,7 +2,9 @@
 #include <SDL_image.h>
 #include <iostream>
 
+// Carrega a textura do objeto de distração
 GLuint DistractionObjects::loadTexture(std::string filepath) {
+  //
   GLuint textureID;
 
   // Carregar a imagem usando stb_image
@@ -22,29 +24,33 @@ GLuint DistractionObjects::loadTexture(std::string filepath) {
   glTexImage2D(GL_TEXTURE_2D, 0, format, surface->w, surface->h, 0, format,
                GL_UNSIGNED_BYTE, surface->pixels);
   glGenerateMipmap(GL_TEXTURE_2D);
-
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
                   GL_LINEAR_MIPMAP_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
+  // Libera a superfície após carregamento
   SDL_FreeSurface(surface); // Libera a superfície após carregamento
   return textureID;
 }
 
+// Cria objetos de distração
 void DistractionObjects::create(GLuint program, int quantity) {
+  // Limpa a lista de objetos de distração
   destroy();
+  // Define o programa de shader
   m_program = program;
+  // Define o número de objetos que deseja criar
   auto const assetsPath{abcg::Application::getAssetsPath()};
 
-  // Carregar a textura para o objeto de distração
+  // Carrega a textura para o objeto de distração
   for (int i = 0; i < quantity; ++i) {
     DistractionObject obj;
     obj.m_texture = loadTexture((assetsPath + "/textures/brownpigeon.png")
                                     .c_str()); // Carrega a textura
 
-    // Adicione uma velocidade aleatória para movimento
+    // Adiciona uma velocidade aleatória para movimento
     obj.m_velocity = glm::vec2(m_randomDist(m_randomEngine) * 0.005f,
                                m_randomDist(m_randomEngine) * 0.005f);
 
@@ -61,6 +67,7 @@ void DistractionObjects::create(GLuint program, int quantity) {
         0.1f,  0.1f,  1.0f, 0.0f  // Superior direito (Y invertido)
     };
 
+    // Cria e configura o VBO
     glGenBuffers(1, &obj.m_VBO);
     glBindBuffer(GL_ARRAY_BUFFER, obj.m_VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
@@ -77,7 +84,7 @@ void DistractionObjects::create(GLuint program, int quantity) {
     glVertexAttribPointer(texCoordAttrib, 2, GL_FLOAT, GL_FALSE,
                           4 * sizeof(float),
                           reinterpret_cast<void *>(2 * sizeof(float)));
-
+    // Desabilita o VBO e o VAO
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
@@ -86,12 +93,16 @@ void DistractionObjects::create(GLuint program, int quantity) {
         glm::vec2(m_randomDist(m_randomEngine), m_randomDist(m_randomEngine));
     obj.m_scale = 0.5f;
 
+    // Adiciona o objeto à lista de distrações
     m_distractions.push_back(obj);
   }
 }
 
+// Renderiza os objetos de distração
 void DistractionObjects::paint() {
+  // Ativa o programa de shader
   glUseProgram(m_program);
+  // Renderiza cada objeto de distração
   for (auto &obj : m_distractions) {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -110,19 +121,19 @@ void DistractionObjects::paint() {
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     glBindVertexArray(0);
   }
+  // Desativa o programa de shader
   glUseProgram(0);
 }
-
+// Libera recursos dos objetos de distração
 void DistractionObjects::destroy() {
   for (auto &obj : m_distractions) {
     glDeleteTextures(1, &obj.m_texture); // Liberar a textura
   }
 }
-
+// Atualiza a posição dos objetos de distração
 void DistractionObjects::update(float deltaTime) {
   for (auto it = m_distractions.begin(); it != m_distractions.end();) {
     it->m_translation += it->m_velocity * deltaTime * 100.0f;
-
     if (it->m_translation.x > 1.0f || it->m_translation.x < -1.0f)
       it->m_velocity.x *= -1.0f;
     if (it->m_translation.y > 1.0f || it->m_translation.y < -1.0f)
@@ -133,43 +144,53 @@ void DistractionObjects::update(float deltaTime) {
 
   // Verifica se a lista está vazia e recria objetos
   if (m_distractions.empty()) {
-    // Define o número de objetos que deseja criar
-    create(m_program, 6); 
+    // Define o número de objetos a ser criado
+    create(m_program, 6);
   }
 }
 
+// Verifica se o clique foi em um objeto de distração
 bool DistractionObjects::checkClickOnDistraction(glm::vec2 clickPos) {
   for (auto it = m_distractions.begin(); it != m_distractions.end(); ++it) {
     if (it->checkClick(clickPos)) {
-      removeDistraction(it); // Remove o objeto clicado
-
+      // Remove o objeto clicado
+      removeDistraction(it);
       // Verifica se a lista está vazia e recria objetos
       if (m_distractions.empty()) {
-        create(m_program, 6); // Novamente, defina o número de objetos
+        // Define o número de objetos novaemente
+        create(m_program, 6);
       }
-      return true; // Retorna verdadeiro se o clique foi em uma distração
+      // Retorna verdadeiro se o clique foi em uma distração
+      return true;
     }
   }
-  return false; // Retorna falso se o clique não foi em nenhuma distração
+  // Retorna falso se o clique não foi em nenhuma distração
+  return false;
 }
 
+// Remove um objeto de distração da lista
 void DistractionObjects::removeDistraction(
     std::list<DistractionObject>::iterator it) {
-  glDeleteTextures(1, &it->m_texture); // Liberar a textura
-  m_distractions.erase(it);            // Remove o objeto da lista
+  // Libera a textura
+  glDeleteTextures(1, &it->m_texture);
+  // Remove o objeto da lista
+  m_distractions.erase(it);
 }
 
+// Verifica se a lista de distrações está vazia
 bool DistractionObjects::DistractionObject::checkClick(
     glm::vec2 const &clickPos) const {
-  // Calcular os limites do objeto
+  // Calcula os limites do objeto
   float halfSize = m_scale * 0.1f;
   glm::vec2 minBounds = m_translation - glm::vec2(halfSize);
   glm::vec2 maxBounds = m_translation + glm::vec2(halfSize);
 
-  // Verificar se a posição do clique está dentro dos limites do objeto
+  // Verifica se a posição do clique está dentro dos limites do objeto
   if (clickPos.x >= minBounds.x && clickPos.x <= maxBounds.x &&
       clickPos.y >= minBounds.y && clickPos.y <= maxBounds.y) {
+    // Retorna verdadeiro se o clique foi em uma distração
     return true;
   }
+  // Retorna falso se o clique não foi em nenhuma distração
   return false;
 }
