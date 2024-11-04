@@ -123,7 +123,7 @@ void Window::onUpdate() {
     updateTimeDisplay();                      // Atualiza a exibição de tempo
   } else if (m_gameOver && m_gameData.m_state != GameState::Playing) {
     if (m_restartDelay < 0) {
-      resetGame(); // Reinicia o jogo
+      //resetGame(); // Reinicia o jogo -- comentado porque o jogo reinicia com bugs e não aparece mensagem de pontuação direito
     }
   }
   checkGameStatus(); // Verifica o status do jogo
