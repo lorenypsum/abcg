@@ -14,7 +14,7 @@ GLuint TargetObjects::loadTexture(std::string filepath) {
   }
 
   // Define o formato da textura com base no canal alfa
-  GLenum format = surface->format->BytesPerPixel == 4 ? GL_RGBA : GL_RGB;
+  GLenum format = (surface->format->BytesPerPixel == 4) ? GL_RGBA : GL_RGB;
 
   // Gera e configura a textura
   glGenTextures(1, &textureID);
@@ -98,6 +98,8 @@ void TargetObjects::create(GLuint program, int quantity) {
 void TargetObjects::paint() {
   glUseProgram(m_program);
   for (auto &obj : m_targets) {
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glBindTexture(GL_TEXTURE_2D, obj.m_texture);
 
     // Enviar translação, rotação e escala para o shader

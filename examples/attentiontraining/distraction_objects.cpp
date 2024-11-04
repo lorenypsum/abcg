@@ -14,7 +14,7 @@ GLuint DistractionObjects::loadTexture(std::string filepath) {
   }
 
   // Define o formato da textura com base no canal alfa
-  GLenum format = surface->format->BytesPerPixel == 4 ? GL_RGBA : GL_RGB;
+  GLenum format = (surface->format->BytesPerPixel == 4) ? GL_RGBA : GL_RGB;
 
   // Gera e configura a textura
   glGenTextures(1, &textureID);
@@ -37,12 +37,12 @@ void DistractionObjects::create(GLuint program, int quantity) {
   destroy();
   m_program = program;
   auto const assetsPath{abcg::Application::getAssetsPath()};
-  
+
   // Carregar a textura para o objeto de distração
   for (int i = 0; i < quantity; ++i) {
     DistractionObject obj;
-    obj.m_texture =
-        loadTexture((assetsPath + "/textures/potatochip_yellow.png").c_str()); // Carrega a textura
+    obj.m_texture = loadTexture((assetsPath + "/textures/potatochip_yellow.png")
+                                    .c_str()); // Carrega a textura
 
     // Adicione uma velocidade aleatória para movimento
     obj.m_velocity = glm::vec2(m_randomDist(m_randomEngine) * 0.001f,
@@ -93,6 +93,8 @@ void DistractionObjects::create(GLuint program, int quantity) {
 void DistractionObjects::paint() {
   glUseProgram(m_program);
   for (auto &obj : m_distractions) {
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glBindTexture(GL_TEXTURE_2D, obj.m_texture);
 
     // Enviar translação, rotação e escala para o shader
