@@ -2,11 +2,11 @@
 
 ![Gameplay GIF](giphy.gif) <!-- Substitua com o link para o GIF -->
 
-Este projeto apresenta o jogo **Caça ao Pombo**, uma ferramenta desenvolvida após uma série de entrevistas empáticas com professores e com uma profissional da neuropsicologia, e sua finalidade é treinar habilidades de atenção e concentração dos jogadores, desafiando-os a identificar e coletar objetos específicos em meio a um ambiente visual dinâmico.
+Este projeto apresenta o jogo **Caça ao Pombo**, uma ferramenta desenvolvida após uma série de entrevistas empáticas com professores e com uma profissional da neuropsicologia, sua finalidade é treinar habilidades de atenção e concentração dos jogadores, desafiando-os a identificar e coletar objetos específicos em meio a um ambiente visual dinâmico.
 
 O ambiente do jogo, embora simule aleatoriedade, permanece constante para permitir testes comparativos de atenção entre jogadores. Isso possibilita o uso dos resultados em análises de desempenho e evolução de habilidades, viabilizando sua aplicação em experimentos científicos.
 
-O repositório contém o código de um jogo desenvolvido em C++ com OpenGL, SDL e ImGui. No jogo, o jogador precisa clicar no alvo correto (pombo branco) enquanto evita clicar em objetos de distração (pombos marrons). Cada acerto no alvo aumenta a pontuação, enquanto clicar em uma distração diminui a pontuação. O objetivo é conseguir a maior pontuação possível antes do tempo acabar.
+O repositório contém o código desenvolvido em C++ com OpenGL, SDL e ImGui. No jogo, o jogador precisa clicar no alvo correto (pombo branco) enquanto evita clicar em objetos de distração (pombos marrons). Cada acerto no alvo aumenta a pontuação, enquanto clicar em uma distração diminui a pontuação. O objetivo é conseguir a maior pontuação possível antes do tempo acabar.
 
 ## Tabela de Conteúdos
 
@@ -20,17 +20,20 @@ O repositório contém o código de um jogo desenvolvido em C++ com OpenGL, SDL 
   - [Interface de Usuário com ImGui](#interface-de-usuário-com-imgui)
   - [Interação do Usuário com SDL](#interação-do-usuário-com-sdl)
   - [Controle de Tempo e Estado do Jogo](#controle-de-tempo-e-estado-do-jogo)
+  - [Estrutura do Código](#estrutura-do-código)
+  - [Melhorias Futuras](#melhorias-futuras)
+  - [Correções Necesárias](#correções-necesárias)
 - [Instalação e Execução](#instalação-e-execução)
 - [Estrutura do Código](#estrutura-do-código)
 - [Referâncias](#referências)
 
 ## Motivação do Projeto
 
-A escolha do tema do jogo foi baseada em **entrevistas empáticas** realizadas via Google Forms, onde foram levantadas as principais dificuldades enfrentadas por professores em sala de aula, e em uma consulta com uma neuropsicóloga especializada em desenvolvimento de habilidades cognitivas. 
+A escolha do tema do jogo foi baseada em **entrevistas empáticas** realizadas via Google Forms, onde foram levantadas as principais dificuldades enfrentadas por professores em sala de aula, após o resultado, uma consulta foi realizada com uma neuropsicóloga especializada em desenvolvimento de habilidades cognitivas. 
 
 ### Entrevistas com Educadores
 
-Nove educadores responderam nosso formulário, para muitos deles, a **falta de atenção e concentração** é a maior dificuldade enfrentada no ambiente escolar. Diante disso, ficou evidente a necessidade de criar uma ferramenta que auxiliasse no treinamento e desenvolvimento dessas habilidades cognitivas em um contexto lúdico e interativo.
+Nove educadores responderam nosso formulário, para muitos deles, a **falta de atenção e concentração** é a maior dificuldade enfrentada no ambiente escolar. Diante disso, ficou evidente a necessidade de criar uma ferramenta que auxiliasse no treinamento e desenvolvimento dessas habilidades cognitivas em um contexto interativo.
 
 ### Resultados das Entrevistas
 ![alt text](image.png)
@@ -44,18 +47,18 @@ Nove educadores responderam nosso formulário, para muitos deles, a **falta de a
 ![alt text](image-8.png)
 ![alt text](image-9.png)
 
-### Consultoria Neuropsicológica
+### Consultoria com Neuropsicológica
 
-Para validar a proposta, uma neuropsicóloga especializada em treinamento cognitivo foi entrevistada e sugeriu uma série de ideias para o desenvolvimento do jogo:
+Para validar a proposta, uma neuropsicóloga especializada em treinamento cognitivo foi entrevistada e sugeriu uma série de ideias para o desenvolvimento do jogo, resumidas abaixo:
 - **Mecânica de Memória e Atenção**: Sugeriu-se que o jogo combinasse elementos de memória, concentração e percepção visual, com o objetivo de manter o jogador focado em uma tarefa específica enquanto é desafiado por distrações.
 - **Progressão por Níveis**: A neuropsicóloga recomendou que o jogo apresentasse desafios progressivos, onde o número de objetos e distrações aumentasse em cada nível, dificultando o reconhecimento dos objetos a serem coletados.
 - **Objetos Únicos e Distrações Dinâmicas**: Outro ponto foi a inclusão de objetos que aparecem apenas uma vez em certos níveis, incentivando o jogador a desenvolver uma atenção seletiva para identificar rapidamente o que é relevante em meio a uma grande quantidade de estímulos visuais.
 
-Essas sugestões foram simplificadas em um mvp e incorporadas ao projeto, dando origem ao **Caça ao Pombo Branco!**.
+Essas sugestões foram simplificadas em um mvp (mínimo produto viável) e incorporadas ao projeto, dando origem ao **Caça ao Pombo Branco!**.
 
 ## Objetivo e Justificativa
 
-O objetivo deste projeto é desenvolver um jogo que **treine a atenção e concentração** dos jogadores, desafiando-os a identificar e coletar objetos específicos em uma tela lotada de distrações. A justificativa do projeto é oferecer aos educadores e profissionais da saúde uma ferramenta prática que ajuda no desenvolvimento e avaliação dessas habilidades em crianças e adolescentes.
+O objetivo deste projeto é desenvolver um jogo que **treine ou avalie a atenção e concentração** dos jogadores, desafiando-os a identificar e coletar objetos específicos em uma tela lotada de distrações. O escopo foi simplificado para um jogo de atenção básico, onde o jogador deve clicar no alvo correto (pombo branco) enquanto evita clicar em objetos de distração (pombos marrons).
 
 ## Funcionalidades
 
@@ -66,14 +69,18 @@ O objetivo deste projeto é desenvolver um jogo que **treine a atenção e conce
 
 ## Técnicas Implementadas
 
-Este jogo foi desenvolvido com várias técnicas de computação gráficas explicitadas abaixo:
+O desenvolvimento se deu com várias técnicas de computação gráficas explicitadas abaixo:
 
 ### Renderização de Objetos com OpenGL
 
 A renderização é feita usando **OpenGL**:
 - **Shaders**: O código utiliza shaders de vértices e fragmentos, localizados no diretório `shaders`, para processar a textura dos objetos e garantir uma renderização leve e responsiva.
-- **Texturas**: São carregadas texturas de pombo branco (alvo) e pombo marrom (distração) para dar contexto ao jogo. SDL_image.h é usado para carregar as imagens.
-- **Transformações**: As posições dos objetos são recalculadas periodicamente, com posições aleatórias a cada nova rodada, utilizando a função `initializeGameObjects()`.
+- **Texturas**: São carregadas texturas de pombo branco (alvo) e pombo marrom (distração) para dar contexto ao jogo. SDL_image.h é usado para carregar as imagens em png.
+- **Transformações**: As posições dos objetos são recalculadas periodicamente, com posições aleatórias a cada nova rodada, utilizando-se diversas funções.
+- **Colisões**: A função `checkCollision()` verifica se a posição do clique corresponde à posição do alvo, permitindo que o jogador colete o alvo correto e aumente sua pontuação.
+- **Renderização de Cenário**: O cenário é renderizado com um fundo de céu e nuvens, criando um ambiente visual agradável e imersivo.
+- **Renderização de Objetos**: Os objetos (alvo e distrações) são renderizados com texturas e posições aleatórias, desafiando o jogador a manter o foco no alvo correto.
+- **Renderização de UI**: A interface do usuário é renderizada com **ImGui**, exibindo informações sobre a pontuação, tempo e estado do jogo.
 
 ### Interface de Usuário com ImGui
 
@@ -97,8 +104,8 @@ Para detectar cliques do mouse e toques na tela, o jogo utiliza **SDL**:
 O estado do jogo e o cronômetro são geridos utilizando a biblioteca **chrono** do C++:
 - **Cronômetro**: Cada segundo, o tempo é decrementado. Ao atingir zero, o jogo termina.
 - **Estados do Jogo**: São definidos vários estados (Start, Playing, Game Over, Win) que determinam a lógica e as mensagens exibidas ao jogador. A função `checkGameStatus()` atualiza o estado com base na pontuação e tempo restantes.
+- **Pontuação**: A pontuação é atualizada com base nos cliques corretos e incorretos do jogador, aumentando ou diminuindo a pontuação conforme necessário.
 
-## Estrutura do Código
 ## Estrutura do Código
 
 - **`main.cpp`**: Arquivo principal responsável pela inicialização do jogo e da interface gráfica.
