@@ -98,6 +98,30 @@ O estado do jogo e o cronômetro são geridos utilizando a biblioteca **chrono**
 - **Cronômetro**: Cada segundo, o tempo é decrementado. Ao atingir zero, o jogo termina.
 - **Estados do Jogo**: São definidos vários estados (Start, Playing, Game Over, Win) que determinam a lógica e as mensagens exibidas ao jogador. A função `checkGameStatus()` atualiza o estado com base na pontuação e tempo restantes.
 
+## Estrutura do Código
+## Estrutura do Código
+
+- **`main.cpp`**: Arquivo principal responsável pela inicialização do jogo e da interface gráfica.
+- **`window.cpp`**: Gerencia a configuração da janela e a renderização dos elementos do jogo.
+- **`window.hpp`**: Define a classe `Window`, que controla a janela do jogo e suas interações.
+- **`distraction_objects.cpp`**: Implementa a classe `DistractionObject`, que representa os objetos de distração dentro do jogo.
+- **`distraction_objects.hpp`**: Declara a classe `DistractionObject`, responsável por modelar os objetos que distraem o jogador.
+- **`target_objects.cpp`**: Implementa a classe `TargetObject`, que representa o alvo que os jogadores devem coletar.
+- **`target_objects.hpp`**: Declara a classe `TargetObject`, responsável por modelar os alvos a serem coletados pelos jogadores.
+- **`background.cpp`**: Implementa a classe `Background`, que se encarrega de renderizar o cenário do jogo.
+- **`background.hpp`**: Declara a classe `Background`, que define os parâmetros para a renderização do cenário.
+- **`gamedata.hpp`**: Define a estrutura `GameData`, que armazena os estados e informações relevantes do jogo.	
+
+### Melhorias Futuras
+- **Níveis de Dificuldade**: Implementar níveis de dificuldade progressivos, com mais objetos e distrações em níveis avançados.
+- **Sons e Efeitos Visuais**: Adicionar efeitos sonoros e visuais para tornar o jogo mais imersivo e envolvente.
+- **Feedback Visual**: Adicionar feedback visual para indicar acertos e erros.
+
+### Correções Necesárias
+- **Corrigir Bug de Vitória**: O estado de vitória não está sendo exibido corretamente ao atingir uma nova pontuação recorde.
+- **Corrigir Resete de Pontuação**: A pontuação não é resetada corretamente ao reiniciar o jogo.
+- **Corrigir Bug de Interface**: A interface do usuário pode ser aprimorada para tornar o jogo mais intuitivo e fácil de usar.
+
 ## Instalação e Execução
 
 Para compilar e executar o jogo:
