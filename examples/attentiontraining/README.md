@@ -126,7 +126,7 @@ O estado do jogo e o cronômetro são geridos utilizando a biblioteca **chrono**
 
 ### Correções Necesárias
 - **Corrigir Bug de Vitória**: O estado de vitória não está sendo exibido corretamente ao atingir uma nova pontuação recorde.
-- **Corrigir Resete de Pontuação**: A pontuação não é resetada corretamente ao reiniciar o jogo.
+- **Corrigir Reset de Pontuação**: A pontuação não é resetada corretamente ao reiniciar o jogo.
 - **Corrigir Bug de Interface**: A interface do usuário pode ser aprimorada para tornar o jogo mais intuitivo e fácil de usar.
 
 ## Instalação e Execução
