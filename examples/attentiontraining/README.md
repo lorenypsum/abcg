@@ -76,8 +76,6 @@ O desenvolvimento se deu com várias técnicas de computação gráficas explici
 A renderização é feita usando **OpenGL**:
 - **Shaders**: O código utiliza shaders de vértices e fragmentos, localizados no diretório `shaders`, para processar a textura dos objetos e garantir uma renderização leve e responsiva.
 - **Texturas**: São carregadas texturas de pombo branco (alvo) e pombo marrom (distração) para dar contexto ao jogo. SDL_image.h é usado para carregar as imagens em png.
-- **Transformações**: As posições dos objetos são recalculadas periodicamente, com posições aleatórias a cada nova rodada, utilizando-se diversas funções.
-- **Colisões**: A função `checkCollision()` verifica se a posição do clique corresponde à posição do alvo, permitindo que o jogador colete o alvo correto e aumente sua pontuação.
 - **Renderização de Cenário**: O cenário é renderizado com um fundo de céu e nuvens..
 - **Renderização de Objetos**: Os objetos (alvo e distrações) são renderizados com texturas e posições aleatórias.no alvo correto.
 - **Renderização de UI**: A interface do usuário é renderizada com **ImGui**, exibindo informações sobre a pontuação, tempo e estado do jogo.
@@ -98,6 +96,8 @@ Para detectar cliques do mouse e toques na tela, o jogo utiliza **SDL**:
 - **SDL_MOUSEBUTTONDOWN** e **SDL_FINGERDOWN**: Eventos capturam a posição de cliques e toques, permitindo que o jogador interaja com o jogo.
 - **Conversão de Coordenadas**: As posições de clique são convertidas para coordenadas normalizadas, permitindo uma fácil verificação de colisão entre o clique e os objetos na tela.
 - **Interatividade**: Ao clicar no alvo correto, a pontuação aumenta, enquanto clicar em uma distração resulta em perda de pontos.
+- **Colisões**: A função `checkCollision()` verifica se a posição do clique corresponde à posição do alvo, permitindo que o jogador colete o alvo correto e aumente sua pontuação.
+- **Transformações**: As posições dos objetos são recalculadas periodicamente, com posições aleatórias a cada nova rodada, utilizando-se diversas funções.
 
 ### Controle de Tempo e Estado do Jogo
 
