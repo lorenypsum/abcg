@@ -78,8 +78,8 @@ A renderização é feita usando **OpenGL**:
 - **Texturas**: São carregadas texturas de pombo branco (alvo) e pombo marrom (distração) para dar contexto ao jogo. SDL_image.h é usado para carregar as imagens em png.
 - **Transformações**: As posições dos objetos são recalculadas periodicamente, com posições aleatórias a cada nova rodada, utilizando-se diversas funções.
 - **Colisões**: A função `checkCollision()` verifica se a posição do clique corresponde à posição do alvo, permitindo que o jogador colete o alvo correto e aumente sua pontuação.
-- **Renderização de Cenário**: O cenário é renderizado com um fundo de céu e nuvens, criando um ambiente visual agradável e imersivo.
-- **Renderização de Objetos**: Os objetos (alvo e distrações) são renderizados com texturas e posições aleatórias, desafiando o jogador a manter o foco no alvo correto.
+- **Renderização de Cenário**: O cenário é renderizado com um fundo de céu e nuvens..
+- **Renderização de Objetos**: Os objetos (alvo e distrações) são renderizados com texturas e posições aleatórias.no alvo correto.
 - **Renderização de UI**: A interface do usuário é renderizada com **ImGui**, exibindo informações sobre a pontuação, tempo e estado do jogo.
 
 ### Interface de Usuário com ImGui
