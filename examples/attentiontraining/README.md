@@ -25,7 +25,7 @@ O repositório contém o código desenvolvido em C++ com OpenGL, SDL e ImGui. No
   - [Correções Necesárias](#correções-necesárias)
 - [Instalação e Execução](#instalação-e-execução)
 - [Estrutura do Código](#estrutura-do-código)
-- [Referâncias](#referências)
+- [Referências](#referências)
 
 ## Motivação do Projeto
 
