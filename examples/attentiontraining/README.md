@@ -1,6 +1,6 @@
 # Jogo de Treinamento de Habilidade de Atenção
 
-![Gameplay GIF](https://example.com/link-to-gameplay-gif) <!-- Substitua com o link para o GIF -->
+![Gameplay GIF](giphy.gif) <!-- Substitua com o link para o GIF -->
 
 Este projeto apresenta o jogo **Caça ao Pombo**, uma ferramenta desenvolvida após uma série de entrevistas empáticas com professores e com uma profissional da neuropsicologia, e sua finalidade é treinar habilidades de atenção e concentração dos jogadores, desafiando-os a identificar e coletar objetos específicos em meio a um ambiente visual dinâmico.
 
@@ -135,11 +135,20 @@ Para compilar e executar o jogo:
 [Configuração do ambiente](https://hbatagelo.github.io/cg/config.html)
 
 3. O jogo pode ser acessado pelo browser no link:
-[Link do jogo](https://lorenypsum.github.io/abcg/attentiontraining/)
+[WebAssembly do jogo](https://lorenypsum.github.io/abcg/attentiontraining/)
 
 ## Video de Gameplay
-[Link do vídeo](placeholder)
+[Link do vídeo](https://drive.google.com/drive/folders/1Twt4VrN87Xa7bjZ_nGLe0jpwOSqIPjjB?usp=sharing)
 
 ## Referências
-
+- [Pigeon Assets](https://pop-shop-packs.itch.io/)
+- [Hbatagelo](https://hbatagelo.github.io/cg/)
 - [OpenGL](https://www.opengl.org/)
+- [SDL](https://www.libsdl.org/)
+- [Chat GPT](https://www.chatgpt.com/)
+- [Reddit](https://www.reddit.com/r/opengl/comments/1910otm/possible_to_use_sdl_image_to_load_in_opengl/?rdt=43070)
+- [Stack Overflow](https://stackoverflow.com/questions/52895444/c-image-loading-with-sdl2-and-sdl-image)
+- [Stack Overflow](https://stackoverflow.com/questions/74577979/how-to-idiomatically-add-external-library-dependencies-that-use-git-and-cmake-to)
+
+
+
