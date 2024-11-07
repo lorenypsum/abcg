@@ -1,8 +1,8 @@
 # Treinamento de atenção seletiva através de jogo 2D
 
-Lorena Silva Sampaio - 11201812025
-Pablo Renato Nunes dos Santos - 11202232225
-Jonas de Mello Oliveira - 11000116
+- Lorena Silva Sampaio - 11201812025
+- Pablo Renato Nunes dos Santos - 11202232225
+- Jonas de Mello Oliveira - 11000116
 
 ![Gameplay GIF](giphy.gif) <!-- Substitua com o link para o GIF -->
 
