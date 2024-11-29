@@ -5,4 +5,5 @@
 #add_subdirectory(coloredtriangles)
 #add_subdirectory(regularpolygons)
 #add_subdirectory(asteroids)
-add_subdirectory(attentiontraining)
+#add_subdirectory(attentiontraining)
+add_subdirectory(attentiontraining3d)
