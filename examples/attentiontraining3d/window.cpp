@@ -1,164 +1,219 @@
 #include "window.hpp"
 
-#include <unordered_map>
-
-// Explicit specialization of std::hash for Vertex
-template <> struct std::hash<Vertex> {
-  size_t operator()(Vertex const &vertex) const noexcept {
-    auto const h1{std::hash<glm::vec3>()(vertex.position)};
-    return h1;
-  }
-};
+#include <glm/gtx/fast_trigonometry.hpp>
+#define PI 3.14159265358979323846
 
 void Window::onEvent(SDL_Event const &event) {
   if (event.type == SDL_KEYDOWN) {
     if (event.key.keysym.sym == SDLK_UP || event.key.keysym.sym == SDLK_w)
-      m_dollySpeed = 1.0f;
+      m_gameData.m_input.set(gsl::narrow<size_t>(Input::Up));
     if (event.key.keysym.sym == SDLK_DOWN || event.key.keysym.sym == SDLK_s)
-      m_dollySpeed = -1.0f;
+      m_gameData.m_input.set(gsl::narrow<size_t>(Input::Down));
     if (event.key.keysym.sym == SDLK_LEFT || event.key.keysym.sym == SDLK_a)
-      m_panSpeed = -1.0f;
+      m_gameData.m_input.set(gsl::narrow<size_t>(Input::Left));
     if (event.key.keysym.sym == SDLK_RIGHT || event.key.keysym.sym == SDLK_d)
-      m_panSpeed = 1.0f;
-    if (event.key.keysym.sym == SDLK_q)
-      m_truckSpeed = -1.0f;
-    if (event.key.keysym.sym == SDLK_e)
-      m_truckSpeed = 1.0f;
+      m_gameData.m_input.set(gsl::narrow<size_t>(Input::Right));
   }
   if (event.type == SDL_KEYUP) {
-    if ((event.key.keysym.sym == SDLK_UP || event.key.keysym.sym == SDLK_w) &&
-        m_dollySpeed > 0)
-      m_dollySpeed = 0.0f;
-    if ((event.key.keysym.sym == SDLK_DOWN || event.key.keysym.sym == SDLK_s) &&
-        m_dollySpeed < 0)
-      m_dollySpeed = 0.0f;
-    if ((event.key.keysym.sym == SDLK_LEFT || event.key.keysym.sym == SDLK_a) &&
-        m_panSpeed < 0)
-      m_panSpeed = 0.0f;
-    if ((event.key.keysym.sym == SDLK_RIGHT ||
-         event.key.keysym.sym == SDLK_d) &&
-        m_panSpeed > 0)
-      m_panSpeed = 0.0f;
-    if (event.key.keysym.sym == SDLK_q && m_truckSpeed < 0)
-      m_truckSpeed = 0.0f;
-    if (event.key.keysym.sym == SDLK_e && m_truckSpeed > 0)
-      m_truckSpeed = 0.0f;
+    if (event.key.keysym.sym == SDLK_UP || event.key.keysym.sym == SDLK_w)
+      m_gameData.m_input.reset(gsl::narrow<size_t>(Input::Up));
+    if (event.key.keysym.sym == SDLK_DOWN || event.key.keysym.sym == SDLK_s)
+      m_gameData.m_input.reset(gsl::narrow<size_t>(Input::Down));
+    if (event.key.keysym.sym == SDLK_LEFT || event.key.keysym.sym == SDLK_a)
+      m_gameData.m_input.reset(gsl::narrow<size_t>(Input::Left));
+    if (event.key.keysym.sym == SDLK_RIGHT || event.key.keysym.sym == SDLK_d)
+      m_gameData.m_input.reset(gsl::narrow<size_t>(Input::Right));
+  }
+
+  if (event.type == SDL_MOUSEWHEEL) {
+    // m_camera.zoom(event.wheel.y);
+  }
+
+  glm::ivec2 mousePosition;
+  SDL_GetMouseState(&mousePosition.x, &mousePosition.y);
+
+  if (event.type == SDL_MOUSEMOTION) {
+    m_camera.mouseMove(mousePosition);
+  }
+  if (event.type == SDL_MOUSEBUTTONDOWN &&
+      event.button.button == SDL_BUTTON_LEFT) {
+    m_camera.mousePress(mousePosition);
+  }
+  if (event.type == SDL_MOUSEBUTTONUP &&
+      event.button.button == SDL_BUTTON_LEFT) {
+    m_camera.mouseRelease();
   }
 }
 
 void Window::onCreate() {
-  auto const &assetsPath{abcg::Application::getAssetsPath()};
+  auto const assetsPath{abcg::Application::getAssetsPath()};
 
-  abcg::glClearColor(0, 0, 0, 1);
-
-  // Enable depth buffering
+  abcg::glClearColor(0, 0.753, 0.961, 1);
   abcg::glEnable(GL_DEPTH_TEST);
 
-  // Create program
-  m_program =
-      abcg::createOpenGLProgram({{.source = assetsPath + "/shaders/lookat.vert",
+  m_program_obj =
+      abcg::createOpenGLProgram({{.source = assetsPath + "shaders/texture.vert",
                                   .stage = abcg::ShaderStage::Vertex},
-                                 {.source = assetsPath + "/shaders/lookat.frag",
+                                 {.source = assetsPath + "shaders/texture.frag",
                                   .stage = abcg::ShaderStage::Fragment}});
 
-  // Ground texture
-  m_ground.create(m_program); // Create ground
+  m_player.loadDiffuseTexture(assetsPath + "maps/Minecraft_steve_skin.jpg");
+  m_player.setSize(10.0f);
+  m_player.loadObj(assetsPath + "minecraft_steve.obj");
+  m_player.setupVAO(m_program_obj);
 
-  // Get location of uniform variables
-  m_viewMatrixLocation = abcg::glGetUniformLocation(m_program, "viewMatrix");
-  m_projMatrixLocation = abcg::glGetUniformLocation(m_program, "projMatrix");
-  m_modelMatrixLocation = abcg::glGetUniformLocation(m_program, "modelMatrix");
-  m_colorLocation = abcg::glGetUniformLocation(m_program, "color");
+  m_Ka = m_player.getKa();
+  m_Kd = m_player.getKd();
+  m_Ks = m_player.getKs();
+  m_shininess = m_player.getShininess();
 
-  // Load model
-  // loadModelFromFile(assetsPath + "bunny.obj");
+  m_ground.loadDiffuseTexture(assetsPath + "maps/Grass_Block_TEX.png");
+  m_ground.loadObj(assetsPath + "Grass_Block.obj");
+  m_ground.setupVAO(m_program_obj);
 
-  // Generate VBO
-  abcg::glGenBuffers(1, &m_VBO);
-  abcg::glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-  abcg::glBufferData(GL_ARRAY_BUFFER,
-                     sizeof(m_vertices.at(0)) * m_vertices.size(),
-                     m_vertices.data(), GL_STATIC_DRAW);
-  abcg::glBindBuffer(GL_ARRAY_BUFFER, 0);
+  m_sand.loadDiffuseTexture(assetsPath + "maps/sand.png");
+  m_sand.loadObj(assetsPath + "sand.obj");
+  m_sand.setupVAO(m_program_obj);
 
-  // Generate EBO
-  abcg::glGenBuffers(1, &m_EBO);
-  abcg::glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
-  abcg::glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-                     sizeof(m_indices.at(0)) * m_indices.size(),
-                     m_indices.data(), GL_STATIC_DRAW);
-  abcg::glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-  // Create VAO
-  abcg::glGenVertexArrays(1, &m_VAO);
-
-  // Bind vertex attributes to current VAO
-  abcg::glBindVertexArray(m_VAO);
-
-  abcg::glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-  auto const positionAttribute{
-      abcg::glGetAttribLocation(m_program, "inPosition")};
-  abcg::glEnableVertexAttribArray(positionAttribute);
-  abcg::glVertexAttribPointer(positionAttribute, 3, GL_FLOAT, GL_FALSE,
-                              sizeof(Vertex), nullptr);
-  abcg::glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-  abcg::glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
-
-  // End of binding to current VAO
-  abcg::glBindVertexArray(0);
-}
-
-void Window::onPaint() {
-  // Clear color buffer and depth buffer
-  abcg::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-  abcg::glViewport(0, 0, m_viewportSize.x, m_viewportSize.y);
-
-  abcg::glUseProgram(m_program);
-
-  // Set uniform variables for viewMatrix and projMatrix
-  // These matrices are used for every scene object
-  abcg::glUniformMatrix4fv(m_viewMatrixLocation, 1, GL_FALSE,
-                           &m_camera.getViewMatrix()[0][0]);
-  abcg::glUniformMatrix4fv(m_projMatrixLocation, 1, GL_FALSE,
-                           &m_camera.getProjMatrix()[0][0]);
-
-  abcg::glBindVertexArray(m_VAO);
-
-  abcg::glUniform4f(m_colorLocation, 1.0f, 0.25f, 0.25f, 1.0f);
-  abcg::glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT,
-                       nullptr);
-
-  abcg::glBindVertexArray(0);
-
-  // Draw ground
-  m_ground.paint();
-
-  abcg::glUseProgram(0);
-}
-
-void Window::onPaintUI() { abcg::OpenGLWindow::onPaintUI(); }
-
-void Window::onResize(glm::ivec2 const &size) {
-  m_viewportSize = size;
-  m_camera.computeProjectionMatrix(size);
-}
-
-void Window::onDestroy() {
-  m_ground.destroy();
-
-  abcg::glDeleteProgram(m_program);
-  abcg::glDeleteBuffers(1, &m_EBO);
-  abcg::glDeleteBuffers(1, &m_VBO);
-  abcg::glDeleteVertexArrays(1, &m_VAO);
+  m_tree.setSize(4.0f);
+  m_tree.loadDiffuseTexture(assetsPath + "maps/Mineways2Skfb-RGBA.png");
+  m_tree.loadObj(assetsPath + "Mineways2Skfb.obj");
+  m_tree.setupVAO(m_program_obj);
 }
 
 void Window::onUpdate() {
   auto const deltaTime{gsl::narrow_cast<float>(getDeltaTime())};
 
-  // Update LookAt camera
-  m_camera.dolly(m_dollySpeed * deltaTime);
-  m_camera.truck(m_truckSpeed * deltaTime);
-  m_camera.pan(m_panSpeed * deltaTime);
+  // Controla o movimento do jogador baseado nas teclas WASD
+  if (m_gameData.m_input[static_cast<size_t>(Input::Left)]) {
+    m_angle -= glm::radians(90.0f);
+    m_camera.rotateAroundPlayer(glm::radians(90.0f));
+  }
+  if (m_gameData.m_input[static_cast<size_t>(Input::Right)]) {
+    m_angle += glm::radians(90.0f);
+    m_camera.rotateAroundPlayer(glm::radians(-90.0f));
+  }
+  if (m_gameData.m_input[static_cast<size_t>(Input::Up)]) {
+    m_position.x -= cos(m_angle) * 2.0f;
+    m_position.z -= sin(m_angle) * 2.0f;
+  }
+    if (m_gameData.m_input[static_cast<size_t>(Input::Down)]) {
+    m_position.x += cos(m_angle) * 2.0f;
+    m_position.z += sin(m_angle) * 2.0f;
+  }
+
+  // Atualiza a câmera com a nova posição do jogador
+  m_camera.update(m_position, m_event, deltaTime);
+}
+
+void Window::onPaint() {
+
+  abcg::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  abcg::glViewport(0, 0, m_viewportSize.x, m_viewportSize.y);
+
+  abcg::glUseProgram(m_program_obj);
+
+  // Get location of uniform variables
+  auto const viewMatrixLoc{
+      abcg::glGetUniformLocation(m_program_obj, "viewMatrix")};
+  auto const projMatrixLoc{
+      abcg::glGetUniformLocation(m_program_obj, "projMatrix")};
+  auto const modelMatrixLoc{
+      abcg::glGetUniformLocation(m_program_obj, "modelMatrix")};
+  auto const normalMatrixLoc{
+      abcg::glGetUniformLocation(m_program_obj, "normalMatrix")};
+  auto const lightDirLoc{
+      abcg::glGetUniformLocation(m_program_obj, "lightDirWorldSpace")};
+  auto const shininessLoc{
+      abcg::glGetUniformLocation(m_program_obj, "shininess")};
+  auto const IaLoc{abcg::glGetUniformLocation(m_program_obj, "Ia")};
+  auto const IdLoc{abcg::glGetUniformLocation(m_program_obj, "Id")};
+  auto const IsLoc{abcg::glGetUniformLocation(m_program_obj, "Is")};
+  auto const KaLoc{abcg::glGetUniformLocation(m_program_obj, "Ka")};
+  auto const KdLoc{abcg::glGetUniformLocation(m_program_obj, "Kd")};
+  auto const KsLoc{abcg::glGetUniformLocation(m_program_obj, "Ks")};
+  auto const diffuseTexLoc{
+      abcg::glGetUniformLocation(m_program_obj, "diffuseTex")};
+
+  // Set uniform variables that have the same value for every model
+  abcg::glUniformMatrix4fv(viewMatrixLoc, 1, GL_FALSE,
+                           &m_camera.getViewMatrix()[0][0]);
+  abcg::glUniformMatrix4fv(projMatrixLoc, 1, GL_FALSE,
+                           &m_camera.getProjMatrix()[0][0]);
+  abcg::glUniform1i(diffuseTexLoc, 0);
+
+  auto const lightDirRotated{glm::vec4(0.0f, 0.0f, 1.0f, 1.0f)};
+
+  abcg::glUniform4fv(lightDirLoc, 1, &lightDirRotated.x);
+  abcg::glUniform4fv(IaLoc, 1, &m_Ia.x);
+  abcg::glUniform4fv(IdLoc, 1, &m_Id.x);
+  abcg::glUniform4fv(IsLoc, 1, &m_Is.x);
+
+  // Set uniform variables for the current model
+  glm::mat4 modelMatrixProt{1.0f};
+
+  auto const modelViewMatrix{
+      glm::mat3(m_camera.getViewMatrix() * modelMatrixProt)};
+  auto const normalMatrix{glm::inverseTranspose(modelViewMatrix)};
+  abcg::glUniformMatrix3fv(normalMatrixLoc, 1, GL_FALSE, &normalMatrix[0][0]);
+
+  abcg::glUniform4fv(KaLoc, 1, &m_Ka.x);
+  abcg::glUniform4fv(KdLoc, 1, &m_Kd.x);
+  abcg::glUniform4fv(KsLoc, 1, &m_Ks.x);
+  abcg::glUniform1f(shininessLoc, m_shininess);
+
+  modelMatrixProt = glm::translate(modelMatrixProt, m_position);
+  modelMatrixProt = glm::rotate(modelMatrixProt, m_angle, glm::vec3(0, 1, 0));
+  modelMatrixProt = glm::scale(modelMatrixProt, glm::vec3(0.15f));
+
+  // Set uniform variable
+  abcg::glUniformMatrix4fv(modelMatrixLoc, 1, GL_FALSE, &modelMatrixProt[0][0]);
+
+  m_player.render();
+
+  // Draw a grid of 2N+1 x 2N+1 tiles on the xz plane, centered around the
+  // origin
+  auto const N{20};
+  for (auto const z : iter::range(-N, N + 1)) {
+    for (auto const x : iter::range(-N, N + 1)) {
+      // Set model matrix as a translation matrix
+      glm::mat4 model{1.0f};
+      model = glm::translate(model, glm::vec3(x, 0.0f, z));
+      abcg::glUniformMatrix4fv(modelMatrixLoc, 1, GL_FALSE, &model[0][0]);
+
+      m_ground.render();
+
+      if (z == -N || z == N || x == -N || x == N) {
+        glm::mat4 model1{1.0f};
+        glm::mat4 model2{1.0f};
+        model1 = glm::translate(model1, glm::vec3(x, 1.15f, z));
+        model2 = glm::translate(model2, glm::vec3(x, 2.30f, z));
+        abcg::glUniformMatrix4fv(modelMatrixLoc, 1, GL_FALSE, &model1[0][0]);
+        m_sand.render();
+        abcg::glUniformMatrix4fv(modelMatrixLoc, 1, GL_FALSE, &model2[0][0]);
+        m_sand.render();
+      }
+    }
+  }
+
+  for (auto const z : m_treePositions) {
+    glm::mat4 model{1.0f};
+    model = glm::translate(model, glm::vec3(z[0], 3.0f, z[1]));
+    abcg::glUniformMatrix4fv(modelMatrixLoc, 1, GL_FALSE, &model[0][0]);
+    m_tree.render();
+  }
+
+  abcg::glUseProgram(0);
+}
+
+void Window::onResize(glm::ivec2 const &size) {
+  m_viewportSize = size;
+  m_camera.resizeViewport(size);
+  m_camera.computeProjectionMatrix(size);
+}
+
+void Window::onDestroy() {
+  m_player.destroy();
+  abcg::glDeleteProgram(m_program_obj);
 }

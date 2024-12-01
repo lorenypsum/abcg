@@ -3,12 +3,10 @@
 
 #include <bitset>
 
-// Estados do jogo
-enum class GameState { Playing, GameOver, Win, Start };
+enum class Input { Right, Left, Down, Up };
 
-// Estado inicial do jogo
 struct GameData {
-  GameState m_state{GameState::Start};
+  std::bitset<4> m_input; // [up, down, left, right]
 };
 
 #endif

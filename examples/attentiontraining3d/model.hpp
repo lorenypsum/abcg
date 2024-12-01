@@ -7,19 +7,17 @@ struct Vertex {
   glm::vec3 position{};
   glm::vec3 normal{};
   glm::vec2 texCoord{};
-  glm::vec4 tangent{};
 
   friend bool operator==(Vertex const &, Vertex const &) = default;
 };
 
 class Model {
 public:
-  void loadCubeTexture(std::string const &path);
   void loadDiffuseTexture(std::string_view path);
-  void loadNormalTexture(std::string_view path);
   void loadObj(std::string_view path, bool standardize = true);
   void render(int numTriangles = -1) const;
   void setupVAO(GLuint program);
+  void setSize(float size) { m_size = size; };
   void destroy();
 
   [[nodiscard]] int getNumTriangles() const {
@@ -33,8 +31,6 @@ public:
 
   [[nodiscard]] bool isUVMapped() const { return m_hasTexCoords; }
 
-  [[nodiscard]] GLuint getCubeTexture() const { return m_cubeTexture; }
-
 private:
   GLuint m_VAO{};
   GLuint m_VBO{};
@@ -45,8 +41,8 @@ private:
   glm::vec4 m_Ks{};
   float m_shininess{};
   GLuint m_diffuseTexture{};
-  GLuint m_normalTexture{};
-  GLuint m_cubeTexture{};
+
+  float m_size{1.0f};
 
   std::vector<Vertex> m_vertices;
   std::vector<GLuint> m_indices;
@@ -55,7 +51,6 @@ private:
   bool m_hasTexCoords{false};
 
   void computeNormals();
-  void computeTangents();
   void createBuffers();
   void standardize();
 };
