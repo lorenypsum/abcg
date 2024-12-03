@@ -152,8 +152,8 @@ bool DistractionObjects::checkClickOnDistraction(glm::vec3 const &clickPos,
         (1.0f - (starClipSpace.y * 0.5f + 0.5f)) * m_viewportSize.y};
 
     // Distância no espaço da tela (clique projetado em 2D)
-    float halfSize = 30.0f; // Tamanho do objeto em pixels na tela
-    if (glm::distance(glm::vec2(clickPos.x, clickPos.y), starScreenPos) <
+    float halfSize = 50.0f; // Tamanho do objeto em pixels na tela
+    if (glm::distance(glm::vec2(clickPos.x, clickPos.y), starScreenPos) <=
         halfSize) {
       randomizeStar(star); // Reposiciona estrela clicada
       return true;         // Clique reconhecido
