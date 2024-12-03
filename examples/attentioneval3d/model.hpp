@@ -47,6 +47,7 @@ private:
 
   bool m_hasNormals{false};
   bool m_hasTexCoords{false};
+  
   void computeNormals();
   void createBuffers();
   void standardize();

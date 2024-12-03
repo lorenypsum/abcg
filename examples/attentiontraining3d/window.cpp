@@ -154,7 +154,7 @@ void Window::onPaint() {
   glm::mat4 modelMatrixProt{1.0f};
 
   auto const modelViewMatrix{
-      glm::mat3(m_camera.getViewMatrix() * modelMatrixProt)};
+      glm::mat3(m_camera.getViewMatrix() * modelMatrixProt)};    
   auto const normalMatrix{glm::inverseTranspose(modelViewMatrix)};
   abcg::glUniformMatrix3fv(normalMatrixLoc, 1, GL_FALSE, &normalMatrix[0][0]);
 

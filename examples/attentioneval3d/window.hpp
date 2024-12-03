@@ -4,15 +4,15 @@
 // Bibliotecas
 #include "abcgOpenGL.hpp"
 #include <chrono>
-#include <vector>
-#include <random>
 #include <glm/gtc/random.hpp>
 #include <glm/gtx/fast_trigonometry.hpp>
+#include <random>
+#include <vector>
 
 // Classes
+#include "distraction_objects.hpp"
 #include "gamedata.hpp"
 #include "model.hpp"
-#include "distraction_objects.hpp"
 
 // Classe que representa a janela do jogo
 class Window : public abcg::OpenGLWindow {
@@ -53,6 +53,7 @@ private:
 
   // Variáveis
   std::default_random_engine m_randomEngine;
+
   std::chrono::steady_clock::time_point m_lastReload;
   glm::ivec2 m_viewportSize;
   float m_FOV{30.0f};

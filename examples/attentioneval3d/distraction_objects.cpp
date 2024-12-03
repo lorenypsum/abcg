@@ -12,15 +12,20 @@ void DistractionObjects::create() {
   abcg::glEnable(GL_DEPTH_TEST);
 
   m_program =
-      abcg::createOpenGLProgram({{.source = assetsPath + "depth.vert",
+      abcg::createOpenGLProgram({{.source = assetsPath + "texture.vert",
                                   .stage = abcg::ShaderStage::Vertex},
-                                 {.source = assetsPath + "depth.frag",
+                                 {.source = assetsPath + "texture.frag",
                                   .stage = abcg::ShaderStage::Fragment}});
 
-  m_model.loadObj(assetsPath + "box.obj");
-  m_model.loadDiffuseTexture(assetsPath + "box.png");
+  m_model.loadDiffuseTexture(assetsPath + "maps/Grass.png");
+  m_model.loadObj(assetsPath + "Grass_Block.obj");
   m_model.setSize(10.0f);
   m_model.setupVAO(m_program);
+
+  m_Ka = m_model.getKa();
+  m_Kd = m_model.getKd();
+  m_Ks = m_model.getKs();
+  m_shininess = m_model.getShininess();
 
   // Camera at (0,0,0) and looking towards the negative z
   glm::vec3 const eye{0.0f, 0.0f, 0.0f};
@@ -58,12 +63,58 @@ void DistractionObjects::paint() {
   auto const projMatrixLoc{abcg::glGetUniformLocation(m_program, "projMatrix")};
   auto const modelMatrixLoc{
       abcg::glGetUniformLocation(m_program, "modelMatrix")};
-  auto const colorLoc{abcg::glGetUniformLocation(m_program, "color")};
+  auto const normalMatrixLoc{
+      abcg::glGetUniformLocation(m_program, "normalMatrix")};
+  auto const lightDirLoc{
+      abcg::glGetUniformLocation(m_program, "lightDirWorldSpace")};
+  auto const shininessLoc{abcg::glGetUniformLocation(m_program, "shininess")};
+
+  auto const IaLoc{abcg::glGetUniformLocation(m_program, "Ia")};
+  auto const IdLoc{abcg::glGetUniformLocation(m_program, "Id")};
+  auto const IsLoc{abcg::glGetUniformLocation(m_program, "Is")};
+  auto const KaLoc{abcg::glGetUniformLocation(m_program, "Ka")};
+  auto const KdLoc{abcg::glGetUniformLocation(m_program, "Kd")};
+  auto const KsLoc{abcg::glGetUniformLocation(m_program, "Ks")};
+  auto const diffuseTexLoc{abcg::glGetUniformLocation(m_program, "diffuseTex")};
+
+  // // Set uniform variables that have the same value for every model
+  // abcg::glUniformMatrix4fv(viewMatrixLoc, 1, GL_FALSE,
+  //                          &m_camera.getViewMatrix()[0][0]);
+  // abcg::glUniformMatrix4fv(projMatrixLoc, 1, GL_FALSE,
+  //                          &m_camera.getProjMatrix()[0][0]);
 
   // Set uniform variables that have the same value for every model
   abcg::glUniformMatrix4fv(viewMatrixLoc, 1, GL_FALSE, &m_viewMatrix[0][0]);
   abcg::glUniformMatrix4fv(projMatrixLoc, 1, GL_FALSE, &m_projMatrix[0][0]);
-  abcg::glUniform4f(colorLoc, 1.0f, 1.0f, 1.0f, 1.0f); // White
+  abcg::glUniform1i(diffuseTexLoc, 0);
+
+  auto const lightDirRotated{glm::vec4(0.0f, 0.0f, 1.0f, 1.0f)};
+
+  abcg::glUniform4fv(lightDirLoc, 1, &lightDirRotated.x);
+  abcg::glUniform4fv(IaLoc, 1, &m_Ia.x);
+  abcg::glUniform4fv(IdLoc, 1, &m_Id.x);
+  abcg::glUniform4fv(IsLoc, 1, &m_Is.x);
+
+  // Set uniform variables for the current model
+  glm::mat4 modelMatrixProt{1.0f};
+
+  // auto const modelViewMatrix{
+  //     glm::mat3(m_camera.getViewMatrix() * modelMatrixProt)};
+  // auto const normalMatrix{glm::inverseTranspose(modelViewMatrix)};
+  // abcg::glUniformMatrix3fv(normalMatrixLoc, 1, GL_FALSE,
+  // &normalMatrix[0][0]);
+
+  abcg::glUniform4fv(KaLoc, 1, &m_Ka.x);
+  abcg::glUniform4fv(KdLoc, 1, &m_Kd.x);
+  abcg::glUniform4fv(KsLoc, 1, &m_Ks.x);
+  abcg::glUniform1f(shininessLoc, m_shininess);
+
+  // modelMatrixProt = glm::translate(modelMatrixProt, m_position);
+  // modelMatrixProt = glm::rotate(modelMatrixProt, m_angle, glm::vec3(0, 1, 0));
+  // modelMatrixProt = glm::scale(modelMatrixProt, glm::vec3(0.15f));
+
+  // Set uniform variable
+  abcg::glUniformMatrix4fv(modelMatrixLoc, 1, GL_FALSE, &modelMatrixProt[0][0]);
 
   // Render each star
   for (auto &star : m_stars) {
