@@ -26,6 +26,14 @@ public:
   std::array<Star, 100> m_stars;
   void randomizeStar(Star &star);
 
+    // star
+  struct Starx {
+    glm::vec3 m_position{};
+    glm::vec3 m_rotationAxis{};
+  };
+  std::array<Starx, 100> m_starsx;
+  void randomizeStarx(Starx &starx);
+
   // distraction objects
   struct DistractionObject {
     float m_angularVelocity{};
@@ -61,11 +69,13 @@ public:
 
 private:
   Model m_distraction;
+  Model m_target;
 
   GLuint m_program{};
   GLint m_translationLoc{};
   GLint m_scaleLoc{};
 
+  // object 1
   glm::vec4 m_lightDir{-1.0f, -1.0f, -1.0f, 0.0f};
   glm::vec4 m_Ia{1.0f};
   glm::vec4 m_Id{1.0f};

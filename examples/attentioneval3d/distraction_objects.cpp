@@ -22,6 +22,11 @@ void DistractionObjects::create() {
   m_distraction.setSize(10.0f);
   m_distraction.setupVAO(m_program);
 
+  m_target.loadDiffuseTexture(assetsPath + "maps/a.png");
+  m_target.loadObj(assetsPath + "teapot.obj");
+  m_target.setSize(10.0f);
+  m_target.setupVAO(m_program);
+
   m_Ka = m_distraction.getKa();
   m_Kd = m_distraction.getKd();
   m_Ks = m_distraction.getKs();
@@ -37,6 +42,11 @@ void DistractionObjects::create() {
   for (auto &star : m_stars) {
     randomizeStar(star);
   }
+
+    // Setup starsx
+  for (auto &starx : m_starsx) {
+    randomizeStarx(starx);
+  }
 }
 
 void DistractionObjects::randomizeStar(Star &star) {
@@ -49,6 +59,18 @@ void DistractionObjects::randomizeStar(Star &star) {
 
   // Random rotation axis
   star.m_rotationAxis = glm::sphericalRand(1.0f);
+}
+
+void DistractionObjects::randomizeStarx(Starx &starx) {
+  // Random position: x and y in [-20, 20), z in [-100, 0)
+  std::uniform_real_distribution<float> distPosXY(-25.0f, 25.0f);
+  std::uniform_real_distribution<float> distPosZ(-100.0f, 0.0f);
+  starx.m_position =
+      glm::vec3(distPosXY(m_randomEngine), distPosXY(m_randomEngine),
+                distPosZ(m_randomEngine));
+
+  // Random rotation axis
+  starx.m_rotationAxis = glm::sphericalRand(1.5f);
 }
 
 void DistractionObjects::paint() {
@@ -110,8 +132,8 @@ void DistractionObjects::paint() {
   abcg::glUniform1f(shininessLoc, m_shininess);
 
   // modelMatrixProt = glm::translate(modelMatrixProt, m_position);
-  // modelMatrixProt = glm::rotate(modelMatrixProt, m_angle, glm::vec3(0, 1, 0));
-  // modelMatrixProt = glm::scale(modelMatrixProt, glm::vec3(0.15f));
+  // modelMatrixProt = glm::rotate(modelMatrixProt, m_angle, glm::vec3(0, 1,
+  // 0)); modelMatrixProt = glm::scale(modelMatrixProt, glm::vec3(0.15f));
 
   // Set uniform variable
   abcg::glUniformMatrix4fv(modelMatrixLoc, 1, GL_FALSE, &modelMatrixProt[0][0]);
@@ -128,6 +150,20 @@ void DistractionObjects::paint() {
     abcg::glUniformMatrix4fv(modelMatrixLoc, 1, GL_FALSE, &modelMatrix[0][0]);
 
     m_distraction.render();
+  }
+
+    // Render pot
+  for (auto &starx : m_starsx) {
+    // Compute model matrix of the current star
+    glm::mat4 modelMatrix{1.0f};
+    modelMatrix = glm::translate(modelMatrix, starx.m_position);
+    modelMatrix = glm::scale(modelMatrix, glm::vec3(0.2f));
+    modelMatrix = glm::rotate(modelMatrix, m_angle, starx.m_rotationAxis);
+  
+    // Set uniform variable
+    abcg::glUniformMatrix4fv(modelMatrixLoc, 1, GL_FALSE, &modelMatrix[0][0]);
+  
+    m_target.render();
   }
 
   abcg::glUseProgram(0);
@@ -178,10 +214,24 @@ void DistractionObjects::update(float deltaTime) {
       star.m_position.z = -50.0f; // Back to -100
     }
   }
+
+    // Update stars
+  for (auto &starx : m_starsx) {
+    // Increase z by 10 units per second
+    starx.m_position.z += deltaTime * 10.0f;
+
+    // If this star is behind the camera, select a new random position &
+    // orientation and move it back to -100
+    if (starx.m_position.z > 0.1f) {
+      randomizeStarx(starx);
+      starx.m_position.z = -50.0f; // Back to -100
+    }
+  }
 }
 
 void DistractionObjects::destroy() {
   m_distraction.destroy();
+  m_target.destroy();
   abcg::glDeleteProgram(m_program);
 }
 
