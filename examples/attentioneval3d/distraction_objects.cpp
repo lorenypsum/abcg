@@ -17,15 +17,15 @@ void DistractionObjects::create() {
                                  {.source = assetsPath + "texture.frag",
                                   .stage = abcg::ShaderStage::Fragment}});
 
-  m_model.loadDiffuseTexture(assetsPath + "maps/Grass.png");
-  m_model.loadObj(assetsPath + "Grass_Block.obj");
-  m_model.setSize(10.0f);
-  m_model.setupVAO(m_program);
+  m_distraction.loadDiffuseTexture(assetsPath + "maps/Grass.png");
+  m_distraction.loadObj(assetsPath + "Grass_Block.obj");
+  m_distraction.setSize(10.0f);
+  m_distraction.setupVAO(m_program);
 
-  m_Ka = m_model.getKa();
-  m_Kd = m_model.getKd();
-  m_Ks = m_model.getKs();
-  m_shininess = m_model.getShininess();
+  m_Ka = m_distraction.getKa();
+  m_Kd = m_distraction.getKd();
+  m_Ks = m_distraction.getKs();
+  m_shininess = m_distraction.getShininess();
 
   // Camera at (0,0,0) and looking towards the negative z
   glm::vec3 const eye{0.0f, 0.0f, 0.0f};
@@ -127,7 +127,7 @@ void DistractionObjects::paint() {
     // Set uniform variable
     abcg::glUniformMatrix4fv(modelMatrixLoc, 1, GL_FALSE, &modelMatrix[0][0]);
 
-    m_model.render();
+    m_distraction.render();
   }
 
   abcg::glUseProgram(0);
@@ -181,7 +181,7 @@ void DistractionObjects::update(float deltaTime) {
 }
 
 void DistractionObjects::destroy() {
-  m_model.destroy();
+  m_distraction.destroy();
   abcg::glDeleteProgram(m_program);
 }
 
