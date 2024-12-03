@@ -23,7 +23,7 @@ public:
     glm::vec3 m_position{};
     glm::vec3 m_rotationAxis{};
   };
-
+  std::array<Star, 100> m_stars;
   void randomizeStar(Star &star);
 
   // distraction objects
@@ -39,7 +39,7 @@ public:
   }
 
   GLuint loadTexture(std::string filepath);
-  std::array<Star, 100> m_stars;
+
   void create();
   void paint();
   void paintUI();
