@@ -36,8 +36,7 @@ void Window::onCreate() {
 
   // Configura estado inicial
   startGame();
-  m_randomEngine.seed(
-      std::chrono::steady_clock::now().time_since_epoch().count());
+  m_randomEngine.seed(std::chrono::steady_clock::now().time_since_epoch().count());
 }
 
 // Desenha os objetos de distração e o alvo

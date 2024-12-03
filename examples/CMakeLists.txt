@@ -6,4 +6,5 @@
 #add_subdirectory(regularpolygons)
 #add_subdirectory(asteroids)
 #add_subdirectory(attentiontraining)
-add_subdirectory(attentiontraining3d)
+#add_subdirectory(attentiontraining3d)
+add_subdirectory(attentioneval3d)

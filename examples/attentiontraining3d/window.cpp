@@ -67,7 +67,7 @@ void Window::onCreate() {
   m_Ks = m_player.getKs();
   m_shininess = m_player.getShininess();
 
-  m_ground.loadDiffuseTexture(assetsPath + "maps/Grass_Block_TEX.png");
+  m_ground.loadDiffuseTexture(assetsPath + "maps/Grass.png");
   m_ground.loadObj(assetsPath + "Grass_Block.obj");
   m_ground.setupVAO(m_program_obj);
 
