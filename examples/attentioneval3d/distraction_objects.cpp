@@ -8,7 +8,7 @@
 void DistractionObjects::create() {
   auto const assetsPath{abcg::Application::getAssetsPath()};
 
-  abcg::glClearColor(0, 0, 0, 1);
+  abcg::glClearColor(1, 0.753, 0.961, 1);
   abcg::glEnable(GL_DEPTH_TEST);
 
   m_program =
@@ -18,6 +18,8 @@ void DistractionObjects::create() {
                                   .stage = abcg::ShaderStage::Fragment}});
 
   m_model.loadObj(assetsPath + "box.obj");
+  m_model.loadDiffuseTexture(assetsPath + "box.png");
+  m_model.setSize(10.0f);
   m_model.setupVAO(m_program);
 
   // Camera at (0,0,0) and looking towards the negative z
