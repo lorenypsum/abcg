@@ -10,7 +10,7 @@
 #include <vector>
 
 // Classes
-#include "distraction_objects.hpp"
+#include "game_objects.hpp"
 #include "gamedata.hpp"
 #include "model.hpp"
 
@@ -39,8 +39,8 @@ private:
   GLuint m_program{};
 
   // Objects
-  Model m_model;
-  DistractionObjects m_distractions;
+  GameObjects m_distractions;
+  GameObjects m_targets;
   GameData m_gameData;
 
   // Shaders
@@ -49,20 +49,6 @@ private:
       "phong",       "gouraud",     "normal",        "depth"};
   std::vector<GLuint> m_programs;
   int m_currentProgramIndex{};
-
-  // Mapping mode
-  // 0: triplanar; 1: cylindrical; 2: spherical; 3: from mesh
-  int m_mappingMode{};
-
-  // Light and material properties
-  glm::vec4 m_lightDir{-1.0f, -1.0f, -1.0f, 0.0f};
-  glm::vec4 m_Ia{1.0f};
-  glm::vec4 m_Id{1.0f};
-  glm::vec4 m_Is{1.0f};
-  glm::vec4 m_Ka{};
-  glm::vec4 m_Kd{};
-  glm::vec4 m_Ks{};
-  float m_shininess{};
 
   // Variáveis do jogo
   int m_score{0};         // Pontuação do jogador

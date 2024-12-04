@@ -1,5 +1,5 @@
-#ifndef DISTRACTION_OBJECTS_HPP_
-#define DISTRACTION_OBJECTS_HPP_
+#ifndef GAME_OBJECTS_HPP_
+#define GAME_OBJECTS_HPP_
 
 #include "abcgOpenGL.hpp"
 // #include "gamedata.hpp"
@@ -16,7 +16,7 @@ struct Vertexn {
   friend bool operator==(Vertexn const &, Vertexn const &) = default;
 };
 
-class DistractionObjects {
+class GameObjects {
 public:
   // star
   struct Star {
@@ -26,7 +26,7 @@ public:
   std::array<Star, 100> m_stars;
   void randomizeStar(Star &star);
 
-    // star
+  // star
   struct Starx {
     glm::vec3 m_position{};
     glm::vec3 m_rotationAxis{};
@@ -35,7 +35,7 @@ public:
   void randomizeStarx(Starx &starx);
 
   // distraction objects
-  struct DistractionObject {
+  struct GameObject {
     float m_angularVelocity{};
     bool checkClick(glm::vec3 const &clickPos) const;
     float m_rotation{0.0f};
@@ -49,15 +49,27 @@ public:
   GLuint loadTexture(std::string filepath);
 
   void create();
+  void createDistraction(const std::string &assetsPath);
+  void createTarget(const std::string &assetsPath);
   void paint();
+  void renderDistraction(const GLint KaLoc, const GLint KdLoc,
+                         const GLint KsLoc, const GLint shininessLoc,
+                         const GLint modelMatrixLoc);
+  void renderTarget(const GLint KaLoc, const GLint KdLoc,
+                         const GLint KsLoc, const GLint shininessLoc,
+                         const GLint modelMatrixLoc);
+  void setModelVariables(const GLint KaLoc, const GLint KdLoc,
+                         const GLint KsLoc, const GLint shininessLoc,
+                         const GLint modelMatrixLoc);
+  void renderObject(const GLint modelMatrixLoc);
   void paintUI();
   void destroy();
   void update(float deltaTime);
-  bool checkClickOnDistraction(glm::vec3 const &clickPos,
-                               glm::mat4 const &viewMatrix,
-                               glm::mat4 const &projMatrix);
-  void removeDistraction(std::list<DistractionObject>::iterator it);
   bool isEmpty() const;
+  bool checkClickOnObject(glm::vec3 const &clickPos,
+                          glm::mat4 const &viewMatrix,
+                          glm::mat4 const &projMatrix);
+  void removeObject(std::list<GameObject>::iterator it);
   void loadObj(std::string_view path, bool standardize = true);
   void render(int numTriangles = -1) const;
   void setupVAO(GLuint program);
@@ -75,7 +87,6 @@ private:
   GLint m_translationLoc{};
   GLint m_scaleLoc{};
 
-  // object 1
   glm::vec4 m_lightDir{-1.0f, -1.0f, -1.0f, 0.0f};
   glm::vec4 m_Ia{1.0f};
   glm::vec4 m_Id{1.0f};
@@ -86,7 +97,8 @@ private:
   float m_shininess{};
 
   float m_angle{};
-  std::list<DistractionObject> m_distractions;
+  std::list<GameObject> m_distractions;
+  std::list<GameObject> m_targets;
 
   std::uniform_real_distribution<float> m_randomDist{-1.0f, 1.0f};
   GLuint m_VAO{};
