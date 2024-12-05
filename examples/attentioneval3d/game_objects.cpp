@@ -201,7 +201,7 @@ bool GameEntities::checkClickOnObject(
         (1.0f - (sceneObjectClipSpace.y * 0.5f + 0.5f)) * m_viewportSize.y};
 
     // Distância no espaço da tela (clique projetado em 2D)
-    float halfSize = 100.0f; // Tamanho do objeto em pixels na tela
+    float halfSize = 150.0f; // Tamanho do objeto em pixels na tela
     if (glm::distance(glm::vec3(clickPos.x, clickPos.y, clickPos.z),
                       glm::vec3(sceneObjectScreenPos, 0.0f)) < halfSize) {
       // Reposiciona estrela clicada
