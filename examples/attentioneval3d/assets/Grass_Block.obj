@@ -1,4 +1,4 @@
-mtllib Grass_Block.mtl
+mtllib block.mtl
 o Grass_Block_Cube
 v 2.000000 0.000006 -2.000000
 v 2.000000 0.000006 2.000000
