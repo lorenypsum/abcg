@@ -1,7 +1,28 @@
 #include "window.hpp"
 
+// Converte um valor hexadecimal em um vetor de 3 componentes
+glm::vec3 hexToVec3(uint32_t hexValue) {
+  float red = ((hexValue >> 16) & 0xFF) / 255.0f;
+  float green = ((hexValue >> 8) & 0xFF) / 255.0f;
+  float blue = (hexValue & 0xFF) / 255.0f;
+
+  return glm::vec3(red, green, blue);
+}
+
+glm::vec3 skyblue = hexToVec3(0xB4DEF5);
+
 void Window::onCreate() {
 
+  abcg::glClearColor(skyblue.r, skyblue.g, skyblue.b, 1.0f);
+
+  auto const assetsPath{abcg::Application::getAssetsPath()};
+
+  // Carrega a fonte
+  auto const filename{assetsPath + "Inconsolata-Medium.ttf"};
+  m_font = ImGui::GetIO().Fonts->AddFontFromFileTTF(filename.c_str(), 30.0f);
+  if (m_font == nullptr) {
+    throw abcg::RuntimeError("Cannot load font file");
+  }
   // Configura estado inicial
   m_randomEngine.seed(
       std::chrono::steady_clock::now().time_since_epoch().count());
@@ -48,14 +69,14 @@ void Window::onPaintUI() {
     ImGui::PushFont(m_font);
     // Exibe a pontuação e o tempo restante
     if (m_gameData.m_state == GameState::Playing) {
-      ImGui::Text("Score: %d Time: %d", m_score, m_gametime);
+      ImGui::Text("Pontuação: %d Tempo: %d", m_score, m_gametime);
     } else if (m_gameData.m_state == GameState::GameOver) {
-      ImGui::Text("Your Score: %d", m_newScore);
+      ImGui::Text("Pontuação final: %d", m_newScore);
     } else if (m_gameData.m_state == GameState::Win) {
-      ImGui::Text("Congratulations! New Record: %d", m_newScore);
+      ImGui::Text("Parabéns! Novo Recorde: %d", m_newScore);
     } else if (m_gameData.m_state == GameState::Start) {
-      ImGui::Text("Pegue o Pombo Branco!");
-      ImGui::Text("Score: %d Time: %d", m_score, m_gametime);
+      ImGui::Text("Pegue os pássaros brancos!");
+      ImGui::Text("Pontuação: %d Tempo: %d", m_score, m_gametime);
     } else {
       ImGui::Text("...");
     }
@@ -85,13 +106,13 @@ void Window::onEvent(SDL_Event const &event) {
           0.0f};
 
       // Verifica cliques em targets ou distractions
-      if (m_objects.checkClickOnObject(
-              clickPos, m_objects.m_viewMatrix,
-              m_objects.m_projMatrix, m_objects.m_targetObjects)) {
+      if (m_objects.checkClickOnObject(clickPos, m_objects.m_viewMatrix,
+                                       m_objects.m_projMatrix,
+                                       m_objects.m_targetObjects)) {
         m_score += 1; // Pontuação aumenta para cliques corretos
-      } else if (m_objects.checkClickOnObject(
-                     clickPos, m_objects.m_viewMatrix,
-                     m_objects.m_projMatrix, m_objects.m_distractionObjects)) {
+      } else if (m_objects.checkClickOnObject(clickPos, m_objects.m_viewMatrix,
+                                              m_objects.m_projMatrix,
+                                              m_objects.m_distractionObjects)) {
         m_score -= 1; // Pontuação diminui para cliques incorretos
       }
     }

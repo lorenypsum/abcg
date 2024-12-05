@@ -8,7 +8,7 @@
 void GameEntities::create() {
   auto const assetsPath{abcg::Application::getAssetsPath()};
 
-  abcg::glClearColor(1, 0.753, 0.961, 1);
+  
   abcg::glEnable(GL_DEPTH_TEST);
 
   m_program =
