@@ -5,14 +5,14 @@ void Window::onCreate() {
   // Configura estado inicial
   m_randomEngine.seed(
       std::chrono::steady_clock::now().time_since_epoch().count());
-  m_distractions.create();
+  m_objects.create();
   startGame();
 }
 
 void Window::onUpdate() {
   // Increase angle by 90 degrees per second
   auto const deltaTime{gsl::narrow_cast<float>(getDeltaTime())};
-  m_distractions.update(deltaTime);
+  m_objects.update(deltaTime);
 
   // Calcula o tempo decorrido desde o último recarregamento
   auto currentTime = std::chrono::steady_clock::now();
@@ -21,16 +21,16 @@ void Window::onUpdate() {
                           .count();
   // Recarrega objetos a cada 3 segundos
   if (elapsedTime >= 1.0f && m_gameData.m_state == GameState::Playing) {
-    --m_gametime;                       // Decrementa o tempo restante
-    // m_distractions.update(elapsedTime); // Atualiza objetos de distração
-    m_lastReload = currentTime;         // Atualiza o tempo de recarga
-    checkGameStatus();                  // Verifica o status do jogo
-    updateTimeDisplay();                // Atualiza a exibição de tempo
+    --m_gametime; // Decrementa o tempo restante
+    // m_objects.update(elapsedTime); // Atualiza objetos de distração
+    m_lastReload = currentTime; // Atualiza o tempo de recarga
+    checkGameStatus();          // Verifica o status do jogo
+    updateTimeDisplay();        // Atualiza a exibição de tempo
   }
   checkGameStatus(); // Verifica o status do jogo
 }
 
-void Window::onPaint() { m_distractions.paint(); }
+void Window::onPaint() { m_objects.paint(); }
 
 void Window::onPaintUI() {
   abcg::OpenGLWindow::onPaintUI();
@@ -64,14 +64,14 @@ void Window::onPaintUI() {
     ImGui::End();
   }
 
-  m_distractions.paintUI();
+  m_objects.paintUI();
 }
 
 void Window::onResize(glm::ivec2 const &size) {
-  m_distractions.m_viewportSize = size;
+  m_objects.m_viewportSize = size;
 }
 
-void Window::onDestroy() { m_distractions.destroy(); }
+void Window::onDestroy() { m_objects.destroy(); }
 
 void Window::onEvent(SDL_Event const &event) {
   if (event.type == SDL_MOUSEBUTTONDOWN &&
@@ -85,13 +85,13 @@ void Window::onEvent(SDL_Event const &event) {
           0.0f};
 
       // Verifica cliques em targets ou distractions
-      if (m_distractions.checkClickOnObject(clickPos,
-                                                 m_distractions.m_viewMatrix,
-                                                 m_distractions.m_projMatrix)) {
+      if (m_objects.checkClickOnObject(
+              clickPos, m_objects.m_viewMatrix,
+              m_objects.m_projMatrix, m_objects.m_stars)) {
         m_score += 1; // Pontuação aumenta para cliques corretos
-      } else if (m_distractions.checkClickOnObject(
-                     clickPos, m_distractions.m_viewMatrix,
-                     m_distractions.m_projMatrix)) {
+      } else if (m_objects.checkClickOnObject(
+                     clickPos, m_objects.m_viewMatrix,
+                     m_objects.m_projMatrix, m_objects.m_starsx)) {
         m_score -= 1; // Pontuação diminui para cliques incorretos
       }
     }
@@ -101,7 +101,7 @@ void Window::onEvent(SDL_Event const &event) {
 // Inicializa os objetos do jogo em posições aleatórias
 void Window::initializeGameObjects() {
   // Recarrega a posição do alvo e dos objetos de distração
-  m_distractions.create();
+  m_objects.create();
 }
 
 // Verifica o status do jogo e atualiza o estado conforme necessário

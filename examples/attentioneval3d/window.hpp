@@ -39,16 +39,8 @@ private:
   GLuint m_program{};
 
   // Objects
-  GameObjects m_distractions;
-  GameObjects m_targets;
+  GameObjects m_objects;
   GameData m_gameData;
-
-  // Shaders
-  std::vector<char const *> m_shaderNames{
-      "cubereflect", "cuberefract", "normalmapping", "texture", "blinnphong",
-      "phong",       "gouraud",     "normal",        "depth"};
-  std::vector<GLuint> m_programs;
-  int m_currentProgramIndex{};
 
   // Variáveis do jogo
   int m_score{0};         // Pontuação do jogador

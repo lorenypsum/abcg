@@ -23,16 +23,10 @@ public:
     glm::vec3 m_position{};
     glm::vec3 m_rotationAxis{};
   };
-  std::array<Star, 100> m_stars;
-  void randomizeStar(Star &star);
-
-  // star
-  struct Starx {
-    glm::vec3 m_position{};
-    glm::vec3 m_rotationAxis{};
-  };
-  std::array<Starx, 100> m_starsx;
-  void randomizeStarx(Starx &starx);
+  std::vector<Star> m_stars = std::vector<Star>(100);
+  std::vector<Star> m_starsx = std::vector<Star>(100);
+  void randomizeStar(Star &star, float minX, float maxX, float minY, float maxY,
+                     float minZ, float maxZ);
 
   // distraction objects
   struct GameObject {
@@ -49,26 +43,33 @@ public:
   GLuint loadTexture(std::string filepath);
 
   void create();
+  void setupStars(std::vector<Star> &m_stars, float minX, float maxX,
+                  float minY, float maxY, float minZ, float maxZ);
+  void setupStars();
   void createDistraction(const std::string &assetsPath);
-  void createTarget(const std::string &assetsPath);
+  void createObject(Model &m_model, const std::string &assetsPath,
+                    const std::string &objPath,
+                    const std::string &texturePaths);
+  void renderObject(Model &m_model, const GLint KaLoc, const GLint KdLoc,
+                    const GLint KsLoc, const GLint shininessLoc,
+                    const GLint modelMatrixLoc, std::vector<Star> &m_stars);
   void paint();
-  void renderDistraction(const GLint KaLoc, const GLint KdLoc,
-                         const GLint KsLoc, const GLint shininessLoc,
-                         const GLint modelMatrixLoc);
-  void renderTarget(const GLint KaLoc, const GLint KdLoc,
-                         const GLint KsLoc, const GLint shininessLoc,
-                         const GLint modelMatrixLoc);
+
   void setModelVariables(const GLint KaLoc, const GLint KdLoc,
                          const GLint KsLoc, const GLint shininessLoc,
                          const GLint modelMatrixLoc);
-  void renderObject(const GLint modelMatrixLoc);
   void paintUI();
   void destroy();
   void update(float deltaTime);
+  void updateStars(std::vector<Star> &m_st, float deltaTime, float incZ,
+                   float posZ, float minX, float maxX, float minY, float maxY,
+                   float minZ, float maxZ);
+  void updateObjects(float deltaTime);
   bool isEmpty() const;
   bool checkClickOnObject(glm::vec3 const &clickPos,
                           glm::mat4 const &viewMatrix,
-                          glm::mat4 const &projMatrix);
+                          glm::mat4 const &projMatrix,
+                          std::vector<Star> &m_stars);
   void removeObject(std::list<GameObject>::iterator it);
   void loadObj(std::string_view path, bool standardize = true);
   void render(int numTriangles = -1) const;
