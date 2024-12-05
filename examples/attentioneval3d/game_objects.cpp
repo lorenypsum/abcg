@@ -294,17 +294,19 @@ void GameEntities::update(float deltaTime) {
 // Renderiza UI
 void GameEntities::paintUI() {
   {
-    auto const widgetSize{ImVec2(218, 62)};
-    ImGui::SetNextWindowPos(ImVec2(m_viewportSize.x - widgetSize.x - 5, 5));
-    ImGui::SetNextWindowSize(widgetSize);
+    auto const widgetSize{ImVec2(218, 62)}; // Variável do tamanho do widget
+    ImGui::SetNextWindowPos(
+        ImVec2(m_viewportSize.x - widgetSize.x - 5, 5)); // Posição do widget
+    ImGui::SetNextWindowSize(widgetSize);                // Tamanho do widget
+    // Cria janela do widget
     ImGui::Begin("Widget window", nullptr, ImGuiWindowFlags_NoDecoration);
-
     {
-      ImGui::PushItemWidth(120);
-      static std::size_t currentIndex{};
+      ImGui::PushItemWidth(120);         // Largura do item
+      static std::size_t currentIndex{}; // Índice atual
+      // Itens do combo
       std::vector<std::string> const comboItems{"Treinamento",
                                                 "Vôo dos Pássaros"};
-
+      // Cria combo
       if (ImGui::BeginCombo("Projeção", comboItems.at(currentIndex).c_str())) {
         for (auto const index : iter::range(comboItems.size())) {
           auto const isSelected{currentIndex == index};
@@ -313,26 +315,28 @@ void GameEntities::paintUI() {
           if (isSelected)
             ImGui::SetItemDefaultFocus();
         }
-        ImGui::EndCombo();
+        ImGui::EndCombo(); // Finaliza combo
       }
-      ImGui::PopItemWidth();
+      ImGui::PopItemWidth(); // Finaliza largura do item
 
+      // Configurações do widget
       ImGui::PushItemWidth(170);
       auto const aspect{gsl::narrow<float>(m_viewportSize.x) /
                         gsl::narrow<float>(m_viewportSize.y)};
       if (currentIndex == 0) {
         m_projMatrix =
-            glm::perspective(glm::radians(m_FOV), aspect, 0.01f, 100.0f);
+            glm::perspective(glm::radians(m_FOV), aspect, 0.01f,
+                             100.0f); // Matriz de projeção de perspectiva
 
         ImGui::SliderFloat("FOV", &m_FOV, 5.0f, 179.0f, "%.0f degrees");
       } else {
-        m_projMatrix = glm::ortho(-20.0f * aspect, 20.0f * aspect, -20.0f,
-                                  20.0f, 0.01f, 100.0f);
+        m_projMatrix =
+            glm::ortho(-20.0f * aspect, 20.0f * aspect, -20.0f, 20.0f, 0.01f,
+                       100.0f); // Matriz de projeção ortográfica
       }
-      ImGui::PopItemWidth();
+      ImGui::PopItemWidth(); // Finaliza configurações do widget
     }
-
-    ImGui::End();
+    ImGui::End(); // Finaliza janela do widget
   }
 }
 
