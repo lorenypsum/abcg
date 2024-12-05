@@ -25,7 +25,7 @@ public:
     glm::vec3 m_rotationAxis{};
   };
 
-  std::vector<SceneObject> m_distractionObjects = std::vector<SceneObject>(100);
+  std::vector<SceneObject> m_distractionObjects = std::vector<SceneObject>(70);
   std::vector<SceneObject> m_targetObjects = std::vector<SceneObject>(100);
   void randomizeSceneObject(SceneObject &sceneObject, float minX, float maxX,
                             float minY, float maxY, float minZ, float maxZ);
@@ -33,9 +33,9 @@ public:
   // distraction objects
   struct GameObject {
     float m_angularVelocity{};
-    bool checkClick(glm::vec3 const &clickPos) const;
     float m_rotation{0.0f};
     float m_scale{};
+    bool checkClick(glm::vec3 const &clickPos) const;
   };
 
   [[nodiscard]] int getNumTriangles() const {
