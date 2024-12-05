@@ -17,9 +17,8 @@ void GameEntities::create() {
                                  {.source = assetsPath + "shaders/texture.frag",
                                   .stage = abcg::ShaderStage::Fragment}});
 
-  createObject(m_distractionModel, assetsPath, "block.obj",
-               "maps/green.png");
-  createObject(m_targetModel, assetsPath, "block.obj", "maps/brown.png");
+  createObject(m_distractionModel, assetsPath, "bird.obj", "maps/green.png");
+  createObject(m_targetModel, assetsPath, "bird.obj", "maps/brown.png");
 
   setupSceneObjects(m_distractionObjects, // m_sceneObjects
                     -25.0f,               // minX
@@ -221,7 +220,7 @@ void GameEntities::update(float deltaTime) {
   updateSceneObjects(m_distractionObjects, // m_sceneObjects
                      deltaTime,            // deltaTime
                      10.0f,                // incZ
-                     -2.0f,                 // incX
+                     -2.0f,                // incX
                      0.0f,                 // incY
                      -50.0f,               // posZ
                      -25.0f,               // minX
