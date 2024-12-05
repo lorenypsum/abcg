@@ -17,8 +17,8 @@ void GameEntities::create() {
                                  {.source = assetsPath + "shaders/texture.frag",
                                   .stage = abcg::ShaderStage::Fragment}});
 
-  createObject(m_distractionModel, assetsPath, "bird.obj", "maps/green.png");
-  createObject(m_targetModel, assetsPath, "bird.obj", "maps/brown.png");
+  createObject(m_distractionModel, assetsPath, "bird.obj", "maps/w-feathers.png");
+  createObject(m_targetModel, assetsPath, "bird.obj", "maps/b-feathers.png");
 
   setupSceneObjects(m_distractionObjects, // m_sceneObjects
                     -25.0f,               // minX
