@@ -1,5 +1,6 @@
 #include "window.hpp"
 
+// Função para criar a janela
 int main(int argc, char **argv) {
   try {
     abcg::Application app(argc, argv);
@@ -9,7 +10,7 @@ int main(int argc, char **argv) {
     window.setWindowSettings({
         .width = 1200,
         .height = 1200,
-        .title = "Avaliação de Atenção",
+        .title = "Vôo dos Pássaros",
     });
 
     app.run(window);
