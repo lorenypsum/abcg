@@ -75,7 +75,7 @@ void GameEntities::createObject(Model &m_model, const std::string &assetsPath,
                                 const std::string &texturePath) {
   m_model.loadDiffuseTexture(assetsPath + texturePath);
   m_model.loadObj(assetsPath + objPath);
-  m_model.setSize(10.0f);
+  m_model.setSize(100.0f);
   m_model.setupVAO(m_program);
 
   m_Ka = m_model.getKa();
@@ -201,7 +201,7 @@ bool GameEntities::checkClickOnObject(
         (1.0f - (sceneObjectClipSpace.y * 0.5f + 0.5f)) * m_viewportSize.y};
 
     // Distância no espaço da tela (clique projetado em 2D)
-    float halfSize = 50.0f; // Tamanho do objeto em pixels na tela
+    float halfSize = 100.0f; // Tamanho do objeto em pixels na tela
     if (glm::distance(glm::vec3(clickPos.x, clickPos.y, clickPos.z),
                       glm::vec3(sceneObjectScreenPos, 0.0f)) <= halfSize) {
       // Reposiciona estrela clicada
@@ -220,7 +220,7 @@ void GameEntities::update(float deltaTime) {
   updateSceneObjects(m_distractionObjects, // m_sceneObjects
                      deltaTime,            // deltaTime
                      10.0f,                // incZ
-                     -2.0f,                // incX
+                     -1.0f,                // incX
                      0.0f,                 // incY
                      -50.0f,               // posZ
                      -25.0f,               // minX
@@ -234,7 +234,7 @@ void GameEntities::update(float deltaTime) {
   updateSceneObjects(m_targetObjects, // m_sceneObjects
                      deltaTime,       // deltaTime
                      10.0f,           // incZ
-                     2.0f,            // incX
+                     1.0f,            // incX
                      0.0f,            // incY
                      -50.0f,          // posZ
                      -25.0f,          // minX
