@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 
+// Dados de posição do vértice
 struct PositionVertex {
   glm::vec3 position{};
 
@@ -17,20 +18,16 @@ struct PositionVertex {
                          PositionVertex const &) = default;
 };
 
+// Classe que representa os objetos do jogo
 class GameEntities {
 public:
-  // Scene Objects
+  // Estrutura de um objeto de cena
   struct SceneObject {
     glm::vec3 m_position{};
     glm::vec3 m_rotationAxis{};
   };
 
-  std::vector<SceneObject> m_distractionObjects = std::vector<SceneObject>(20);
-  std::vector<SceneObject> m_targetObjects = std::vector<SceneObject>(30);
-  void randomizeSceneObject(SceneObject &sceneObject, float minX, float maxX,
-                            float minY, float maxY, float minZ, float maxZ);
-
-  // distraction objects
+  // Estrutura de um objeto do jogo
   struct GameObject {
     float m_angularVelocity{};
     float m_rotation{0.0f};
@@ -38,17 +35,38 @@ public:
     bool checkClick(glm::vec3 const &clickPos) const;
   };
 
+  // Vetores de objetos de cena
+  std::vector<SceneObject> m_distractionObjects = std::vector<SceneObject>(20);
+  std::vector<SceneObject> m_targetObjects = std::vector<SceneObject>(30);
+
+  // Número de triângulos
   [[nodiscard]] int getNumTriangles() const {
     return gsl::narrow<int>(m_indices.size()) / 3;
   }
 
-  GLuint loadTexture(std::string filepath);
-
+  // Funções de ciclo de vida do renderização
   void create();
+  void paint();
+  void paintUI();
+  void destroy();
+  void update(float deltaTime);
+  void render(int numTriangles = -1) const;
+  void setupVAO(GLuint program);
+  bool isEmpty() const;
+
+  // Funções de manipulação dos modelos
+  void setModelVariables(const GLint KaLoc, const GLint KdLoc,
+                         const GLint KsLoc, const GLint shininessLoc,
+                         const GLint modelMatrixLoc);
+
+  // Funções de manipulação de objetos da cena
+  void updateSceneObjects(std::vector<SceneObject> &m_st, float deltaTime,
+                          float incZ, float incX, float incY, float posZ,
+                          float minX, float maxX, float minY, float maxY,
+                          float minZ, float maxZ);
   void setupSceneObjects(std::vector<SceneObject> &m_sceneObjects, float minX,
                          float maxX, float minY, float maxY, float minZ,
                          float maxZ);
-  void createDistraction(const std::string &assetsPath);
   void createObject(Model &m_model, const std::string &assetsPath,
                     const std::string &objPath,
                     const std::string &texturePaths);
@@ -56,42 +74,45 @@ public:
                     const GLint KsLoc, const GLint shininessLoc,
                     const GLint modelMatrixLoc,
                     std::vector<SceneObject> &m_sceneObjects);
-  void paint();
-
-  void setModelVariables(const GLint KaLoc, const GLint KdLoc,
-                         const GLint KsLoc, const GLint shininessLoc,
-                         const GLint modelMatrixLoc);
-  void paintUI();
-  void destroy();
-  void update(float deltaTime);
-  void updateSceneObjects(std::vector<SceneObject> &m_st, float deltaTime,
-                          float incZ, float incX, float incY, float posZ,
-                          float minX, float maxX, float minY, float maxY,
-                          float minZ, float maxZ);
+  void randomizeSceneObject(SceneObject &sceneObject, float minX, float maxX,
+                            float minY, float maxY, float minZ, float maxZ);
   void updateObjects(float deltaTime);
-  bool isEmpty() const;
   bool checkClickOnObject(glm::vec3 const &clickPos,
                           glm::mat4 const &viewMatrix,
                           glm::mat4 const &projMatrix,
                           std::vector<SceneObject> &m_sceneObjects);
   void removeObject(std::list<GameObject>::iterator it);
   void loadObj(std::string_view path, bool standardize = true);
-  void render(int numTriangles = -1) const;
-  void setupVAO(GLuint program);
+
+  // Definição matrizes de projeção e visão
   glm::ivec2 m_viewportSize{};
   glm::mat4 m_viewMatrix{1.0f};
   glm::mat4 m_projMatrix{1.0f};
+
+  // Variáveis
   std::default_random_engine m_randomEngine;
   float m_FOV{30.0f};
 
 private:
+  // Modelos
   Model m_distractionModel;
   Model m_targetModel;
 
+  // Lista de objetos do jogo
+  std::list<GameObject> m_distractions;
+  std::list<GameObject> m_targets;
+
+  // Programa de shader
   GLuint m_program{};
+  GLuint m_VAO{};
+  GLuint m_VBO{};
+  GLuint m_EBO{};
+
+  // Variáveis de shader
   GLint m_translationLoc{};
   GLint m_scaleLoc{};
 
+  // Variáveis de modelo (propriedades do material)
   glm::vec4 m_lightDir{-1.0f, -1.0f, -1.0f, 0.0f};
   glm::vec4 m_Ia{1.0f};
   glm::vec4 m_Id{1.0f};
@@ -100,22 +121,12 @@ private:
   glm::vec4 m_Kd{};
   glm::vec4 m_Ks{};
   float m_shininess{};
-
   float m_angle{};
-  std::list<GameObject> m_distractions;
-  std::list<GameObject> m_targets;
-
+  
+  // Variáveis de controle distribuição de objetos
   std::uniform_real_distribution<float> m_randomDist{-1.0f, 1.0f};
-  GLuint m_VAO{};
-  GLuint m_VBO{};
-  GLuint m_EBO{};
-
   std::vector<PositionVertex> m_vertices;
   std::vector<GLuint> m_indices;
-
-  void createBuffers();
-  void standardize();
-  void loadModel(std::string_view path);
 };
 
 #endif

@@ -8,7 +8,7 @@ int main(int argc, char **argv) {
     window.setOpenGLSettings({});
     window.setWindowSettings({
         .width = 1200,
-        .height = 600,
+        .height = 1200,
         .title = "Avaliação de Atenção",
     });
 
