@@ -12,9 +12,9 @@ void GameEntities::create() {
   abcg::glEnable(GL_DEPTH_TEST);
 
   m_program =
-      abcg::createOpenGLProgram({{.source = assetsPath + "texture.vert",
+      abcg::createOpenGLProgram({{.source = assetsPath + "shaders/texture.vert",
                                   .stage = abcg::ShaderStage::Vertex},
-                                 {.source = assetsPath + "texture.frag",
+                                 {.source = assetsPath + "shaders/texture.frag",
                                   .stage = abcg::ShaderStage::Fragment}});
 
   createObject(m_distractionModel, assetsPath, "Grass_Block.obj",
