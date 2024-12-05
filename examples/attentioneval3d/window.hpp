@@ -39,7 +39,7 @@ private:
   GLuint m_program{};
 
   // Objects
-  GameObjects m_objects;
+  GameEntities m_objects;
   GameData m_gameData;
 
   // Variáveis do jogo

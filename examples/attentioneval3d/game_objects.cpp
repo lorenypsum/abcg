@@ -5,7 +5,7 @@
 #include <iostream>
 
 // Cria objetos
-void GameObjects::create() {
+void GameEntities::create() {
   auto const assetsPath{abcg::Application::getAssetsPath()};
 
   abcg::glClearColor(1, 0.753, 0.961, 1);
@@ -19,21 +19,23 @@ void GameObjects::create() {
 
   createObject(m_distraction, assetsPath, "Grass_Block.obj", "maps/Grass.png");
   createObject(m_target, assetsPath, "Grass_Block.obj", "maps/a.png");
-  setupStars(m_stars, -25.0f, 25.0f, -25.0f, 25.0f, -100.0f, 0.0f);
-  setupStars(m_starsx, -25.0f, 25.0f, -25.0f, 25.0f, -100.0f, 0.0f);
+  setupSpatialObjects(m_distactionObjects, -25.0f, 25.0f, -25.0f, 25.0f, -100.0f, 0.0f);
+  setupSpatialObjects(m_targetObjects, -25.0f, 25.0f, -25.0f, 25.0f, -100.0f, 0.0f);
 }
 
-void GameObjects::setupStars(std::vector<Star> &m_st, float minX, float maxX,
-                             float minY, float maxY, float minZ, float maxZ) {
+void GameEntities::setupSpatialObjects(std::vector<SpatialObject> &m_st, float minX,
+                              float maxX, float minY, float maxY, float minZ,
+                              float maxZ) {
   // Setup stars
   for (auto &star : m_st) {
     randomizeStar(star, minX, maxX, minY, maxY, minZ, maxZ);
   }
 }
 
-void GameObjects::updateStars(std::vector<Star> &m_st, float deltaTime,
-                              float incZ, float posZ, float minX, float maxX,
-                              float minY, float maxY, float minZ, float maxZ) {
+void GameEntities::updateSpatialObjects(std::vector<SpatialObject> &m_st,
+                               float deltaTime, float incZ, float posZ,
+                               float minX, float maxX, float minY, float maxY,
+                               float minZ, float maxZ) {
 
   m_angle = glm::wrapAngle(m_angle + glm::radians(90.0f) * deltaTime);
 
@@ -51,9 +53,9 @@ void GameObjects::updateStars(std::vector<Star> &m_st, float deltaTime,
   }
 }
 
-void GameObjects::createObject(Model &m_model, const std::string &assetsPath,
-                               const std::string &objPath,
-                               const std::string &texturePath) {
+void GameEntities::createObject(Model &m_model, const std::string &assetsPath,
+                                const std::string &objPath,
+                                const std::string &texturePath) {
   m_model.loadDiffuseTexture(assetsPath + texturePath);
   m_model.loadObj(assetsPath + objPath);
   m_model.setSize(10.0f);
@@ -71,8 +73,9 @@ void GameObjects::createObject(Model &m_model, const std::string &assetsPath,
   m_viewMatrix = glm::lookAt(eye, at, up);
 }
 
-void GameObjects::randomizeStar(Star &star, float minX, float maxX, float minY,
-                                float maxY, float minZ, float maxZ) {
+void GameEntities::randomizeStar(SpatialObject &star, float minX, float maxX,
+                                 float minY, float maxY, float minZ,
+                                 float maxZ) {
   // Random position: x and y in [minX, maxX), z in [minZ, maxZ)
   std::uniform_real_distribution<float> distPosX(minX, maxX);
   std::uniform_real_distribution<float> distPosY(minY, maxY);
@@ -85,7 +88,7 @@ void GameObjects::randomizeStar(Star &star, float minX, float maxX, float minY,
   star.m_rotationAxis = glm::sphericalRand(1.0f);
 }
 
-void GameObjects::paint() {
+void GameEntities::paint() {
   abcg::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   abcg::glViewport(0, 0, m_viewportSize.x, m_viewportSize.y);
@@ -124,18 +127,18 @@ void GameObjects::paint() {
   abcg::glUniform4fv(IsLoc, 1, &m_Is.x);
 
   renderObject(m_distraction, KaLoc, KdLoc, KsLoc, shininessLoc, modelMatrixLoc,
-               m_stars);
+               m_distactionObjects);
   renderObject(m_target, KaLoc, KdLoc, KsLoc, shininessLoc, modelMatrixLoc,
-               m_starsx);
+               m_targetObjects);
 
   abcg::glUseProgram(0);
 }
 
-void GameObjects::renderObject(Model &m_model, const GLint KaLoc,
-                               const GLint KdLoc, const GLint KsLoc,
-                               const GLint shininessLoc,
-                               const GLint modelMatrixLoc,
-                               std::vector<Star> &m_st) {
+void GameEntities::renderObject(Model &m_model, const GLint KaLoc,
+                                const GLint KdLoc, const GLint KsLoc,
+                                const GLint shininessLoc,
+                                const GLint modelMatrixLoc,
+                                std::vector<SpatialObject> &m_st) {
   // Set uniform variables for the current model
   glm::mat4 modelMatrixProt{1.0f};
 
@@ -161,11 +164,11 @@ void GameObjects::renderObject(Model &m_model, const GLint KaLoc,
   }
 }
 
-bool GameObjects::checkClickOnObject(glm::vec3 const &clickPos,
-                                     glm::mat4 const &viewMatrix,
-                                     glm::mat4 const &projMatrix,
-                                     std::vector<Star> &m_stars) {
-  for (auto &star : m_stars) {
+bool GameEntities::checkClickOnObject(glm::vec3 const &clickPos,
+                                      glm::mat4 const &viewMatrix,
+                                      glm::mat4 const &projMatrix,
+                                      std::vector<SpatialObject> &m_distactionObjects) {
+  for (auto &star : m_distactionObjects) {
     // Posição 3D da estrela
     glm::vec3 starPosition = star.m_position;
 
@@ -195,22 +198,22 @@ bool GameObjects::checkClickOnObject(glm::vec3 const &clickPos,
   return false;
 }
 
-void GameObjects::update(float deltaTime) {
+void GameEntities::update(float deltaTime) {
   // Increase angle by 90 degrees per second
-  updateStars(m_stars, deltaTime, 10.0f, -50.0f, -25.0f, 25.0f, -25.0f, 25.0f,
+  updateSpatialObjects(m_distactionObjects, deltaTime, 10.0f, -50.0f, -25.0f, 25.0f, -25.0f, 25.0f,
               -100.0f, 0.0f);
 
-  updateStars(m_starsx, deltaTime, 10.0f, -50.0f, -25.0f, 25.0f, -25.0f, 25.0f,
+  updateSpatialObjects(m_targetObjects, deltaTime, 10.0f, -50.0f, -25.0f, 25.0f, -25.0f, 25.0f,
               -100.0f, 0.0f);
 }
 
-void GameObjects::destroy() {
+void GameEntities::destroy() {
   m_distraction.destroy();
   m_target.destroy();
   abcg::glDeleteProgram(m_program);
 }
 
-void GameObjects::paintUI() {
+void GameEntities::paintUI() {
   {
     auto const widgetSize{ImVec2(218, 62)};
     ImGui::SetNextWindowPos(ImVec2(m_viewportSize.x - widgetSize.x - 5, 5));

@@ -87,11 +87,11 @@ void Window::onEvent(SDL_Event const &event) {
       // Verifica cliques em targets ou distractions
       if (m_objects.checkClickOnObject(
               clickPos, m_objects.m_viewMatrix,
-              m_objects.m_projMatrix, m_objects.m_stars)) {
+              m_objects.m_projMatrix, m_objects.m_distactionObjects)) {
         m_score += 1; // Pontuação aumenta para cliques corretos
       } else if (m_objects.checkClickOnObject(
                      clickPos, m_objects.m_viewMatrix,
-                     m_objects.m_projMatrix, m_objects.m_starsx)) {
+                     m_objects.m_projMatrix, m_objects.m_targetObjects)) {
         m_score -= 1; // Pontuação diminui para cliques incorretos
       }
     }
