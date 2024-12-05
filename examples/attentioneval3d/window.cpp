@@ -19,6 +19,16 @@ void Window::onCreate() {
 
   auto const assetsPath{abcg::Application::getAssetsPath()};
 
+  m_program_obj =
+      abcg::createOpenGLProgram({{.source = assetsPath + "shaders/texture.vert",
+                                  .stage = abcg::ShaderStage::Vertex},
+                                 {.source = assetsPath + "shaders/texture.frag",
+                                  .stage = abcg::ShaderStage::Fragment}});
+
+  m_ground.loadDiffuseTexture(assetsPath + "maps/grass.png");
+  m_ground.loadObj(assetsPath + "block.obj");
+  m_ground.setupVAO(m_program_obj);
+
   // Carrega a fonte
   auto const filename{assetsPath + "Inconsolata-Medium.ttf"};
   m_font = ImGui::GetIO().Fonts->AddFontFromFileTTF(filename.c_str(), 25.0f);
@@ -69,8 +79,8 @@ void Window::onPaintUI() {
       ImGui::StyleColorsDark();
       ImGui::SetWindowFontScale(1.0f);
       ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0, 1.0, 1.0, 1.0f));
-      ImGui::PushStyleColor(ImGuiCol_WindowBg,
-                            ImVec4(yinmnBlue.r, yinmnBlue.g, yinmnBlue.b, 1.0f));
+      ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(yinmnBlue.r, yinmnBlue.g,
+                                                      yinmnBlue.b, 1.0f));
       ImGui::Indent((size.x / 4));
       ImGui::PushFont(m_font);
       // Exibe a pontuação e o tempo restante

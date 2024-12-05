@@ -42,6 +42,9 @@ private:
   GameEntities m_objects;
   GameData m_gameData;
 
+  Model m_ground;
+  GLuint m_program_obj{};
+
   // Variáveis do jogo
   int m_score{0};         // Pontuação do jogador
   int m_lastScore{0};     // Pontuação anterior
