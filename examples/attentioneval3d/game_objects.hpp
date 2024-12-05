@@ -20,6 +20,7 @@ struct PositionVertex {
 
 // Classe que representa os objetos do jogo
 class GameEntities {
+
 public:
   // Estrutura de um objeto de cena
   struct SceneObject {
@@ -122,7 +123,7 @@ private:
   glm::vec4 m_Ks{};
   float m_shininess{};
   float m_angle{};
-  
+
   // Variáveis de controle distribuição de objetos
   std::uniform_real_distribution<float> m_randomDist{-1.0f, 1.0f};
   std::vector<PositionVertex> m_vertices;
