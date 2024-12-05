@@ -25,8 +25,8 @@ public:
     glm::vec3 m_rotationAxis{};
   };
 
-  std::vector<SceneObject> m_distractionObjects = std::vector<SceneObject>(70);
-  std::vector<SceneObject> m_targetObjects = std::vector<SceneObject>(100);
+  std::vector<SceneObject> m_distractionObjects = std::vector<SceneObject>(20);
+  std::vector<SceneObject> m_targetObjects = std::vector<SceneObject>(30);
   void randomizeSceneObject(SceneObject &sceneObject, float minX, float maxX,
                             float minY, float maxY, float minZ, float maxZ);
 

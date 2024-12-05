@@ -8,7 +8,6 @@
 void GameEntities::create() {
   auto const assetsPath{abcg::Application::getAssetsPath()};
 
-  
   abcg::glEnable(GL_DEPTH_TEST);
 
   m_program =
@@ -17,23 +16,24 @@ void GameEntities::create() {
                                  {.source = assetsPath + "shaders/texture.frag",
                                   .stage = abcg::ShaderStage::Fragment}});
 
-  createObject(m_distractionModel, assetsPath, "bird.obj", "maps/w-feathers.png");
-  createObject(m_targetModel, assetsPath, "bird.obj", "maps/b-feathers.png");
+  createObject(m_distractionModel, assetsPath, "bird.obj",
+               "maps/b-feathers.png");
+  createObject(m_targetModel, assetsPath, "bird.obj", "maps/w-feathers.png");
 
   setupSceneObjects(m_distractionObjects, // m_sceneObjects
-                    -25.0f,               // minX
-                    25.0f,                // maxX
-                    -25.0f,               // minY
-                    25.0f,                // maxY
-                    -100.0f,              // minZ
+                    -15.0f,               // minX
+                    15.0f,                // maxX
+                    0.0f,                 // minY
+                    15.0f,                // maxY
+                    -50.0f,               // minZ
                     0.0f                  // maxZ
   );
   setupSceneObjects(m_targetObjects, // m_sceneObjects
-                    -25.0f,          // minX
-                    25.0f,           // maxX
-                    -25.0f,          // minY
-                    25.0f,           // maxY
-                    -100.0f,         // minZ
+                    -15.0f,          // minX
+                    15.0f,           // maxX
+                    0.0f,            // minY
+                    15.0f,           // maxY
+                    -50.0f,          // minZ
                     0.0f             // maxZ
   );
 }
@@ -203,10 +203,16 @@ bool GameEntities::checkClickOnObject(
     // Distância no espaço da tela (clique projetado em 2D)
     float halfSize = 100.0f; // Tamanho do objeto em pixels na tela
     if (glm::distance(glm::vec3(clickPos.x, clickPos.y, clickPos.z),
-                      glm::vec3(sceneObjectScreenPos, 0.0f)) <= halfSize) {
+                      glm::vec3(sceneObjectScreenPos, 0.0f)) < halfSize) {
       // Reposiciona estrela clicada
-      randomizeSceneObject(sceneObject, -25.0f, 25.0f, -25.0f, 25.0f, -100.0f,
-                           0.0f);
+      randomizeSceneObject(sceneObject, // sceneObject
+                           -15.0f,      // minX
+                           15.0f,       // maxX
+                           0.0f,        // minY
+                           15.0f,       // maxY
+                           -50.0f,      // minZ
+                           0.0f         // maxZ
+      );
       // Clique reconhecido
       return true;
     }
@@ -219,13 +225,13 @@ void GameEntities::update(float deltaTime) {
   // Increase angle by 90 degrees per second
   updateSceneObjects(m_distractionObjects, // m_sceneObjects
                      deltaTime,            // deltaTime
-                     10.0f,                // incZ
+                     15.0f,                // incZ
                      -1.0f,                // incX
                      0.0f,                 // incY
                      -50.0f,               // posZ
-                     -25.0f,               // minX
-                     25.0f,                // maxX
-                     -25.0f,               // minY
+                     -15.0f,               // minX
+                     15.0f,                // maxX
+                     0.0f,                 // minY
                      25.0f,                // maxY
                      -100.0f,              // minZ
                      0.0f                  // maxZ
@@ -234,14 +240,14 @@ void GameEntities::update(float deltaTime) {
   updateSceneObjects(m_targetObjects, // m_sceneObjects
                      deltaTime,       // deltaTime
                      10.0f,           // incZ
-                     1.0f,            // incX
+                     0.0f,            // incX
                      0.0f,            // incY
                      -50.0f,          // posZ
-                     -25.0f,          // minX
-                     25.0f,           // maxX
-                     -25.0f,          // minY
-                     25.0f,           // maxY
-                     -100.0f,         // minZ
+                     -15.0f,          // minX
+                     15.0f,           // maxX
+                     0.0f,            // minY
+                     15.0f,           // maxY
+                     -50.0f,          // minZ
                      0.0f             // maxZ
   );
 }
