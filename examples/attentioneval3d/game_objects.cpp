@@ -181,6 +181,7 @@ void GameEntities::paint() {
   abcg::glUseProgram(0);
 }
 
+// TODO: Renderizar solo/chão adequadamente
 // Renderiza objetos de cena
 void GameEntities::renderObject(Model &m_model, const GLint KaLoc,
                                 const GLint KdLoc, const GLint KsLoc,
@@ -189,7 +190,7 @@ void GameEntities::renderObject(Model &m_model, const GLint KaLoc,
                                 std::vector<SceneObject> &m_scObjects) {
 
   // Aplica variáveis uniformes para o modelo de matriz de protótipo
-  glm::mat4 modelMatrixProt{1.0f};
+  glm::mat4 modelMatrixProt{1.0f}; // Matriz de modelo protótipo
   abcg::glUniformMatrix4fv(modelMatrixLoc, 1, GL_FALSE,
                            &modelMatrixProt[0][0]); // Matriz de modelo
   abcg::glUniform4fv(KaLoc, 1, &m_Ka.x);            // Coeficiente ambiente
@@ -201,8 +202,7 @@ void GameEntities::renderObject(Model &m_model, const GLint KaLoc,
   for (auto &scObject : m_scObjects) {
 
     // Computa a matriz de modelo para todos objeto de cena
-    glm::mat4 modelMatrix{1.0f};
-
+    glm::mat4 modelMatrix{1.0f}; // Matriz de modelo
     modelMatrix =
         glm::translate(modelMatrix, scObject.m_position); // Posição do objeto
     modelMatrix = glm::scale(modelMatrix, glm::vec3(0.7f)); // Escala do objeto
@@ -217,23 +217,22 @@ void GameEntities::renderObject(Model &m_model, const GLint KaLoc,
 
 // Verifica se um objeto de cena foi clicado
 bool GameEntities::checkClickOnObject(
-    glm::vec3 const &clickPos,               // clickPos
-    glm::mat4 const &viewMatrix,             // viewMatrix
-    glm::mat4 const &projMatrix,             // projMatrix
-    std::vector<SceneObject> &m_sceneObjects // m_sceneObjects
-) {
-  for (auto &sceneObject : m_sceneObjects) {
-    // Posição 3D do objeto de cena (pássaro)
-    glm::vec3 sceneObjectPosition = sceneObject.m_position;
+    glm::vec3 const &clickPos, glm::mat4 const &viewMatrix,
+    glm::mat4 const &projMatrix, std::vector<SceneObject> &m_sceneObjects) {
 
-    // Converta a posição do objeto de cena para o espaço da tela
+  // Verifica se o clique atingiu um objeto de cena
+  for (auto &sceneObject : m_sceneObjects) {
+
+    glm::vec3 sceneObjectPosition =
+        sceneObject.m_position; // Posição 3D do objeto de cena (pássaro)
+
+    // Converte a posição do objeto de cena para o espaço da tela
     glm::vec4 sceneObjectClipSpace =
         projMatrix * viewMatrix * glm::vec4(sceneObjectPosition, 1.0f);
     // Normaliza no espaço de recorte
     sceneObjectClipSpace /= sceneObjectClipSpace.w;
 
-    // A posição da estrela está em -1 a 1.
-    // Precisamos escalá-la para coordenadas da janela
+    // A posição do objeto que está em -1 a 1 é escalada para o tamanho da tela
     glm::vec2 sceneObjectScreenPos = {
         (sceneObjectClipSpace.x * 0.5f + 0.5f) * m_viewportSize.x,
         (1.0f - (sceneObjectClipSpace.y * 0.5f + 0.5f)) * m_viewportSize.y};
@@ -242,7 +241,8 @@ bool GameEntities::checkClickOnObject(
     float halfSize = 100.0f; // Tamanho do objeto em pixels na tela
     if (glm::distance(glm::vec3(clickPos.x, clickPos.y, clickPos.z),
                       glm::vec3(sceneObjectScreenPos, 0.0f)) <= halfSize) {
-      // Reposiciona estrela clicada
+      // TODO: Remover objeto clicado
+      // Reposiciona objeto clicada
       randomizeSceneObject(sceneObject, // sceneObject
                            -15.0f,      // minX
                            15.0f,       // maxX
@@ -259,8 +259,9 @@ bool GameEntities::checkClickOnObject(
   return false;
 }
 
+// Atualiza objetos de cena
 void GameEntities::update(float deltaTime) {
-  // Increase angle by 90 degrees per second
+  // Atualiza objetos de cena de distração
   updateSceneObjects(m_distractionObjects, // m_sceneObjects
                      deltaTime,            // deltaTime
                      15.0f,                // incZ
@@ -274,7 +275,7 @@ void GameEntities::update(float deltaTime) {
                      -100.0f,              // minZ
                      0.0f                  // maxZ
   );
-
+  // Atualiza objetos de cena de alvo
   updateSceneObjects(m_targetObjects, // m_sceneObjects
                      deltaTime,       // deltaTime
                      10.0f,           // incZ
@@ -290,12 +291,7 @@ void GameEntities::update(float deltaTime) {
   );
 }
 
-void GameEntities::destroy() {
-  m_distractionModel.destroy();
-  m_targetModel.destroy();
-  abcg::glDeleteProgram(m_program);
-}
-
+// Renderiza UI
 void GameEntities::paintUI() {
   {
     auto const widgetSize{ImVec2(218, 62)};
@@ -306,10 +302,10 @@ void GameEntities::paintUI() {
     {
       ImGui::PushItemWidth(120);
       static std::size_t currentIndex{};
-      std::vector<std::string> const comboItems{"Perspective", "Orthographic"};
+      std::vector<std::string> const comboItems{"Treinamento",
+                                                "Vôo dos Pássaros"};
 
-      if (ImGui::BeginCombo("Projection",
-                            comboItems.at(currentIndex).c_str())) {
+      if (ImGui::BeginCombo("Projeção", comboItems.at(currentIndex).c_str())) {
         for (auto const index : iter::range(comboItems.size())) {
           auto const isSelected{currentIndex == index};
           if (ImGui::Selectable(comboItems.at(index).c_str(), isSelected))
@@ -338,4 +334,11 @@ void GameEntities::paintUI() {
 
     ImGui::End();
   }
+}
+
+// Finaliza objetos de cena
+void GameEntities::destroy() {
+  m_distractionModel.destroy();
+  m_targetModel.destroy();
+  abcg::glDeleteProgram(m_program);
 }
