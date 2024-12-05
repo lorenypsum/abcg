@@ -292,6 +292,7 @@ void GameEntities::update(float deltaTime) {
 }
 
 // Renderiza UI
+// TODO: Ter uma matriz de projeção diferente para o cenário 3D
 void GameEntities::paintUI() {
   {
     auto const widgetSize{ImVec2(218, 62)}; // Variável do tamanho do widget
