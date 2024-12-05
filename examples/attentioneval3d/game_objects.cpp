@@ -17,38 +17,56 @@ void GameEntities::create() {
                                  {.source = assetsPath + "texture.frag",
                                   .stage = abcg::ShaderStage::Fragment}});
 
-  createObject(m_distraction, assetsPath, "Grass_Block.obj", "maps/Grass.png");
-  createObject(m_target, assetsPath, "Grass_Block.obj", "maps/a.png");
-  setupSpatialObjects(m_distactionObjects, -25.0f, 25.0f, -25.0f, 25.0f, -100.0f, 0.0f);
-  setupSpatialObjects(m_targetObjects, -25.0f, 25.0f, -25.0f, 25.0f, -100.0f, 0.0f);
+  createObject(m_distractionModel, assetsPath, "Grass_Block.obj",
+               "maps/Grass.png");
+  createObject(m_targetModel, assetsPath, "Grass_Block.obj", "maps/a.png");
+
+  setupSceneObjects(m_distractionObjects, // m_sceneObjects
+                    -25.0f,               // minX
+                    25.0f,                // maxX
+                    -25.0f,               // minY
+                    25.0f,                // maxY
+                    -100.0f,              // minZ
+                    0.0f                  // maxZ
+  );
+  setupSceneObjects(m_targetObjects, // m_sceneObjects
+                    -25.0f,          // minX
+                    25.0f,           // maxX
+                    -25.0f,          // minY
+                    25.0f,           // maxY
+                    -100.0f,         // minZ
+                    0.0f             // maxZ
+  );
 }
 
-void GameEntities::setupSpatialObjects(std::vector<SpatialObject> &m_st, float minX,
-                              float maxX, float minY, float maxY, float minZ,
-                              float maxZ) {
-  // Setup stars
-  for (auto &star : m_st) {
-    randomizeStar(star, minX, maxX, minY, maxY, minZ, maxZ);
+void GameEntities::setupSceneObjects(std::vector<SceneObject> &m_sceneObjects,
+                                     float minX, float maxX, float minY,
+                                     float maxY, float minZ, float maxZ) {
+  // Setup scene objects
+  for (auto &sceneObject : m_sceneObjects) {
+    randomizeSceneObject(sceneObject, minX, maxX, minY, maxY, minZ, maxZ);
   }
 }
 
-void GameEntities::updateSpatialObjects(std::vector<SpatialObject> &m_st,
-                               float deltaTime, float incZ, float posZ,
-                               float minX, float maxX, float minY, float maxY,
-                               float minZ, float maxZ) {
+void GameEntities::updateSceneObjects(std::vector<SceneObject> &m_sceneObjects,
+                                      float deltaTime, float incZ, float incX,
+                                      float incY, float posZ, float minX,
+                                      float maxX, float minY, float maxY,
+                                      float minZ, float maxZ) {
 
   m_angle = glm::wrapAngle(m_angle + glm::radians(90.0f) * deltaTime);
 
-  // Update stars
-  for (auto &star : m_st) {
-    // Increase z by 10 units per second
-    star.m_position.z += deltaTime * incZ;
+  // Update scene objects
+  for (auto &sceneObject : m_sceneObjects) {
+    // Increase z by incZ units per second
+    sceneObject.m_position.z += deltaTime * incZ;
+    sceneObject.m_position.x += deltaTime * incX;
+    sceneObject.m_position.y += deltaTime * incY;
 
-    // If this star is behind the camera, select a new random position &
-    // orientation and move it back to -100
-    if (star.m_position.z > 0.1f) {
-      randomizeStar(star, minX, maxX, minY, maxY, minZ, maxZ);
-      star.m_position.z = posZ; // Back to -100
+    // If this sceneObject is behind the camera, select a new random position
+    if (sceneObject.m_position.z > 0.1f) {
+      randomizeSceneObject(sceneObject, minX, maxX, minY, maxY, minZ, maxZ);
+      sceneObject.m_position.z = posZ; // Back to -100
     }
   }
 }
@@ -73,19 +91,19 @@ void GameEntities::createObject(Model &m_model, const std::string &assetsPath,
   m_viewMatrix = glm::lookAt(eye, at, up);
 }
 
-void GameEntities::randomizeStar(SpatialObject &star, float minX, float maxX,
-                                 float minY, float maxY, float minZ,
-                                 float maxZ) {
+void GameEntities::randomizeSceneObject(SceneObject &sceneObject, float minX,
+                                        float maxX, float minY, float maxY,
+                                        float minZ, float maxZ) {
   // Random position: x and y in [minX, maxX), z in [minZ, maxZ)
   std::uniform_real_distribution<float> distPosX(minX, maxX);
   std::uniform_real_distribution<float> distPosY(minY, maxY);
   std::uniform_real_distribution<float> distPosZ(minZ, maxZ);
-  star.m_position =
+  sceneObject.m_position =
       glm::vec3(distPosX(m_randomEngine), distPosY(m_randomEngine),
                 distPosZ(m_randomEngine));
 
   // Random rotation axis
-  star.m_rotationAxis = glm::sphericalRand(1.0f);
+  sceneObject.m_rotationAxis = glm::sphericalRand(1.0f);
 }
 
 void GameEntities::paint() {
@@ -126,9 +144,9 @@ void GameEntities::paint() {
   abcg::glUniform4fv(IdLoc, 1, &m_Id.x);
   abcg::glUniform4fv(IsLoc, 1, &m_Is.x);
 
-  renderObject(m_distraction, KaLoc, KdLoc, KsLoc, shininessLoc, modelMatrixLoc,
-               m_distactionObjects);
-  renderObject(m_target, KaLoc, KdLoc, KsLoc, shininessLoc, modelMatrixLoc,
+  renderObject(m_distractionModel, KaLoc, KdLoc, KsLoc, shininessLoc,
+               modelMatrixLoc, m_distractionObjects);
+  renderObject(m_targetModel, KaLoc, KdLoc, KsLoc, shininessLoc, modelMatrixLoc,
                m_targetObjects);
 
   abcg::glUseProgram(0);
@@ -138,7 +156,7 @@ void GameEntities::renderObject(Model &m_model, const GLint KaLoc,
                                 const GLint KdLoc, const GLint KsLoc,
                                 const GLint shininessLoc,
                                 const GLint modelMatrixLoc,
-                                std::vector<SpatialObject> &m_st) {
+                                std::vector<SceneObject> &m_sceneObjects) {
   // Set uniform variables for the current model
   glm::mat4 modelMatrixProt{1.0f};
 
@@ -150,13 +168,13 @@ void GameEntities::renderObject(Model &m_model, const GLint KaLoc,
   // Set uniform variable
   abcg::glUniformMatrix4fv(modelMatrixLoc, 1, GL_FALSE, &modelMatrixProt[0][0]);
 
-  // Render each star
-  for (auto &star : m_st) {
-    // Compute model matrix of the current star
+  // Render each sceneObject
+  for (auto &sceneObject : m_sceneObjects) {
+    // Compute model matrix of the current sceneObject
     glm::mat4 modelMatrix{1.0f};
-    modelMatrix = glm::translate(modelMatrix, star.m_position);
+    modelMatrix = glm::translate(modelMatrix, sceneObject.m_position);
     modelMatrix = glm::scale(modelMatrix, glm::vec3(0.2f));
-    modelMatrix = glm::rotate(modelMatrix, m_angle, star.m_rotationAxis);
+    modelMatrix = glm::rotate(modelMatrix, m_angle, sceneObject.m_rotationAxis);
 
     // Set uniform variable
     abcg::glUniformMatrix4fv(modelMatrixLoc, 1, GL_FALSE, &modelMatrix[0][0]);
@@ -164,52 +182,74 @@ void GameEntities::renderObject(Model &m_model, const GLint KaLoc,
   }
 }
 
-bool GameEntities::checkClickOnObject(glm::vec3 const &clickPos,
-                                      glm::mat4 const &viewMatrix,
-                                      glm::mat4 const &projMatrix,
-                                      std::vector<SpatialObject> &m_distactionObjects) {
-  for (auto &star : m_distactionObjects) {
+bool GameEntities::checkClickOnObject(
+    glm::vec3 const &clickPos, glm::mat4 const &viewMatrix,
+    glm::mat4 const &projMatrix, std::vector<SceneObject> &m_sceneObjects) {
+  for (auto &sceneObject : m_sceneObjects) {
     // Posição 3D da estrela
-    glm::vec3 starPosition = star.m_position;
+    glm::vec3 sceneObjectPosition = sceneObject.m_position;
 
-    // Converta o starPosition para o espaço da tela
-    glm::vec4 starClipSpace =
-        projMatrix * viewMatrix * glm::vec4(starPosition, 1.0f);
+    // Converta a posição do objeto de cena para o espaço da tela
+    glm::vec4 sceneObjectClipSpace =
+        projMatrix * viewMatrix * glm::vec4(sceneObjectPosition, 1.0f);
     // Normaliza no espaço de recorte
-    starClipSpace /= starClipSpace.w;
+    sceneObjectClipSpace /= sceneObjectClipSpace.w;
 
     // A posição da estrela está em -1 a 1.
     // Precisamos escalá-la para coordenadas da janela
-    glm::vec2 starScreenPos = {
-        (starClipSpace.x * 0.5f + 0.5f) * m_viewportSize.x,
-        (1.0f - (starClipSpace.y * 0.5f + 0.5f)) * m_viewportSize.y};
+    glm::vec2 sceneObjectScreenPos = {
+        (sceneObjectClipSpace.x * 0.5f + 0.5f) * m_viewportSize.x,
+        (1.0f - (sceneObjectClipSpace.y * 0.5f + 0.5f)) * m_viewportSize.y};
 
     // Distância no espaço da tela (clique projetado em 2D)
     float halfSize = 50.0f; // Tamanho do objeto em pixels na tela
     if (glm::distance(glm::vec3(clickPos.x, clickPos.y, clickPos.z),
-                      glm::vec3(starScreenPos, 0.0f)) <= halfSize) {
+                      glm::vec3(sceneObjectScreenPos, 0.0f)) <= halfSize) {
       // Reposiciona estrela clicada
-      randomizeStar(star, -25.0f, 25.0f, -25.0f, 25.0f, -100.0f, 0.0f);
+      randomizeSceneObject(sceneObject, -25.0f, 25.0f, -25.0f, 25.0f, -100.0f,
+                           0.0f);
       // Clique reconhecido
       return true;
     }
   }
-  // Nenhuma estrela foi clicada
+  // Nenhum objeto na cena foi clicado
   return false;
 }
 
 void GameEntities::update(float deltaTime) {
   // Increase angle by 90 degrees per second
-  updateSpatialObjects(m_distactionObjects, deltaTime, 10.0f, -50.0f, -25.0f, 25.0f, -25.0f, 25.0f,
-              -100.0f, 0.0f);
+  updateSceneObjects(m_distractionObjects, // m_sceneObjects
+                     deltaTime,            // deltaTime
+                     10.0f,                // incZ
+                     -2.0f,                 // incX
+                     0.0f,                 // incY
+                     -50.0f,               // posZ
+                     -25.0f,               // minX
+                     25.0f,                // maxX
+                     -25.0f,               // minY
+                     25.0f,                // maxY
+                     -100.0f,              // minZ
+                     0.0f                  // maxZ
+  );
 
-  updateSpatialObjects(m_targetObjects, deltaTime, 10.0f, -50.0f, -25.0f, 25.0f, -25.0f, 25.0f,
-              -100.0f, 0.0f);
+  updateSceneObjects(m_targetObjects, // m_sceneObjects
+                     deltaTime,       // deltaTime
+                     10.0f,           // incZ
+                     2.0f,            // incX
+                     0.0f,            // incY
+                     -50.0f,          // posZ
+                     -25.0f,          // minX
+                     25.0f,           // maxX
+                     -25.0f,          // minY
+                     25.0f,           // maxY
+                     -100.0f,         // minZ
+                     0.0f             // maxZ
+  );
 }
 
 void GameEntities::destroy() {
-  m_distraction.destroy();
-  m_target.destroy();
+  m_distractionModel.destroy();
+  m_targetModel.destroy();
   abcg::glDeleteProgram(m_program);
 }
 

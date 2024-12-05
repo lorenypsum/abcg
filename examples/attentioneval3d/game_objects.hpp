@@ -19,17 +19,16 @@ struct PositionVertex {
 
 class GameEntities {
 public:
-  // star
-  struct SpatialObject {
+  // Scene Objects
+  struct SceneObject {
     glm::vec3 m_position{};
     glm::vec3 m_rotationAxis{};
   };
 
-  std::vector<SpatialObject> m_distactionObjects =
-      std::vector<SpatialObject>(100);
-  std::vector<SpatialObject> m_targetObjects = std::vector<SpatialObject>(100);
-  void randomizeStar(SpatialObject &star, float minX, float maxX, float minY,
-                     float maxY, float minZ, float maxZ);
+  std::vector<SceneObject> m_distractionObjects = std::vector<SceneObject>(100);
+  std::vector<SceneObject> m_targetObjects = std::vector<SceneObject>(100);
+  void randomizeSceneObject(SceneObject &sceneObject, float minX, float maxX,
+                            float minY, float maxY, float minZ, float maxZ);
 
   // distraction objects
   struct GameObject {
@@ -46,9 +45,9 @@ public:
   GLuint loadTexture(std::string filepath);
 
   void create();
-  void setupSpatialObjects(std::vector<SpatialObject> &m_distactionObjects,
-                           float minX, float maxX, float minY, float maxY,
-                           float minZ, float maxZ);
+  void setupSceneObjects(std::vector<SceneObject> &m_sceneObjects, float minX,
+                         float maxX, float minY, float maxY, float minZ,
+                         float maxZ);
   void createDistraction(const std::string &assetsPath);
   void createObject(Model &m_model, const std::string &assetsPath,
                     const std::string &objPath,
@@ -56,7 +55,7 @@ public:
   void renderObject(Model &m_model, const GLint KaLoc, const GLint KdLoc,
                     const GLint KsLoc, const GLint shininessLoc,
                     const GLint modelMatrixLoc,
-                    std::vector<SpatialObject> &m_distactionObjects);
+                    std::vector<SceneObject> &m_sceneObjects);
   void paint();
 
   void setModelVariables(const GLint KaLoc, const GLint KdLoc,
@@ -65,15 +64,16 @@ public:
   void paintUI();
   void destroy();
   void update(float deltaTime);
-  void updateSpatialObjects(std::vector<SpatialObject> &m_st, float deltaTime,
-                            float incZ, float posZ, float minX, float maxX,
-                            float minY, float maxY, float minZ, float maxZ);
+  void updateSceneObjects(std::vector<SceneObject> &m_st, float deltaTime,
+                          float incZ, float incX, float incY, float posZ,
+                          float minX, float maxX, float minY, float maxY,
+                          float minZ, float maxZ);
   void updateObjects(float deltaTime);
   bool isEmpty() const;
   bool checkClickOnObject(glm::vec3 const &clickPos,
                           glm::mat4 const &viewMatrix,
                           glm::mat4 const &projMatrix,
-                          std::vector<SpatialObject> &m_distactionObjects);
+                          std::vector<SceneObject> &m_sceneObjects);
   void removeObject(std::list<GameObject>::iterator it);
   void loadObj(std::string_view path, bool standardize = true);
   void render(int numTriangles = -1) const;
@@ -85,8 +85,8 @@ public:
   float m_FOV{30.0f};
 
 private:
-  Model m_distraction;
-  Model m_target;
+  Model m_distractionModel;
+  Model m_targetModel;
 
   GLuint m_program{};
   GLint m_translationLoc{};
