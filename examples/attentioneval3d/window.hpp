@@ -27,7 +27,7 @@ protected:
   void onUpdate() override;
 
 public:
-  // Funções de ciclo de vida do jogo
+  // Funções de ciclo da aplicação 3d (jogo)
   void initializeGameObjects();
   void checkGameStatus();
   void updateTimeDisplay();
@@ -37,13 +37,15 @@ public:
 private:
   // Programa de shader
   GLuint m_program{};
+  GLuint m_program_obj{};
 
-  // Objects
+  // Variáveis de viewport
+  glm::ivec2 m_viewportSize;
+
+  // Classes Instanciadas
   GameEntities m_objects;
   GameData m_gameData;
-
   Model m_ground;
-  GLuint m_program_obj{};
 
   // Variáveis do jogo
   int m_score{0};         // Pontuação do jogador
@@ -55,9 +57,7 @@ private:
 
   // Variáveis
   std::default_random_engine m_randomEngine;
-
   std::chrono::steady_clock::time_point m_lastReload;
-  glm::ivec2 m_viewportSize;
   float m_FOV{30.0f};
   ImFont *m_font{};
 };

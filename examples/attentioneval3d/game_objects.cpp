@@ -11,6 +11,7 @@ void GameEntities::create() {
 
   abcg::glEnable(GL_DEPTH_TEST); // Habilita teste de profundidade
 
+  // Configurações de luz
   m_program = abcg::createOpenGLProgram(
       {{.source = assetsPath + "shaders/texture.vert",
         .stage = abcg::ShaderStage::Vertex},

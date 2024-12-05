@@ -13,38 +13,52 @@ glm::vec3 hexToVec3(uint32_t hexValue) {
 glm::vec3 yinmnBlue = hexToVec3(0x465775);
 glm::vec3 skyblue = hexToVec3(0xB4DEF5);
 
+// Inicializa a janela
 void Window::onCreate() {
 
-  abcg::glClearColor(skyblue.r, skyblue.g, skyblue.b, 1.0f);
+  abcg::glClearColor(skyblue.r, skyblue.g, skyblue.b, 1.0f); // Cor de fundo
 
-  auto const assetsPath{abcg::Application::getAssetsPath()};
+  auto const assetsPath{
+      abcg::Application::getAssetsPath()}; // Caminho dos assets
 
-  m_program_obj =
-      abcg::createOpenGLProgram({{.source = assetsPath + "shaders/texture.vert",
-                                  .stage = abcg::ShaderStage::Vertex},
-                                 {.source = assetsPath + "shaders/texture.frag",
-                                  .stage = abcg::ShaderStage::Fragment}});
+  // TODO: Carregar o chão/solo
+  // m_program_obj =
+  //     abcg::createOpenGLProgram({{.source = assetsPath +
+  //     "shaders/texture.vert",
+  //                                 .stage = abcg::ShaderStage::Vertex},
+  //                                {.source = assetsPath +
+  //                                "shaders/texture.frag",
+  //                                 .stage = abcg::ShaderStage::Fragment}});
 
-  m_ground.loadDiffuseTexture(assetsPath + "maps/grass.png");
-  m_ground.loadObj(assetsPath + "block.obj");
-  m_ground.setupVAO(m_program_obj);
+  // m_ground.loadDiffuseTexture(assetsPath + "maps/grass.png");
+  // m_ground.loadObj(assetsPath + "block.obj");
+  // m_ground.setupVAO(m_program_obj);
 
   // Carrega a fonte
   auto const filename{assetsPath + "Inconsolata-Medium.ttf"};
   m_font = ImGui::GetIO().Fonts->AddFontFromFileTTF(filename.c_str(), 25.0f);
   if (m_font == nullptr) {
-    throw abcg::RuntimeError("Cannot load font file");
+    throw abcg::RuntimeError("Não é possível carregar o arquivo de fonte");
   }
+
   // Configura estado inicial
   m_randomEngine.seed(
       std::chrono::steady_clock::now().time_since_epoch().count());
+
+  // Inicializa os objetos do jogo
   m_objects.create();
+
+  // Inicializa o Jogo
   startGame();
 }
 
+// Atualiza a janela
 void Window::onUpdate() {
-  // Increase angle by 90 degrees per second
+
+  // Calcula o tempo decorrido desde a última atualização
   auto const deltaTime{gsl::narrow_cast<float>(getDeltaTime())};
+
+  // Atualiza objetos de cena
   m_objects.update(deltaTime);
 
   // Calcula o tempo decorrido desde o último recarregamento
@@ -52,10 +66,10 @@ void Window::onUpdate() {
   float elapsedTime = std::chrono::duration_cast<std::chrono::seconds>(
                           currentTime - m_lastReload)
                           .count();
+
   // Recarrega objetos a cada 3 segundos
   if (elapsedTime >= 1.0f && m_gameData.m_state == GameState::Playing) {
-    --m_gametime; // Decrementa o tempo restante
-    // m_objects.update(elapsedTime); // Atualiza objetos de distração
+    --m_gametime;               // Decrementa o tempo restante
     m_lastReload = currentTime; // Atualiza o tempo de recarga
     checkGameStatus();          // Verifica o status do jogo
     updateTimeDisplay();        // Atualiza a exibição de tempo
@@ -63,55 +77,66 @@ void Window::onUpdate() {
   checkGameStatus(); // Verifica o status do jogo
 }
 
+// Renderiza a janela
+// TODO: Renderizar o chão/solo
 void Window::onPaint() { m_objects.paint(); }
 
+// Renderiza a interface do usuário
 void Window::onPaintUI() {
-  abcg::OpenGLWindow::onPaintUI();
 
+  abcg::OpenGLWindow::onPaintUI();
   {
     // Configura a janela de interface do usuário
-    auto const size{ImVec2(600, 67)};
-    auto const position{ImVec2(size.x / 2, 5.0f)};
-    ImGui::SetNextWindowPos(position);
-    ImGui::SetNextWindowSize(size);
+    auto const size{ImVec2(600, 67)};              // Tamanho da janela
+    auto const position{ImVec2(size.x / 2, 5.0f)}; // Posição da janela
+    ImGui::SetNextWindowPos(position); // Configura a posição da janela
+    ImGui::SetNextWindowSize(size);    // Configura o tamanho da janela
     ImGui::Begin(" ", nullptr, ImGuiWindowFlags_NoDecoration);
     {
-      ImGui::StyleColorsDark();
-      ImGui::SetWindowFontScale(1.0f);
-      ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0, 1.0, 1.0, 1.0f));
-      ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(yinmnBlue.r, yinmnBlue.g,
-                                                      yinmnBlue.b, 1.0f));
-      ImGui::Indent((size.x / 4));
-      ImGui::PushFont(m_font);
+      ImGui::StyleColorsDark();        // Estilo escuro
+      ImGui::SetWindowFontScale(1.0f); // Escala da fonte
+      ImGui::PushStyleColor(ImGuiCol_Text,
+                            ImVec4(1.0, 1.0, 1.0, 1.0f)); // Cor do texto
+      ImGui::PushStyleColor(
+          ImGuiCol_WindowBg,
+          ImVec4(yinmnBlue.r, yinmnBlue.g, yinmnBlue.b, 1.0f)); // Cor de fundo
+      ImGui::Indent((size.x / 4)); // Identação do texto
+      ImGui::PushFont(m_font);     // Inclui Fonte
+
       // Exibe a pontuação e o tempo restante
       if (m_gameData.m_state == GameState::Playing) {
-
-        ImGui::Text("Pontuação: %d Tempo: %d", m_score, m_gametime);
+        ImGui::Text("Pontuação: %d Tempo: %d", m_score,
+                    m_gametime); // Texto de pontuação e tempo
       } else if (m_gameData.m_state == GameState::GameOver) {
-        ImGui::Text("Pontuação final: %d", m_newScore);
+        ImGui::Text("Pontuação final: %d",
+                    m_newScore); // Texto de pontuação final
       } else if (m_gameData.m_state == GameState::Win) {
-        ImGui::Text("Parabéns! Novo Recorde: %d", m_newScore);
+        ImGui::Text("Parabéns! Novo Recorde: %d",
+                    m_newScore); // Texto de novo recorde
       } else if (m_gameData.m_state == GameState::Start) {
-        ImGui::Text("Pegue os pássaros brancos!");
-        ImGui::Text("Pontuação: %d Tempo: %d", m_score, m_gametime);
+        ImGui::Text("Pegue os pássaros brancos!"); // Texto de instrução
+        ImGui::Text("Pontuação: %d Tempo: %d", m_score,
+                    m_gametime); // Texto de pontuação e tempo
       } else {
-        ImGui::Text("...");
+        ImGui::Text("..."); // Texto de DEFAULT
       }
+
       // Finaliza a janela de interface do usuário
       ImGui::PopFont();
       ImGui::End();
     }
   }
 
-  m_objects.paintUI();
+  m_objects.paintUI(); // Renderiza a interface dos objetos
 }
 
+// Atualiza o tamanho da janela
 void Window::onResize(glm::ivec2 const &size) {
   m_objects.m_viewportSize = size;
 }
 
-void Window::onDestroy() { m_objects.destroy(); }
-
+// Eventos de clique do mouse
+// TODO: Incluir toque na tela
 void Window::onEvent(SDL_Event const &event) {
   if (event.type == SDL_MOUSEBUTTONDOWN &&
       event.button.button == SDL_BUTTON_LEFT) {
@@ -139,8 +164,7 @@ void Window::onEvent(SDL_Event const &event) {
 
 // Inicializa os objetos do jogo em posições aleatórias
 void Window::initializeGameObjects() {
-  // Recarrega a posição do alvo e dos objetos de distração
-  m_objects.create();
+  m_objects.create(); // Recarrega a posição do alvo e dos objetos de distração
 }
 
 // Verifica o status do jogo e atualiza o estado conforme necessário
@@ -168,7 +192,7 @@ void Window::checkGameStatus() {
   else if (m_gametime > 0 && m_gameData.m_state != GameState::Win &&
            m_gameData.m_state != GameState::GameOver && m_score > 0) {
     m_gameOver = false;
-    m_gameData.m_state = GameState::Playing;
+    m_gameData.m_state = GameState::Playing; // Estado de jogo em andamento
   }
 }
 
@@ -177,7 +201,7 @@ void Window::updateTimeDisplay() {
   if (m_gametime <= 0) {
     m_newScore = m_score;
     m_gameOver = true;
-    m_gameData.m_state = GameState::GameOver;
+    m_gameData.m_state = GameState::GameOver; // Estado de game over
   }
 }
 
@@ -190,9 +214,8 @@ void Window::resetGame() {
     m_gametime = 30;
     m_gameOver = false;
     m_restartDelay = 40;
-    m_gameData.m_state =
-        GameState::Start; // Começa do estado Start
-                          // Recria os objetos e reinicia o tempo de recarga
+    m_gameData.m_state = GameState::Start; // Começa do estado Start
+    // Recria os objetos e reinicia o tempo de recarga
     m_lastReload = std::chrono::steady_clock::now();
     initializeGameObjects();
   }
@@ -210,3 +233,6 @@ void Window::startGame() {
   m_lastReload = std::chrono::steady_clock::now();
   initializeGameObjects();
 }
+
+// Destroi a janela
+void Window::onDestroy() { m_objects.destroy(); }
