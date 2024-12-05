@@ -61,7 +61,7 @@ void Window::onPaintUI() {
   {
     // Configura a janela de interface do usuário
     auto const size{ImVec2(600, 67)};
-    auto const position{ImVec2(m_viewportSize.x + (size.x / 2), 5.0f)};
+    auto const position{ImVec2(size.x / 2, 5.0f)};
     ImGui::SetNextWindowPos(position);
     ImGui::SetNextWindowSize(size);
     ImGui::Begin(" ", nullptr, ImGuiWindowFlags_NoDecoration);
