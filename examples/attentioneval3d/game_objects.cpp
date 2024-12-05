@@ -18,8 +18,8 @@ void GameEntities::create() {
                                   .stage = abcg::ShaderStage::Fragment}});
 
   createObject(m_distractionModel, assetsPath, "block.obj",
-               "maps/Grass.png");
-  createObject(m_targetModel, assetsPath, "block.obj", "maps/a.png");
+               "maps/green.png");
+  createObject(m_targetModel, assetsPath, "block.obj", "maps/brown.png");
 
   setupSceneObjects(m_distractionObjects, // m_sceneObjects
                     -25.0f,               // minX
