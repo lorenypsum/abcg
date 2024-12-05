@@ -172,7 +172,7 @@ void GameEntities::renderObject(Model &m_model, const GLint KaLoc,
     // Compute model matrix of the current sceneObject
     glm::mat4 modelMatrix{1.0f};
     modelMatrix = glm::translate(modelMatrix, sceneObject.m_position);
-    modelMatrix = glm::scale(modelMatrix, glm::vec3(0.2f));
+    modelMatrix = glm::scale(modelMatrix, glm::vec3(0.7f));
     modelMatrix = glm::rotate(modelMatrix, m_angle, sceneObject.m_rotationAxis);
 
     // Set uniform variable
