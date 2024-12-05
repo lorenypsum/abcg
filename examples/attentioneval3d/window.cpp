@@ -9,6 +9,8 @@ glm::vec3 hexToVec3(uint32_t hexValue) {
   return glm::vec3(red, green, blue);
 }
 
+// Cores
+glm::vec3 yinmnBlue = hexToVec3(0x465775);
 glm::vec3 skyblue = hexToVec3(0xB4DEF5);
 
 void Window::onCreate() {
@@ -19,7 +21,7 @@ void Window::onCreate() {
 
   // Carrega a fonte
   auto const filename{assetsPath + "Inconsolata-Medium.ttf"};
-  m_font = ImGui::GetIO().Fonts->AddFontFromFileTTF(filename.c_str(), 30.0f);
+  m_font = ImGui::GetIO().Fonts->AddFontFromFileTTF(filename.c_str(), 25.0f);
   if (m_font == nullptr) {
     throw abcg::RuntimeError("Cannot load font file");
   }
@@ -58,31 +60,37 @@ void Window::onPaintUI() {
 
   {
     // Configura a janela de interface do usuário
-    auto const size{ImVec2(800, 600)};
-    auto const position{ImVec2(170.0f, 1.0f)};
+    auto const size{ImVec2(600, 67)};
+    auto const position{ImVec2(m_viewportSize.x + (size.x / 2), 5.0f)};
     ImGui::SetNextWindowPos(position);
     ImGui::SetNextWindowSize(size);
-    ImGuiWindowFlags const flags{ImGuiWindowFlags_NoBackground |
-                                 ImGuiWindowFlags_NoTitleBar |
-                                 ImGuiWindowFlags_NoInputs};
-    ImGui::Begin(" ", nullptr, flags);
-    ImGui::PushFont(m_font);
-    // Exibe a pontuação e o tempo restante
-    if (m_gameData.m_state == GameState::Playing) {
-      ImGui::Text("Pontuação: %d Tempo: %d", m_score, m_gametime);
-    } else if (m_gameData.m_state == GameState::GameOver) {
-      ImGui::Text("Pontuação final: %d", m_newScore);
-    } else if (m_gameData.m_state == GameState::Win) {
-      ImGui::Text("Parabéns! Novo Recorde: %d", m_newScore);
-    } else if (m_gameData.m_state == GameState::Start) {
-      ImGui::Text("Pegue os pássaros brancos!");
-      ImGui::Text("Pontuação: %d Tempo: %d", m_score, m_gametime);
-    } else {
-      ImGui::Text("...");
+    ImGui::Begin(" ", nullptr, ImGuiWindowFlags_NoDecoration);
+    {
+      ImGui::StyleColorsDark();
+      ImGui::SetWindowFontScale(1.0f);
+      ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0, 1.0, 1.0, 1.0f));
+      ImGui::PushStyleColor(ImGuiCol_WindowBg,
+                            ImVec4(yinmnBlue.r, yinmnBlue.g, yinmnBlue.b, 1.0f));
+      ImGui::Indent((size.x / 4));
+      ImGui::PushFont(m_font);
+      // Exibe a pontuação e o tempo restante
+      if (m_gameData.m_state == GameState::Playing) {
+
+        ImGui::Text("Pontuação: %d Tempo: %d", m_score, m_gametime);
+      } else if (m_gameData.m_state == GameState::GameOver) {
+        ImGui::Text("Pontuação final: %d", m_newScore);
+      } else if (m_gameData.m_state == GameState::Win) {
+        ImGui::Text("Parabéns! Novo Recorde: %d", m_newScore);
+      } else if (m_gameData.m_state == GameState::Start) {
+        ImGui::Text("Pegue os pássaros brancos!");
+        ImGui::Text("Pontuação: %d Tempo: %d", m_score, m_gametime);
+      } else {
+        ImGui::Text("...");
+      }
+      // Finaliza a janela de interface do usuário
+      ImGui::PopFont();
+      ImGui::End();
     }
-    // Finaliza a janela de interface do usuário
-    ImGui::PopFont();
-    ImGui::End();
   }
 
   m_objects.paintUI();

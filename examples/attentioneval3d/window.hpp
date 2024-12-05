@@ -54,7 +54,7 @@ private:
   std::default_random_engine m_randomEngine;
 
   std::chrono::steady_clock::time_point m_lastReload;
-  glm::ivec2 m_viewportSize;
+  glm::ivec2 m_viewportSize{};
   float m_FOV{30.0f};
   ImFont *m_font{};
 };
