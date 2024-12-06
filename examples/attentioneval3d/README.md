@@ -138,16 +138,16 @@ render: Renderiza o modelo configurando a textura, ativando o VAO e chamando glD
 Libera recursos como texturas, buffers e VAO quando o objeto é destruído.
 
 ```
-- **Objetos do Jogo (game_objects.hpp e game_objects.cpp)**: 
+- **Objetos do Jogo (game_objects.hpp e game_objects.cpp)**: O código gerencia a renderização e interação dos objetos do jogo.
 ```
 1. Estrutura Principal
 Objetos do jogo são representados por dois grupos:
-    m_distractionObjects: Objetos que distraem o jogador (pássaros com penas coloridas, por exemplo).
-    m_targetObjects: Objetos que o jogador deve focar (alvos específicos, como pássaros com penas brancas).    
+    m_distractionObjects: Objetos que distraem o jogador (pássaros com penas azuis).
+    m_targetObjects: Objetos que o jogador deve focar (pássaros com penas brancas).    
 Shaders: 
     O programa de sombreamento (m_program) é configurado para aplicar texturas e iluminação aos objetos.
 Modelos 3D: 
-    Os modelos de distração e alvo são carregados a partir de arquivos .obj e associados a texturas.
+    Os modelos de distração e alvo são carregados a partir de arquivos .obj e associados às texturas.
 
 2. Geração e Atualização de Objetos
 setupSceneObjects: 
@@ -169,10 +169,34 @@ checkClickOnObject:
 
 5. Interface do Usuário
 paintUI:
-    Cria uma interface gráfica usando ImGui para alterar o tipo de projeção (perspectiva ou ortográfica) e ajustar o campo de visão (FOV).
+    Cria uma interface gráfica usando ImGui para alterar o tipo de projeção (perspectiva ou ortográfica) e ajustar o campo de visão (baseado no projeto efeito Starfield do material das aulas).
 ```
 - **Renderização de Janela (window.hpp e window.cpp)**: 
-```Para esse projeto não houve renderização de cenário, apenas dos objetos 3D.
+```
+1. Configuração Inicial
+A cor de fundo é definida (skyblue) utilizando a função glClearColor.
+A fonte do texto é carregada a partir de um arquivo TTF.
+Objetos do jogo são inicializados, e o jogo começa no estado inicial (GameState::Start).
+
+2.Lógica de Jogo
+Estados do Jogo: 
+    O jogo pode estar nos estados Start, Playing, GameOver, ou Win.
+Tempo e Pontuação:
+    O temporizador decrementa a cada segundo enquanto o estado é Playing.
+    A pontuação aumenta ou diminui com base em cliques corretos ou incorretos.
+Fim do Jogo:
+    O jogo termina (GameOver) quando o tempo chega a zero.
+    Se a pontuação atual exceder o recorde anterior, o estado muda para Win.
+
+3.Eventos de Interação
+Clique do mouse: 
+    Converte a posição do clique em coordenadas normalizadas e verifica se o jogador clicou em um alvo ou distração.
+
+4.Renderização
+Renderiza os objetos do jogo e uma interface do usuário usando ImGui para exibir a pontuação e o tempo restante.
+
+5. Reinicialização
+Funções como resetGame() e startGame() permitem reiniciar o jogo para o estado inicial, com objetos reposicionados aleatoriamente e variáveis reiniciadas.
 ```
 
 
