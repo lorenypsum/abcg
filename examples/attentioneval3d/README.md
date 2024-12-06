@@ -4,7 +4,7 @@
 - Pablo Renato Nunes dos Santos - 11202232225
 - Jonas de Mello Oliveira - 11000116
 
-![Gameplay GIF](giphy.gif) <!-- Substitua com o link para o GIF -->
+![Gameplay GIF](giphy.gif)
 
 Este projeto apresenta o jogo/aplicação 3D **Vôo dos Pássaro**, uma ferramenta desenvolvida após uma série de entrevistas empáticas com professores e com uma profissional da neuropsicologia, sua finalidade é treinar habilidades de atenção e concentração dos jogadores, desafiando-os a identificar e coletar objetos específicos em meio a um ambiente visual dinâmico. (No caso, pássaros brancos).
 
