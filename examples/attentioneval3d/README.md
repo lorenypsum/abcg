@@ -85,10 +85,10 @@ O estado do jogo e o cronômetro são geridos utilizando a biblioteca **chrono**
 ### Renderização de Objetos com OpenGL
 
 A renderização é feita usando **OpenGL**:
-- **Shaders**: O código utiliza shaders.
+- **Shaders (texture.vert e texture.frag)**: O projeto utiliza o código de shaders "textura" baseado no viewer6 do material das aulas.
 ```
 1. Blinn-Phong:
-O programda de shader utilizado é baseado no viewer6 (do material das aulas) o qual implementa um sistema de sombreamento usando o modelo Blinn-Phong para iluminação.
+O programda de shader utilizado implementa um sistema de sombreamento usando o modelo Blinn-Phong para iluminação.
 
 2. Mapeamento de Textura:
 Utiliza-se também o mapeamento de textura em GLSL (OpenGL Shading Language). 
@@ -103,7 +103,7 @@ As informações do vertex sahder são repassadas ao fragment shader para comput
 O resultado é uma combinação de textura e iluminação física para gerar a cor final de cada pixel vista nos objetos (modelos de pássaro).
 
 ```
-- **Modelo**: O código manipula modelos 3D (.obj) com texturas e materiais (.mtl) para renderizar objetos 3D.
+- **Modelo (model.hpp e model.cpp)**: O código manipula modelos 3D (.obj) com texturas e materiais (.mtl) para renderizar objetos 3D.
 ```
 1. Definição de Vértices e Índices: 
 Os vértices contêm posição, normais e coordenadas de textura. A estrutura de hash otimiza a busca por vértices únicos.
@@ -135,15 +135,43 @@ Os trecho comentados são para o uso futuro para texturas normais e cubo.
 render: Renderiza o modelo configurando a textura, ativando o VAO e chamando glDrawElements para desenhar os triângulos.
 
 9. Destruição:
-
 Libera recursos como texturas, buffers e VAO quando o objeto é destruído.
 
 ```
-- **Objetos do Jogo**: 
+- **Objetos do Jogo (game_objects.hpp e game_objects.cpp)**: 
 ```
-Os objetos (alvo e distrações) são modelos 3D (.obj) com propriedades de materiais (.mtl) que são renderizados com texturas e iluminação determinada pelo configuração do shader.
+1. Estrutura Principal
+Objetos do jogo são representados por dois grupos:
+    m_distractionObjects: Objetos que distraem o jogador (pássaros com penas coloridas, por exemplo).
+    m_targetObjects: Objetos que o jogador deve focar (alvos específicos, como pássaros com penas brancas).    
+Shaders: 
+    O programa de sombreamento (m_program) é configurado para aplicar texturas e iluminação aos objetos.
+Modelos 3D: 
+    Os modelos de distração e alvo são carregados a partir de arquivos .obj e associados a texturas.
+
+2. Geração e Atualização de Objetos
+setupSceneObjects: 
+    Inicializa as posições e propriedades aleatórias dos objetos dentro de limites 3D definidos.
+updateSceneObjects: 
+    Atualiza a posição dos objetos com base no tempo (deltaTime) e velocidade. Se o objeto sair da área visível, ele é reposicionado aleatoriamente.
+
+3. Renderização
+paint: 
+    Configura o ambiente de renderização, define variáveis uniformes para o shader e chama renderObject para desenhar os objetos na tela.
+renderObject: 
+    Aplica transformações como translação, escala e rotação antes de renderizar cada objeto.
+
+4. Interação do Usuário
+checkClickOnObject:
+    Verifica se um clique do usuário atinge algum objeto na tela.
+    Converte as coordenadas do objeto para o espaço da tela e compara com a posição do clique.
+    Reposiciona o objeto atingido.
+
+5. Interface do Usuário
+paintUI:
+    Cria uma interface gráfica usando ImGui para alterar o tipo de projeção (perspectiva ou ortográfica) e ajustar o campo de visão (FOV).
 ```
-- **Renderização de Janela**: 
+- **Renderização de Janela (window.hpp e window.cpp)**: 
 ```Para esse projeto não houve renderização de cenário, apenas dos objetos 3D.
 ```
 
