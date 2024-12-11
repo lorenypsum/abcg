@@ -75,7 +75,7 @@ public:
   void createNet(Model &m_model, const std::string &assetsPath,
                  const std::string &objPath, const std::string &texturePath);
   void renderObject(Model &m_model, std::vector<SceneObject> &m_sceneObjects);
-  void renderNet(Model &m_model,std::vector<SceneObject> &m_scObjects);
+  void renderNet(Model &m_model, std::vector<SceneObject> &m_scObjects);
   void randomizeSceneObject(SceneObject &sceneObject, float minX, float maxX,
                             float minY, float maxY, float minZ, float maxZ);
   void updateObjects(float deltaTime);
@@ -136,6 +136,17 @@ private:
   std::uniform_real_distribution<float> m_randomDist{-1.0f, 1.0f};
   std::vector<PositionVertex> m_vertices;
   std::vector<GLuint> m_indices;
+
+  // Shaders
+  std::vector<char const *> m_shaderNames{
+      "cubereflect", "cuberefract", "normalmapping", "texture", "blinnphong",
+      "phong",       "gouraud",     "normal",        "depth"};
+  std::vector<GLuint> m_programs;
+  int m_currentProgramIndex{};
+
+  // Mapping mode
+  // 0: triplanar; 1: cylindrical; 2: spherical; 3: from mesh
+  int m_mappingMode{};
 };
 
 #endif
