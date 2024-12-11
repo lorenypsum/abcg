@@ -148,7 +148,7 @@ void GameEntities::paint() {
   // Renderiza objetos de cena
   renderObject(m_distractionModel, m_distractionObjects);
   renderObject(m_targetModel, m_targetObjects);
-  // renderNet(m_netModel, modelMatrixLoc, m_netObjects);
+  renderNet(m_netModel, m_netObjects);
 
   // Finaliza
   abcg::glUseProgram(0);
@@ -158,7 +158,85 @@ void GameEntities::paint() {
 // Renderiza objetos de cena
 void GameEntities::renderObject(Model &m_model,
                                 std::vector<SceneObject> &m_scObjects) {
-                                    // Variáveis uniformes do modelo
+  // Variáveis uniformes do modelo
+  m_Ka = m_model.getKa();               // Coeficiente de reflexão ambiente
+  m_Kd = m_model.getKd();               // Coeficiente de reflexão difusa
+  m_Ks = m_model.getKs();               // Coeficiente de reflexão especular
+  m_shininess = m_model.getShininess(); // Brilho
+
+  // Atribui variáveis uniformes
+  auto const viewMatrixLoc{
+      abcg::glGetUniformLocation(m_program, "viewMatrix")}; // Matriz de visão
+  auto const projMatrixLoc{abcg::glGetUniformLocation(
+      m_program, "projMatrix")}; // Matriz de projeção
+  auto const modelMatrixLoc{
+      abcg::glGetUniformLocation(m_program, "modelMatrix")}; // Matriz de modelo
+  auto const normalMatrixLoc{
+      abcg::glGetUniformLocation(m_program, "normalMatrix")}; // Matriz normal
+  auto const lightDirLoc{
+      abcg::glGetUniformLocation(m_program, "lightDirWorldSpace")}; // Luz
+  auto const shininessLoc{
+      abcg::glGetUniformLocation(m_program, "shininess")}; // Brilho
+  auto const IaLoc{
+      abcg::glGetUniformLocation(m_program, "Ia")}; // Intensidade ambiente
+  auto const IdLoc{
+      abcg::glGetUniformLocation(m_program, "Id")}; // Intensidade difusa
+  auto const IsLoc{
+      abcg::glGetUniformLocation(m_program, "Is")}; // Intensidade especular
+  auto const KaLoc{
+      abcg::glGetUniformLocation(m_program, "Ka")}; // Coeficiente ambiente
+  auto const KdLoc{
+      abcg::glGetUniformLocation(m_program, "Kd")}; // Coeficiente difuso
+  auto const KsLoc{
+      abcg::glGetUniformLocation(m_program, "Ks")}; // Coeficiente especular
+  auto const diffuseTexLoc{
+      abcg::glGetUniformLocation(m_program, "diffuseTex")}; // Textura
+  auto const normalTexLoc{abcg::glGetUniformLocation(m_program, "normalTex")};
+  auto const lightDirRotated{
+      glm::vec4(0.0f, 0.0f, 1.0f, 1.0f)}; // Luz rotacionada
+
+  // Aplica variáveis uniformes
+  abcg::glUniformMatrix4fv(viewMatrixLoc, 1, GL_FALSE,
+                           &m_viewMatrix[0][0]); // Matriz de visão
+  abcg::glUniformMatrix4fv(projMatrixLoc, 1, GL_FALSE,
+                           &m_projMatrix[0][0]); // Matriz de projeção
+  abcg::glUniform1i(diffuseTexLoc, 0);           // Textura
+  abcg::glUniform1i(normalTexLoc, 1);
+  abcg::glUniform4fv(lightDirLoc, 1, &lightDirRotated.x); // Luz
+  abcg::glUniform4fv(IaLoc, 1, &m_Ia.x); // Intensidade ambiente
+  abcg::glUniform4fv(IdLoc, 1, &m_Id.x); // Intensidade difusa
+  abcg::glUniform4fv(IsLoc, 1, &m_Is.x); // Intensidade especular
+
+  // Aplica variáveis uniformes para o modelo de matriz de protótipo
+  glm::mat4 modelMatrixProt{1.0f}; // Matriz de modelo protótipo
+  abcg::glUniformMatrix4fv(modelMatrixLoc, 1, GL_FALSE,
+                           &modelMatrixProt[0][0]); // Matriz de modelo
+  abcg::glUniform4fv(KaLoc, 1, &m_Ka.x);            // Coeficiente ambiente
+  abcg::glUniform4fv(KdLoc, 1, &m_Kd.x);            // Coeficiente difuso
+  abcg::glUniform4fv(KsLoc, 1, &m_Ks.x);            // Coeficiente especular
+  abcg::glUniform1f(shininessLoc, m_shininess);     // Brilho
+
+  // Renderiza cada objeto de cena
+  for (auto &scObject : m_scObjects) {
+
+    // Computa a matriz de modelo para todos objeto de cena
+    glm::mat4 modelMatrix{1.0f}; // Matriz de modelo
+    modelMatrix =
+        glm::translate(modelMatrix, scObject.m_position); // Posição do objeto
+    modelMatrix = glm::scale(modelMatrix, glm::vec3(0.7f)); // Escala do objeto
+    modelMatrix = glm::rotate(modelMatrix, m_angle,
+                              scObject.m_rotationAxis); // Rotação do objeto
+
+    // Aplica variáveis uniformes para o modelo
+    abcg::glUniformMatrix4fv(modelMatrixLoc, 1, GL_FALSE, &modelMatrix[0][0]);
+    m_model.render();
+  }
+}
+
+// Renderiza rede da cena
+void GameEntities::renderNet(Model &m_model,
+                             std::vector<SceneObject> &m_scObjects) {
+
   m_Ka = m_model.getKa();               // Coeficiente de reflexão ambiente
   m_Kd = m_model.getKd();               // Coeficiente de reflexão difusa
   m_Ks = m_model.getKs();               // Coeficiente de reflexão especular
@@ -213,53 +291,6 @@ void GameEntities::renderObject(Model &m_model,
   abcg::glUniform4fv(KdLoc, 1, &m_Kd.x);            // Coeficiente difuso
   abcg::glUniform4fv(KsLoc, 1, &m_Ks.x);            // Coeficiente especular
   abcg::glUniform1f(shininessLoc, m_shininess);     // Brilho
-
-  // Renderiza cada objeto de cena
-  for (auto &scObject : m_scObjects) {
-
-    // Computa a matriz de modelo para todos objeto de cena
-    glm::mat4 modelMatrix{1.0f}; // Matriz de modelo
-    modelMatrix =
-        glm::translate(modelMatrix, scObject.m_position); // Posição do objeto
-    modelMatrix = glm::scale(modelMatrix, glm::vec3(0.7f)); // Escala do objeto
-    modelMatrix = glm::rotate(modelMatrix, m_angle,
-                              scObject.m_rotationAxis); // Rotação do objeto
-
-    // Aplica variáveis uniformes para o modelo
-    abcg::glUniformMatrix4fv(modelMatrixLoc, 1, GL_FALSE, &modelMatrix[0][0]);
-    m_model.render();
-  }
-}
-
-// Renderiza rede da cena
-void GameEntities::renderNet(Model &m_model, const GLint modelMatrixLoc,
-                             std::vector<SceneObject> &m_scObjects) {
-
-  // Aplica variáveis uniformes para o modelo de matriz de protótipo
-  glm::mat4 modelMatrixProt{1.0f}; // Matriz de modelo protótipo
-  abcg::glUniformMatrix4fv(modelMatrixLoc, 1, GL_FALSE,
-                           &modelMatrixProt[0][0]); // Matriz de modelo
-
-  // Variáveis uniformes do modelo
-  m_Ka = m_model.getKa();               // Coeficiente de reflexão ambiente
-  m_Kd = m_model.getKd();               // Coeficiente de reflexão difusa
-  m_Ks = m_model.getKs();               // Coeficiente de reflexão especular
-  m_shininess = m_model.getShininess(); // Brilho
-
-  auto const KaLoc{
-      abcg::glGetUniformLocation(m_program, "Ka")}; // Coeficiente ambiente
-  auto const KdLoc{
-      abcg::glGetUniformLocation(m_program, "Kd")}; // Coeficiente difuso
-  auto const KsLoc{
-      abcg::glGetUniformLocation(m_program, "Ks")}; // Coeficiente especular
-
-  auto const shininessLoc{
-      abcg::glGetUniformLocation(m_program, "shininess")}; // Brilho
-
-  abcg::glUniform4fv(KaLoc, 1, &m_Ka.x);        // Coeficiente ambiente
-  abcg::glUniform4fv(KdLoc, 1, &m_Kd.x);        // Coeficiente difuso
-  abcg::glUniform4fv(KsLoc, 1, &m_Ks.x);        // Coeficiente especular
-  abcg::glUniform1f(shininessLoc, m_shininess); // Brilho
 
   // Renderiza cada objeto de cena
   for (auto &scObject : m_scObjects) {
