@@ -23,13 +23,8 @@ void GameEntities::create() {
   createObject(m_targetModel, assetsPath, "bird.obj",
                "maps/w-feathers.png"); // Cria objeto alvo
 
-  createObject(m_netModel, assetsPath, "block.obj", "maps/w-feathers.png"); // Cria rede
-
-  // Camera at (0,0,0) and looking towards the negative z
-  // glm::vec3 const eye{0.0f, 0.0f, 0.0f};
-  // glm::vec3 const at{0.0f, 0.0f, -1.0f};
-  // glm::vec3 const up{0.0f, 1.0f, 0.0f};
-  // m_viewMatrix = glm::lookAt(eye, at, up);
+  createNet(m_netModel, assetsPath, "block.obj",
+            "maps/w-feathers.png"); // Cria rede
 
   float x = 0.0f;
   float y = -0.3f; // Mantém Y fixo
@@ -113,6 +108,30 @@ void GameEntities::createObject(Model &m_model, const std::string &assetsPath,
   glm::vec3 const eye{0.0f, 0.0f, 0.0f}; // Posição da câmera (origem)
   glm::vec3 const at{0.0f, 0.0f,
                      -1.0f}; // Ponto que câmera está olhando (eixo z)
+  glm::vec3 const up{0.0f, 1.0f, 0.0f};    // Vetor up da câmera (eixo y)
+  m_viewMatrix = glm::lookAt(eye, at, up); // Matriz de visão
+}
+
+// Cria rede
+void GameEntities::createNet(Model &m_model, const std::string &assetsPath,
+                             const std::string &objPath,
+                             const std::string &texturePath) {
+
+  // Carrega modelo, textura, tamanho e configura VAO
+  // m_model.loadDiffuseTexture(assetsPath + texturePath); // Textura
+  m_model.loadObj(assetsPath + objPath); // Objeto
+  m_model.setSize(100.0f);               // Tamanho
+  m_model.setupVAO(m_program);           // Configura VAO
+
+  // Variáveis uniformes do modelo
+  m_Ka = m_model.getKa();               // Coeficiente de reflexão ambiente
+  m_Kd = m_model.getKd();               // Coeficiente de reflexão difusa
+  m_Ks = m_model.getKs();               // Coeficiente de reflexão especular
+  m_shininess = m_model.getShininess(); // Brilho
+
+  // Camera em posição inicial
+  glm::vec3 const eye{0.0f, 0.0f, 0.0f};   // Posição da câmera (origem)
+  glm::vec3 const at{0.0f, 0.0f, -1.0f};   // Olhar da câmera (eixo z)
   glm::vec3 const up{0.0f, 1.0f, 0.0f};    // Vetor up da câmera (eixo y)
   m_viewMatrix = glm::lookAt(eye, at, up); // Matriz de visão
 }
