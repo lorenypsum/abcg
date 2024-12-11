@@ -18,12 +18,17 @@ void GameEntities::create() {
        {.source = assetsPath + "shaders/texture.frag",
         .stage = abcg::ShaderStage::Fragment}}); // Programa de shader
 
+  // Camera em posição inicial
+  glm::vec3 const eye{0.0f, 0.0f, 0.0f}; // Posição da câmera (origem)
+  glm::vec3 const at{0.0f, 0.0f, -1.0f}; // Olhar da câmera (eixo z)
+  glm::vec3 const up{0.0f, 1.0f, 0.0f};  // Vetor up da câmera (eixo y)
+
   createObject(m_distractionModel, assetsPath, "bird.obj",
                "maps/b-feathers.png"); // Cria objeto de distração
   createObject(m_targetModel, assetsPath, "bird.obj",
                "maps/w-feathers.png"); // Cria objeto alvo
 
-  createNet(m_netModel, assetsPath, "block.obj",
+  createNet(m_netModel, assetsPath, "teapot.obj",
             "maps/w-feathers.png"); // Cria rede
 
   float x = 0.0f;
@@ -97,19 +102,6 @@ void GameEntities::createObject(Model &m_model, const std::string &assetsPath,
   m_model.loadObj(assetsPath + objPath);                // Objeto
   m_model.setSize(100.0f);                              // Tamanho
   m_model.setupVAO(m_program);                          // Configura VAO
-
-  // Variáveis uniformes do modelo
-  m_Ka = m_model.getKa();               // Coeficiente de reflexão ambiente
-  m_Kd = m_model.getKd();               // Coeficiente de reflexão difusa
-  m_Ks = m_model.getKs();               // Coeficiente de reflexão especular
-  m_shininess = m_model.getShininess(); // Brilho
-
-  // Camera em posição inicial
-  glm::vec3 const eye{0.0f, 0.0f, 0.0f}; // Posição da câmera (origem)
-  glm::vec3 const at{0.0f, 0.0f,
-                     -1.0f}; // Ponto que câmera está olhando (eixo z)
-  glm::vec3 const up{0.0f, 1.0f, 0.0f};    // Vetor up da câmera (eixo y)
-  m_viewMatrix = glm::lookAt(eye, at, up); // Matriz de visão
 }
 
 // Cria rede
@@ -118,22 +110,10 @@ void GameEntities::createNet(Model &m_model, const std::string &assetsPath,
                              const std::string &texturePath) {
 
   // Carrega modelo, textura, tamanho e configura VAO
-  // m_model.loadDiffuseTexture(assetsPath + texturePath); // Textura
-  m_model.loadObj(assetsPath + objPath); // Objeto
-  m_model.setSize(100.0f);               // Tamanho
-  m_model.setupVAO(m_program);           // Configura VAO
-
-  // Variáveis uniformes do modelo
-  m_Ka = m_model.getKa();               // Coeficiente de reflexão ambiente
-  m_Kd = m_model.getKd();               // Coeficiente de reflexão difusa
-  m_Ks = m_model.getKs();               // Coeficiente de reflexão especular
-  m_shininess = m_model.getShininess(); // Brilho
-
-  // Camera em posição inicial
-  glm::vec3 const eye{0.0f, 0.0f, 0.0f};   // Posição da câmera (origem)
-  glm::vec3 const at{0.0f, 0.0f, -1.0f};   // Olhar da câmera (eixo z)
-  glm::vec3 const up{0.0f, 1.0f, 0.0f};    // Vetor up da câmera (eixo y)
-  m_viewMatrix = glm::lookAt(eye, at, up); // Matriz de visão
+  m_model.loadNormalTexture(assetsPath + texturePath); // Textura
+  m_model.loadObj(assetsPath + objPath);               // Objeto
+  m_model.setSize(30.0f);                              // Tamanho
+  m_model.setupVAO(m_program);                         // Configura VAO
 }
 
 // Aleatoriza a posição de um objeto de cena
@@ -164,6 +144,25 @@ void GameEntities::paint() {
   abcg::glViewport(0, 0, m_viewportSize.x, m_viewportSize.y); // Viewport
 
   abcg::glUseProgram(m_program); // Usa o programa de shader
+
+  // Renderiza objetos de cena
+  renderObject(m_distractionModel, m_distractionObjects);
+  renderObject(m_targetModel, m_targetObjects);
+  // renderNet(m_netModel, modelMatrixLoc, m_netObjects);
+
+  // Finaliza
+  abcg::glUseProgram(0);
+}
+
+// TODO: Renderizar solo/chão adequadamente
+// Renderiza objetos de cena
+void GameEntities::renderObject(Model &m_model,
+                                std::vector<SceneObject> &m_scObjects) {
+                                    // Variáveis uniformes do modelo
+  m_Ka = m_model.getKa();               // Coeficiente de reflexão ambiente
+  m_Kd = m_model.getKd();               // Coeficiente de reflexão difusa
+  m_Ks = m_model.getKs();               // Coeficiente de reflexão especular
+  m_shininess = m_model.getShininess(); // Brilho
 
   // Atribui variáveis uniformes
   auto const viewMatrixLoc{
@@ -206,26 +205,6 @@ void GameEntities::paint() {
   abcg::glUniform4fv(IdLoc, 1, &m_Id.x); // Intensidade difusa
   abcg::glUniform4fv(IsLoc, 1, &m_Is.x); // Intensidade especular
 
-  // Renderiza objetos de cena
-  renderObject(m_distractionModel, KaLoc, KdLoc, KsLoc, shininessLoc,
-               modelMatrixLoc, m_distractionObjects);
-  renderObject(m_targetModel, KaLoc, KdLoc, KsLoc, shininessLoc, modelMatrixLoc,
-               m_targetObjects);
-  renderNet(m_netModel, KaLoc, KdLoc, KsLoc, shininessLoc, modelMatrixLoc,
-            m_netObjects);
-
-  // Finaliza
-  abcg::glUseProgram(0);
-}
-
-// TODO: Renderizar solo/chão adequadamente
-// Renderiza objetos de cena
-void GameEntities::renderObject(Model &m_model, const GLint KaLoc,
-                                const GLint KdLoc, const GLint KsLoc,
-                                const GLint shininessLoc,
-                                const GLint modelMatrixLoc,
-                                std::vector<SceneObject> &m_scObjects) {
-
   // Aplica variáveis uniformes para o modelo de matriz de protótipo
   glm::mat4 modelMatrixProt{1.0f}; // Matriz de modelo protótipo
   abcg::glUniformMatrix4fv(modelMatrixLoc, 1, GL_FALSE,
@@ -253,20 +232,34 @@ void GameEntities::renderObject(Model &m_model, const GLint KaLoc,
 }
 
 // Renderiza rede da cena
-void GameEntities::renderNet(Model &m_model, const GLint KaLoc,
-                             const GLint KdLoc, const GLint KsLoc,
-                             const GLint shininessLoc,
-                             const GLint modelMatrixLoc,
+void GameEntities::renderNet(Model &m_model, const GLint modelMatrixLoc,
                              std::vector<SceneObject> &m_scObjects) {
 
   // Aplica variáveis uniformes para o modelo de matriz de protótipo
   glm::mat4 modelMatrixProt{1.0f}; // Matriz de modelo protótipo
   abcg::glUniformMatrix4fv(modelMatrixLoc, 1, GL_FALSE,
                            &modelMatrixProt[0][0]); // Matriz de modelo
-  abcg::glUniform4fv(KaLoc, 1, &m_Ka.x);            // Coeficiente ambiente
-  abcg::glUniform4fv(KdLoc, 1, &m_Kd.x);            // Coeficiente difuso
-  abcg::glUniform4fv(KsLoc, 1, &m_Ks.x);            // Coeficiente especular
-  abcg::glUniform1f(shininessLoc, m_shininess);     // Brilho
+
+  // Variáveis uniformes do modelo
+  m_Ka = m_model.getKa();               // Coeficiente de reflexão ambiente
+  m_Kd = m_model.getKd();               // Coeficiente de reflexão difusa
+  m_Ks = m_model.getKs();               // Coeficiente de reflexão especular
+  m_shininess = m_model.getShininess(); // Brilho
+
+  auto const KaLoc{
+      abcg::glGetUniformLocation(m_program, "Ka")}; // Coeficiente ambiente
+  auto const KdLoc{
+      abcg::glGetUniformLocation(m_program, "Kd")}; // Coeficiente difuso
+  auto const KsLoc{
+      abcg::glGetUniformLocation(m_program, "Ks")}; // Coeficiente especular
+
+  auto const shininessLoc{
+      abcg::glGetUniformLocation(m_program, "shininess")}; // Brilho
+
+  abcg::glUniform4fv(KaLoc, 1, &m_Ka.x);        // Coeficiente ambiente
+  abcg::glUniform4fv(KdLoc, 1, &m_Kd.x);        // Coeficiente difuso
+  abcg::glUniform4fv(KsLoc, 1, &m_Ks.x);        // Coeficiente especular
+  abcg::glUniform1f(shininessLoc, m_shininess); // Brilho
 
   // Renderiza cada objeto de cena
   for (auto &scObject : m_scObjects) {
