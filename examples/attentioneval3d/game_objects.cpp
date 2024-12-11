@@ -18,6 +18,13 @@ void GameEntities::create() {
        {.source = assetsPath + "shaders/texture.frag",
         .stage = abcg::ShaderStage::Fragment}}); // Programa de shader
 
+  // Configurações de luz
+  m_program_2 = abcg::createOpenGLProgram(
+      {{.source = assetsPath + "shaders/normalmapping.vert",
+        .stage = abcg::ShaderStage::Vertex},
+       {.source = assetsPath + "shaders/normalmapping.frag",
+        .stage = abcg::ShaderStage::Fragment}}); // Programa de shader
+
   // Camera em posição inicial
   glm::vec3 const eye{0.0f, 0.0f, 0.0f}; // Posição da câmera (origem)
   glm::vec3 const at{0.0f, 0.0f, -1.0f}; // Olhar da câmera (eixo z)
@@ -28,8 +35,8 @@ void GameEntities::create() {
   createObject(m_targetModel, assetsPath, "bird.obj",
                "maps/w-feathers.png"); // Cria objeto alvo
 
-  createNet(m_netModel, assetsPath, "teapot.obj",
-            "maps/w-feathers.png"); // Cria rede
+  createNet(m_netModel, assetsPath, "wicker_basket.obj",
+            "maps/WoodFineDark.jpg"); // Cria rede
 
   float x = 0.0f;
   float y = -0.3f; // Mantém Y fixo
@@ -75,10 +82,11 @@ void GameEntities::createNet(Model &m_model, const std::string &assetsPath,
                              const std::string &texturePath) {
 
   // Carrega modelo, textura, tamanho e configura VAO
-  m_model.loadNormalTexture(assetsPath + texturePath); // Textura
-  m_model.loadObj(assetsPath + objPath);               // Objeto
-  m_model.setSize(30.0f);                              // Tamanho
-  m_model.setupVAO(m_program);                         // Configura VAO
+  m_model.loadDiffuseTexture(assetsPath + "maps/WoodFineDark004_COL_2K.jpg"); // Textura
+  m_model.loadNormalTexture(assetsPath + "maps/WoodFineDark004_NRM_2K.jpg"); // Textura Normal
+  m_model.loadObj(assetsPath + objPath); // Objeto
+  m_model.setSize(30.0f);                // Tamanho
+  m_model.setupVAO(m_program_2);         // Configura VAO
 }
 
 // Configura objetos de cena
@@ -190,7 +198,7 @@ void GameEntities::renderObject(Model &m_model,
       abcg::glGetUniformLocation(m_program, "Ks")}; // Coeficiente especular
   auto const diffuseTexLoc{
       abcg::glGetUniformLocation(m_program, "diffuseTex")}; // Textura
-  auto const normalTexLoc{abcg::glGetUniformLocation(m_program, "normalTex")};
+
   auto const lightDirRotated{
       glm::vec4(0.0f, 0.0f, 1.0f, 1.0f)}; // Luz rotacionada
 
@@ -200,7 +208,6 @@ void GameEntities::renderObject(Model &m_model,
   abcg::glUniformMatrix4fv(projMatrixLoc, 1, GL_FALSE,
                            &m_projMatrix[0][0]); // Matriz de projeção
   abcg::glUniform1i(diffuseTexLoc, 0);           // Textura
-  abcg::glUniform1i(normalTexLoc, 1);
   abcg::glUniform4fv(lightDirLoc, 1, &lightDirRotated.x); // Luz
   abcg::glUniform4fv(IaLoc, 1, &m_Ia.x); // Intensidade ambiente
   abcg::glUniform4fv(IdLoc, 1, &m_Id.x); // Intensidade difusa
@@ -235,6 +242,9 @@ void GameEntities::renderObject(Model &m_model,
 // Renderiza rede da cena
 void GameEntities::renderNet(Model &m_model,
                              std::vector<SceneObject> &m_scObjects) {
+  abcg::glViewport(0, 0, m_viewportSize.x, m_viewportSize.y); // Viewport
+
+  abcg::glUseProgram(m_program_2); // Usa o programa de shader
 
   m_Ka = m_model.getKa();               // Coeficiente de reflexão ambiente
   m_Kd = m_model.getKd();               // Coeficiente de reflexão difusa
@@ -243,33 +253,34 @@ void GameEntities::renderNet(Model &m_model,
 
   // Atribui variáveis uniformes
   auto const viewMatrixLoc{
-      abcg::glGetUniformLocation(m_program, "viewMatrix")}; // Matriz de visão
+      abcg::glGetUniformLocation(m_program_2, "viewMatrix")}; // Matriz de visão
   auto const projMatrixLoc{abcg::glGetUniformLocation(
-      m_program, "projMatrix")}; // Matriz de projeção
-  auto const modelMatrixLoc{
-      abcg::glGetUniformLocation(m_program, "modelMatrix")}; // Matriz de modelo
+      m_program_2, "projMatrix")}; // Matriz de projeção
+  auto const modelMatrixLoc{abcg::glGetUniformLocation(
+      m_program_2, "modelMatrix")}; // Matriz de modelo
   auto const normalMatrixLoc{
-      abcg::glGetUniformLocation(m_program, "normalMatrix")}; // Matriz normal
+      abcg::glGetUniformLocation(m_program_2, "normalMatrix")}; // Matriz normal
   auto const lightDirLoc{
-      abcg::glGetUniformLocation(m_program, "lightDirWorldSpace")}; // Luz
+      abcg::glGetUniformLocation(m_program_2, "lightDirWorldSpace")}; // Luz
   auto const shininessLoc{
-      abcg::glGetUniformLocation(m_program, "shininess")}; // Brilho
+      abcg::glGetUniformLocation(m_program_2, "shininess")}; // Brilho
   auto const IaLoc{
-      abcg::glGetUniformLocation(m_program, "Ia")}; // Intensidade ambiente
+      abcg::glGetUniformLocation(m_program_2, "Ia")}; // Intensidade ambiente
   auto const IdLoc{
-      abcg::glGetUniformLocation(m_program, "Id")}; // Intensidade difusa
+      abcg::glGetUniformLocation(m_program_2, "Id")}; // Intensidade difusa
   auto const IsLoc{
-      abcg::glGetUniformLocation(m_program, "Is")}; // Intensidade especular
+      abcg::glGetUniformLocation(m_program_2, "Is")}; // Intensidade especular
   auto const KaLoc{
-      abcg::glGetUniformLocation(m_program, "Ka")}; // Coeficiente ambiente
+      abcg::glGetUniformLocation(m_program_2, "Ka")}; // Coeficiente ambiente
   auto const KdLoc{
-      abcg::glGetUniformLocation(m_program, "Kd")}; // Coeficiente difuso
+      abcg::glGetUniformLocation(m_program_2, "Kd")}; // Coeficiente difuso
   auto const KsLoc{
-      abcg::glGetUniformLocation(m_program, "Ks")}; // Coeficiente especular
+      abcg::glGetUniformLocation(m_program_2, "Ks")}; // Coeficiente especular
   auto const diffuseTexLoc{
-      abcg::glGetUniformLocation(m_program, "diffuseTex")}; // Textura
+      abcg::glGetUniformLocation(m_program_2, "diffuseTex")}; // Textura
   auto const lightDirRotated{
       glm::vec4(0.0f, 0.0f, 1.0f, 1.0f)}; // Luz rotacionada
+  auto const normalTexLoc{abcg::glGetUniformLocation(m_program, "normalTex")};
 
   // Aplica variáveis uniformes
   abcg::glUniformMatrix4fv(viewMatrixLoc, 1, GL_FALSE,
@@ -277,6 +288,7 @@ void GameEntities::renderNet(Model &m_model,
   abcg::glUniformMatrix4fv(projMatrixLoc, 1, GL_FALSE,
                            &m_projMatrix[0][0]); // Matriz de projeção
   abcg::glUniform1i(diffuseTexLoc, 0);           // Textura
+  abcg::glUniform1i(normalTexLoc, 1);
   abcg::glUniform4fv(lightDirLoc, 1, &lightDirRotated.x); // Luz
   abcg::glUniform4fv(IaLoc, 1, &m_Ia.x); // Intensidade ambiente
   abcg::glUniform4fv(IdLoc, 1, &m_Id.x); // Intensidade difusa
@@ -437,5 +449,7 @@ void GameEntities::paintUI() {
 void GameEntities::destroy() {
   m_distractionModel.destroy();
   m_targetModel.destroy();
+  m_netModel.destroy();
   abcg::glDeleteProgram(m_program);
+  abcg::glDeleteProgram(m_program_2);
 }

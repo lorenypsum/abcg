@@ -113,6 +113,7 @@ private:
 
   // Programa de shader
   GLuint m_program{};
+  GLuint m_program_2{};
   GLuint m_VAO{};
   GLuint m_VBO{};
   GLuint m_EBO{};
