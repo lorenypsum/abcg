@@ -23,6 +23,21 @@ void GameEntities::create() {
   createObject(m_targetModel, assetsPath, "bird.obj",
                "maps/w-feathers.png"); // Cria objeto alvo
 
+  createObject(m_netModel, assetsPath, "block.obj", "maps/w-feathers.png"); // Cria rede
+
+  // Camera at (0,0,0) and looking towards the negative z
+  // glm::vec3 const eye{0.0f, 0.0f, 0.0f};
+  // glm::vec3 const at{0.0f, 0.0f, -1.0f};
+  // glm::vec3 const up{0.0f, 1.0f, 0.0f};
+  // m_viewMatrix = glm::lookAt(eye, at, up);
+
+  float x = 0.0f;
+  float y = -0.3f; // Mantém Y fixo
+  float z = -2.0f; // Mantém Z fixo
+
+  m_net.m_position = glm::vec3(x, y, z);
+  m_net.m_rotationAxis = glm::vec3(0.1f, 0.0f, 0.0f);
+
   setupSceneObjects(m_distractionObjects, // m_sceneObjects
                     -15.0f,               // minX
                     15.0f,                // maxX
@@ -177,6 +192,8 @@ void GameEntities::paint() {
                modelMatrixLoc, m_distractionObjects);
   renderObject(m_targetModel, KaLoc, KdLoc, KsLoc, shininessLoc, modelMatrixLoc,
                m_targetObjects);
+  renderNet(m_netModel, KaLoc, KdLoc, KsLoc, shininessLoc, modelMatrixLoc,
+            m_netObjects);
 
   // Finaliza
   abcg::glUseProgram(0);
@@ -209,6 +226,38 @@ void GameEntities::renderObject(Model &m_model, const GLint KaLoc,
     modelMatrix = glm::scale(modelMatrix, glm::vec3(0.7f)); // Escala do objeto
     modelMatrix = glm::rotate(modelMatrix, m_angle,
                               scObject.m_rotationAxis); // Rotação do objeto
+
+    // Aplica variáveis uniformes para o modelo
+    abcg::glUniformMatrix4fv(modelMatrixLoc, 1, GL_FALSE, &modelMatrix[0][0]);
+    m_model.render();
+  }
+}
+
+// Renderiza rede da cena
+void GameEntities::renderNet(Model &m_model, const GLint KaLoc,
+                             const GLint KdLoc, const GLint KsLoc,
+                             const GLint shininessLoc,
+                             const GLint modelMatrixLoc,
+                             std::vector<SceneObject> &m_scObjects) {
+
+  // Aplica variáveis uniformes para o modelo de matriz de protótipo
+  glm::mat4 modelMatrixProt{1.0f}; // Matriz de modelo protótipo
+  abcg::glUniformMatrix4fv(modelMatrixLoc, 1, GL_FALSE,
+                           &modelMatrixProt[0][0]); // Matriz de modelo
+  abcg::glUniform4fv(KaLoc, 1, &m_Ka.x);            // Coeficiente ambiente
+  abcg::glUniform4fv(KdLoc, 1, &m_Kd.x);            // Coeficiente difuso
+  abcg::glUniform4fv(KsLoc, 1, &m_Ks.x);            // Coeficiente especular
+  abcg::glUniform1f(shininessLoc, m_shininess);     // Brilho
+
+  // Renderiza cada objeto de cena
+  for (auto &scObject : m_scObjects) {
+
+    // Computa a matriz de modelo para todos objeto de cena
+    glm::mat4 modelMatrix{1.0f}; // Matriz de modelo
+    modelMatrix = glm::translate(modelMatrix,
+                                 m_net.m_position); // Parte inferior central
+    modelMatrix = glm::scale(modelMatrix, glm::vec3(0.2f)); // Ajusta o tamanho
+    modelMatrix = glm::rotate(modelMatrix, 11.0f, m_net.m_rotationAxis);
 
     // Aplica variáveis uniformes para o modelo
     abcg::glUniformMatrix4fv(modelMatrixLoc, 1, GL_FALSE, &modelMatrix[0][0]);

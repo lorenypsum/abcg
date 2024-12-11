@@ -39,6 +39,7 @@ public:
   // Vetores de objetos de cena
   std::vector<SceneObject> m_distractionObjects = std::vector<SceneObject>(20);
   std::vector<SceneObject> m_targetObjects = std::vector<SceneObject>(30);
+  std::vector<SceneObject> m_netObjects = std::vector<SceneObject>(1);
 
   // Número de triângulos
   [[nodiscard]] int getNumTriangles() const {
@@ -71,10 +72,15 @@ public:
   void createObject(Model &m_model, const std::string &assetsPath,
                     const std::string &objPath,
                     const std::string &texturePaths);
+  void createNet(Model &m_model, const std::string &assetsPath, const std::string &objPath,
+                 const std::string &texturePath);                  
   void renderObject(Model &m_model, const GLint KaLoc, const GLint KdLoc,
                     const GLint KsLoc, const GLint shininessLoc,
                     const GLint modelMatrixLoc,
                     std::vector<SceneObject> &m_sceneObjects);
+  void renderNet(Model &m_model, const GLint KaLoc, const GLint KdLoc,
+                 const GLint KsLoc, const GLint shininessLoc,
+                 const GLint modelMatrixLoc, std::vector<SceneObject> &m_scObjects);                 
   void randomizeSceneObject(SceneObject &sceneObject, float minX, float maxX,
                             float minY, float maxY, float minZ, float maxZ);
   void updateObjects(float deltaTime);
@@ -98,7 +104,14 @@ private:
   // Modelos
   Model m_distractionModel;
   Model m_targetModel;
+  Model m_netModel;
 
+  struct Net {
+    glm::vec3 m_position{};
+    glm::vec3 m_rotationAxis{};
+  };
+
+  Net m_net;
   // Lista de objetos do jogo
   std::list<GameObject> m_distractions;
   std::list<GameObject> m_targets;

@@ -147,13 +147,13 @@ void Model::createBuffers() {
 //                  path + "negy.jpg", path + "posz.jpg", path + "negz.jpg"}});
 // }
 
-// void Model::loadNormalTexture(std::string_view path) {
-//   if (!std::filesystem::exists(path))
-//     return;
+void Model::loadNormalTexture(std::string_view path) {
+  if (!std::filesystem::exists(path))
+    return;
 
-//   abcg::glDeleteTextures(1, &m_normalTexture);
-//   m_normalTexture = abcg::loadOpenGLTexture({.path = path});
-// }
+  abcg::glDeleteTextures(1, &m_normalTexture);
+  m_normalTexture = abcg::loadOpenGLTexture({.path = path});
+}
 
 // Carrega textura difusa
 void Model::loadDiffuseTexture(std::string_view path) {
