@@ -57,6 +57,30 @@ void GameEntities::create() {
   );                                 // Configura objetos alvo
 }
 
+// Cria um objeto de cena
+void GameEntities::createObject(Model &m_model, const std::string &assetsPath,
+                                const std::string &objPath,
+                                const std::string &texturePath) {
+
+  // Carrega modelo, textura, tamanho e configura VAO
+  m_model.loadDiffuseTexture(assetsPath + texturePath); // Textura
+  m_model.loadObj(assetsPath + objPath);                // Objeto
+  m_model.setSize(100.0f);                              // Tamanho
+  m_model.setupVAO(m_program);                          // Configura VAO
+}
+
+// Cria rede
+void GameEntities::createNet(Model &m_model, const std::string &assetsPath,
+                             const std::string &objPath,
+                             const std::string &texturePath) {
+
+  // Carrega modelo, textura, tamanho e configura VAO
+  m_model.loadNormalTexture(assetsPath + texturePath); // Textura
+  m_model.loadObj(assetsPath + objPath);               // Objeto
+  m_model.setSize(30.0f);                              // Tamanho
+  m_model.setupVAO(m_program);                         // Configura VAO
+}
+
 // Configura objetos de cena
 void GameEntities::setupSceneObjects(std::vector<SceneObject> &m_sceneObjects,
                                      float minX, float maxX, float minY,
@@ -92,30 +116,6 @@ void GameEntities::updateSceneObjects(std::vector<SceneObject> &m_sceneObjects,
   }
 }
 
-// Cria um objeto de cena
-void GameEntities::createObject(Model &m_model, const std::string &assetsPath,
-                                const std::string &objPath,
-                                const std::string &texturePath) {
-
-  // Carrega modelo, textura, tamanho e configura VAO
-  m_model.loadDiffuseTexture(assetsPath + texturePath); // Textura
-  m_model.loadObj(assetsPath + objPath);                // Objeto
-  m_model.setSize(100.0f);                              // Tamanho
-  m_model.setupVAO(m_program);                          // Configura VAO
-}
-
-// Cria rede
-void GameEntities::createNet(Model &m_model, const std::string &assetsPath,
-                             const std::string &objPath,
-                             const std::string &texturePath) {
-
-  // Carrega modelo, textura, tamanho e configura VAO
-  m_model.loadNormalTexture(assetsPath + texturePath); // Textura
-  m_model.loadObj(assetsPath + objPath);               // Objeto
-  m_model.setSize(30.0f);                              // Tamanho
-  m_model.setupVAO(m_program);                         // Configura VAO
-}
-
 // Aleatoriza a posição de um objeto de cena
 void GameEntities::randomizeSceneObject(SceneObject &sceneObject, float minX,
                                         float maxX, float minY, float maxY,
@@ -141,10 +141,6 @@ void GameEntities::randomizeSceneObject(SceneObject &sceneObject, float minX,
 void GameEntities::paint() {
   abcg::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Limpa a tela
 
-  abcg::glViewport(0, 0, m_viewportSize.x, m_viewportSize.y); // Viewport
-
-  abcg::glUseProgram(m_program); // Usa o programa de shader
-
   // Renderiza objetos de cena
   renderObject(m_distractionModel, m_distractionObjects);
   renderObject(m_targetModel, m_targetObjects);
@@ -158,6 +154,9 @@ void GameEntities::paint() {
 // Renderiza objetos de cena
 void GameEntities::renderObject(Model &m_model,
                                 std::vector<SceneObject> &m_scObjects) {
+  abcg::glViewport(0, 0, m_viewportSize.x, m_viewportSize.y); // Viewport
+
+  abcg::glUseProgram(m_program); // Usa o programa de shader
   // Variáveis uniformes do modelo
   m_Ka = m_model.getKa();               // Coeficiente de reflexão ambiente
   m_Kd = m_model.getKd();               // Coeficiente de reflexão difusa
