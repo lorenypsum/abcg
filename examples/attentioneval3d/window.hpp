@@ -34,6 +34,7 @@ public:
   void resetGame();
   void startGame();
 
+
 private:
   // Programa de shader
   GLuint m_program{};

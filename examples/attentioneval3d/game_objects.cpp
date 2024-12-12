@@ -198,6 +198,7 @@ void GameEntities::renderObject(GLuint &program, Model &m_model,
   abcg::glUniformMatrix4fv(projMatrixLoc, 1, GL_FALSE,
                            &m_projMatrix[0][0]); // Matriz de projeção
   abcg::glUniform1i(diffuseTexLoc, 0);           // Textura
+  abcg::glUniform1i(normalTexLoc, 1);
   abcg::glUniform4fv(lightDirLoc, 1, &lightDirRotated.x); // Luz
   abcg::glUniform4fv(IaLoc, 1, &m_Ia.x); // Intensidade ambiente
   abcg::glUniform4fv(IdLoc, 1, &m_Id.x); // Intensidade difusa
@@ -298,8 +299,7 @@ void GameEntities::renderNet(GLuint &program, Model &m_model,
 
     // Computa a matriz de modelo para todos objeto de cena
     glm::mat4 modelMatrix{1.0f}; // Matriz de modelo
-    modelMatrix = glm::translate(modelMatrix,
-                                 m_net.m_position); // Parte inferior central
+    modelMatrix = glm::translate(modelMatrix, m_net.m_position);
     modelMatrix = glm::scale(modelMatrix, glm::vec3(0.2f)); // Ajusta o tamanho
     modelMatrix = glm::rotate(modelMatrix, 11.0f, m_net.m_rotationAxis);
 

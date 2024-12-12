@@ -21,18 +21,6 @@ void Window::onCreate() {
   auto const assetsPath{
       abcg::Application::getAssetsPath()}; // Caminho dos assets
 
-  // TODO: Carregar o chão/solo
-  // m_program_obj =
-  //     abcg::createOpenGLProgram({{.source = assetsPath +
-  //     "shaders/texture.vert",
-  //                                 .stage = abcg::ShaderStage::Vertex},
-  //                                {.source = assetsPath +
-  //                                "shaders/texture.frag",
-  //                                 .stage = abcg::ShaderStage::Fragment}});
-
-  // m_ground.loadDiffuseTexture(assetsPath + "maps/grass.png");
-  // m_ground.loadObj(assetsPath + "block.obj");
-  // m_ground.setupVAO(m_program_obj);
 
   // Carrega a fonte
   auto const filename{assetsPath + "Inconsolata-Medium.ttf"};
