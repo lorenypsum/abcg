@@ -76,13 +76,11 @@ public:
   void setupSceneObjects(std::vector<SceneObject> &m_sceneObjects, float minX,
                          float maxX, float minY, float maxY, float minZ,
                          float maxZ);
-  void createObject(Model &m_model, const std::string &assetsPath,
+  void createObject(GLuint &program, Model &m_model, const std::string &assetsPath,
                     const std::string &objPath,
-                    const std::string &texturePaths);
-  void createNet(Model &m_model, const std::string &assetsPath,
-                 const std::string &objPath, const std::string &texturePath);
-  void renderObject(Model &m_model, std::vector<SceneObject> &m_sceneObjects);
-  void renderNet(Model &m_model, std::vector<SceneObject> &m_scObjects);
+                    const std::string &texturePaths, const std::string &normalPath);
+  void renderObject(GLuint &program, Model &m_model, std::vector<SceneObject> &m_sceneObjects);
+  void renderNet(GLuint &program, Model &m_model, std::vector<SceneObject> &m_scObjects);
   void randomizeSceneObject(SceneObject &sceneObject, float minX, float maxX,
                             float minY, float maxY, float minZ, float maxZ);
   void updateObjects(float deltaTime);

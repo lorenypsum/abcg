@@ -30,13 +30,13 @@ void GameEntities::create() {
   glm::vec3 const at{0.0f, 0.0f, -1.0f}; // Olhar da câmera (eixo z)
   glm::vec3 const up{0.0f, 1.0f, 0.0f};  // Vetor up da câmera (eixo y)
 
-  createObject(m_distractionModel, assetsPath, "bird.obj",
-               "maps/b-feathers.png"); // Cria objeto de distração
-  createObject(m_targetModel, assetsPath, "bird.obj",
-               "maps/w-feathers.png"); // Cria objeto alvo
-
-  createNet(m_netModel, assetsPath, "wicker_basket.obj",
-            "maps/WoodFineDark.jpg"); // Cria rede
+  createObject(m_program, m_distractionModel, assetsPath, "bird.obj",
+               "maps/b-feathers.png",
+               "maps/normal.jpg"); // Cria objeto de distração
+  createObject(m_program, m_targetModel, assetsPath, "bird.obj",
+               "maps/w-feathers.png", "maps/normal.jpg"); // Cria objeto alvo
+  createObject(m_program_2, m_netModel, assetsPath, "wicker_basket.obj",
+               "maps/wood.jpg", "maps/normal.jpg"); // Cria objeto alvo
 
   float x = 0.0f;
   float y = -0.3f; // Mantém Y fixo
@@ -65,28 +65,18 @@ void GameEntities::create() {
 }
 
 // Cria um objeto de cena
-void GameEntities::createObject(Model &m_model, const std::string &assetsPath,
+void GameEntities::createObject(GLuint &program, Model &m_model,
+                                const std::string &assetsPath,
                                 const std::string &objPath,
-                                const std::string &texturePath) {
+                                const std::string &texturePath,
+                                const std::string &normalPath) {
 
   // Carrega modelo, textura, tamanho e configura VAO
   m_model.loadDiffuseTexture(assetsPath + texturePath); // Textura
+  m_model.loadNormalTexture(assetsPath + normalPath);   // Textura Normal
   m_model.loadObj(assetsPath + objPath);                // Objeto
   m_model.setSize(100.0f);                              // Tamanho
-  m_model.setupVAO(m_program);                          // Configura VAO
-}
-
-// Cria rede
-void GameEntities::createNet(Model &m_model, const std::string &assetsPath,
-                             const std::string &objPath,
-                             const std::string &texturePath) {
-
-  // Carrega modelo, textura, tamanho e configura VAO
-  m_model.loadDiffuseTexture(assetsPath + "maps/WoodFineDark004_COL_2K.jpg"); // Textura
-  m_model.loadNormalTexture(assetsPath + "maps/WoodFineDark004_NRM_2K.jpg"); // Textura Normal
-  m_model.loadObj(assetsPath + objPath); // Objeto
-  m_model.setSize(30.0f);                // Tamanho
-  m_model.setupVAO(m_program_2);         // Configura VAO
+  m_model.setupVAO(program);                            // Configura VAO
 }
 
 // Configura objetos de cena
@@ -150,9 +140,9 @@ void GameEntities::paint() {
   abcg::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Limpa a tela
 
   // Renderiza objetos de cena
-  renderObject(m_distractionModel, m_distractionObjects);
-  renderObject(m_targetModel, m_targetObjects);
-  renderNet(m_netModel, m_netObjects);
+  renderObject(m_program, m_distractionModel, m_distractionObjects);
+  renderObject(m_program, m_targetModel, m_targetObjects);
+  renderNet(m_program_2, m_netModel, m_netObjects);
 
   // Finaliza
   abcg::glUseProgram(0);
@@ -160,11 +150,11 @@ void GameEntities::paint() {
 
 // TODO: Renderizar solo/chão adequadamente
 // Renderiza objetos de cena
-void GameEntities::renderObject(Model &m_model,
+void GameEntities::renderObject(GLuint &program, Model &m_model,
                                 std::vector<SceneObject> &m_scObjects) {
   abcg::glViewport(0, 0, m_viewportSize.x, m_viewportSize.y); // Viewport
 
-  abcg::glUseProgram(m_program); // Usa o programa de shader
+  abcg::glUseProgram(program); // Usa o programa de shader
   // Variáveis uniformes do modelo
   m_Ka = m_model.getKa();               // Coeficiente de reflexão ambiente
   m_Kd = m_model.getKd();               // Coeficiente de reflexão difusa
@@ -173,32 +163,32 @@ void GameEntities::renderObject(Model &m_model,
 
   // Atribui variáveis uniformes
   auto const viewMatrixLoc{
-      abcg::glGetUniformLocation(m_program, "viewMatrix")}; // Matriz de visão
-  auto const projMatrixLoc{abcg::glGetUniformLocation(
-      m_program, "projMatrix")}; // Matriz de projeção
+      abcg::glGetUniformLocation(program, "viewMatrix")}; // Matriz de visão
+  auto const projMatrixLoc{
+      abcg::glGetUniformLocation(program, "projMatrix")}; // Matriz de projeção
   auto const modelMatrixLoc{
-      abcg::glGetUniformLocation(m_program, "modelMatrix")}; // Matriz de modelo
+      abcg::glGetUniformLocation(program, "modelMatrix")}; // Matriz de modelo
   auto const normalMatrixLoc{
-      abcg::glGetUniformLocation(m_program, "normalMatrix")}; // Matriz normal
+      abcg::glGetUniformLocation(program, "normalMatrix")}; // Matriz normal
   auto const lightDirLoc{
-      abcg::glGetUniformLocation(m_program, "lightDirWorldSpace")}; // Luz
+      abcg::glGetUniformLocation(program, "lightDirWorldSpace")}; // Luz
   auto const shininessLoc{
-      abcg::glGetUniformLocation(m_program, "shininess")}; // Brilho
+      abcg::glGetUniformLocation(program, "shininess")}; // Brilho
   auto const IaLoc{
-      abcg::glGetUniformLocation(m_program, "Ia")}; // Intensidade ambiente
+      abcg::glGetUniformLocation(program, "Ia")}; // Intensidade ambiente
   auto const IdLoc{
-      abcg::glGetUniformLocation(m_program, "Id")}; // Intensidade difusa
+      abcg::glGetUniformLocation(program, "Id")}; // Intensidade difusa
   auto const IsLoc{
-      abcg::glGetUniformLocation(m_program, "Is")}; // Intensidade especular
+      abcg::glGetUniformLocation(program, "Is")}; // Intensidade especular
   auto const KaLoc{
-      abcg::glGetUniformLocation(m_program, "Ka")}; // Coeficiente ambiente
+      abcg::glGetUniformLocation(program, "Ka")}; // Coeficiente ambiente
   auto const KdLoc{
-      abcg::glGetUniformLocation(m_program, "Kd")}; // Coeficiente difuso
+      abcg::glGetUniformLocation(program, "Kd")}; // Coeficiente difuso
   auto const KsLoc{
-      abcg::glGetUniformLocation(m_program, "Ks")}; // Coeficiente especular
+      abcg::glGetUniformLocation(program, "Ks")}; // Coeficiente especular
   auto const diffuseTexLoc{
-      abcg::glGetUniformLocation(m_program, "diffuseTex")}; // Textura
-
+      abcg::glGetUniformLocation(program, "diffuseTex")}; // Textura
+  auto const normalTexLoc{abcg::glGetUniformLocation(program, "normalTex")};
   auto const lightDirRotated{
       glm::vec4(0.0f, 0.0f, 1.0f, 1.0f)}; // Luz rotacionada
 
@@ -240,11 +230,11 @@ void GameEntities::renderObject(Model &m_model,
 }
 
 // Renderiza rede da cena
-void GameEntities::renderNet(Model &m_model,
+void GameEntities::renderNet(GLuint &program, Model &m_model,
                              std::vector<SceneObject> &m_scObjects) {
   abcg::glViewport(0, 0, m_viewportSize.x, m_viewportSize.y); // Viewport
 
-  abcg::glUseProgram(m_program_2); // Usa o programa de shader
+  abcg::glUseProgram(program); // Usa o programa de shader
 
   m_Ka = m_model.getKa();               // Coeficiente de reflexão ambiente
   m_Kd = m_model.getKd();               // Coeficiente de reflexão difusa
@@ -253,34 +243,34 @@ void GameEntities::renderNet(Model &m_model,
 
   // Atribui variáveis uniformes
   auto const viewMatrixLoc{
-      abcg::glGetUniformLocation(m_program_2, "viewMatrix")}; // Matriz de visão
-  auto const projMatrixLoc{abcg::glGetUniformLocation(
-      m_program_2, "projMatrix")}; // Matriz de projeção
-  auto const modelMatrixLoc{abcg::glGetUniformLocation(
-      m_program_2, "modelMatrix")}; // Matriz de modelo
+      abcg::glGetUniformLocation(program, "viewMatrix")}; // Matriz de visão
+  auto const projMatrixLoc{
+      abcg::glGetUniformLocation(program, "projMatrix")}; // Matriz de projeção
+  auto const modelMatrixLoc{
+      abcg::glGetUniformLocation(program, "modelMatrix")}; // Matriz de modelo
   auto const normalMatrixLoc{
-      abcg::glGetUniformLocation(m_program_2, "normalMatrix")}; // Matriz normal
+      abcg::glGetUniformLocation(program, "normalMatrix")}; // Matriz normal
   auto const lightDirLoc{
-      abcg::glGetUniformLocation(m_program_2, "lightDirWorldSpace")}; // Luz
+      abcg::glGetUniformLocation(program, "lightDirWorldSpace")}; // Luz
   auto const shininessLoc{
-      abcg::glGetUniformLocation(m_program_2, "shininess")}; // Brilho
+      abcg::glGetUniformLocation(program, "shininess")}; // Brilho
   auto const IaLoc{
-      abcg::glGetUniformLocation(m_program_2, "Ia")}; // Intensidade ambiente
+      abcg::glGetUniformLocation(program, "Ia")}; // Intensidade ambiente
   auto const IdLoc{
-      abcg::glGetUniformLocation(m_program_2, "Id")}; // Intensidade difusa
+      abcg::glGetUniformLocation(program, "Id")}; // Intensidade difusa
   auto const IsLoc{
-      abcg::glGetUniformLocation(m_program_2, "Is")}; // Intensidade especular
+      abcg::glGetUniformLocation(program, "Is")}; // Intensidade especular
   auto const KaLoc{
-      abcg::glGetUniformLocation(m_program_2, "Ka")}; // Coeficiente ambiente
+      abcg::glGetUniformLocation(program, "Ka")}; // Coeficiente ambiente
   auto const KdLoc{
-      abcg::glGetUniformLocation(m_program_2, "Kd")}; // Coeficiente difuso
+      abcg::glGetUniformLocation(program, "Kd")}; // Coeficiente difuso
   auto const KsLoc{
-      abcg::glGetUniformLocation(m_program_2, "Ks")}; // Coeficiente especular
+      abcg::glGetUniformLocation(program, "Ks")}; // Coeficiente especular
   auto const diffuseTexLoc{
-      abcg::glGetUniformLocation(m_program_2, "diffuseTex")}; // Textura
+      abcg::glGetUniformLocation(program, "diffuseTex")}; // Textura
+  auto const normalTexLoc{abcg::glGetUniformLocation(program, "normalTex")};
   auto const lightDirRotated{
       glm::vec4(0.0f, 0.0f, 1.0f, 1.0f)}; // Luz rotacionada
-  auto const normalTexLoc{abcg::glGetUniformLocation(m_program, "normalTex")};
 
   // Aplica variáveis uniformes
   abcg::glUniformMatrix4fv(viewMatrixLoc, 1, GL_FALSE,
