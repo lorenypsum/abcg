@@ -160,6 +160,27 @@ void Window::onEvent(SDL_Event const &event) {
       }
     }
   }
+
+  if (event.type == SDL_KEYDOWN) {
+    switch (event.key.keysym.sym) {
+    case SDLK_UP: // Mover para cima
+      m_objects.m_net.m_position.y += 0.1f;
+      break;
+    case SDLK_DOWN: // Mover para baixo
+      m_objects.m_net.m_position.y -= 0.1f;
+      break;
+    case SDLK_LEFT: // Mover para a esquerda
+      m_objects.m_net.m_position.x -= 0.1f;
+      break;
+    case SDLK_RIGHT: // Mover para a direita
+      m_objects.m_net.m_position.x += 0.1f;
+      break;
+    }
+  }
+
+  // Limites para evitar que o astronauta saia da tela
+  m_objects.m_net.m_position.x = std::clamp(m_objects.m_net.m_position.x, -0.5f, 0.5f);
+  m_objects.m_net.m_position.y = std::clamp(m_objects.m_net.m_position.y, -0.5f, 0.5f);
 }
 
 // Inicializa os objetos do jogo em posições aleatórias
