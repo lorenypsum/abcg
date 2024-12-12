@@ -21,7 +21,6 @@ void Window::onCreate() {
   auto const assetsPath{
       abcg::Application::getAssetsPath()}; // Caminho dos assets
 
-
   // Carrega a fonte
   auto const filename{assetsPath + "Inconsolata-Medium.ttf"};
   m_font = ImGui::GetIO().Fonts->AddFontFromFileTTF(filename.c_str(), 25.0f);
@@ -60,9 +59,54 @@ void Window::onUpdate() {
     --m_gametime;               // Decrementa o tempo restante
     m_lastReload = currentTime; // Atualiza o tempo de recarga
     checkGameStatus();          // Verifica o status do jogo
-    updateTimeDisplay();        // Atualiza a exibição de tempo
+    // Atualiza a lógica de colisões
+    detectCollisions();
+    updateTimeDisplay(); // Atualiza a exibição de tempo
   }
+  // Atualiza a lógica de colisões
+  detectCollisions();
   checkGameStatus(); // Verifica o status do jogo
+}
+
+// Função para detectar colisões
+void Window::detectCollisions() {
+    // A rede possui uma posição e um tamanho (vamos assumir um raio ou largura e altura)
+    glm::vec3 netPosition = m_objects.m_net.m_position; 
+    float netSize = 1.0f; // Tamanho da rede, pode ser ajustado
+
+    // Detecta colisões com targets
+    for (auto &target : m_objects.m_targetObjects) {
+        glm::vec3 targetPosition = target.m_position;
+        float targetSize = target.m_size; // Tamanho do target, pode ser ajustado
+
+        // Distância entre a rede e o target
+        float distance = glm::distance(netPosition, targetPosition);
+
+        // Se a distância for menor que a soma dos raios, houve uma colisão
+        if (distance < (netSize + targetSize)) {
+            // A colisão com o target aumenta a pontuação
+            m_score += 1;
+            // Reseta ou remove o target após a colisão
+            target.m_position = glm::vec3(-1000.0f, -1000.0f, 0.0f); // Exemplo de remoção do target
+        }
+    }
+
+    // Detecta colisões com distractions
+    for (auto &distraction : m_objects.m_distractionObjects) {
+        glm::vec3 distractionPosition = distraction.m_position;
+        float distractionSize = distraction.m_size; // Tamanho do distraction, pode ser ajustado
+
+        // Distância entre a rede e o distraction
+        float distance = glm::distance(netPosition, distractionPosition);
+
+        // Se a distância for menor que a soma dos raios, houve uma colisão
+        if (distance < (netSize + distractionSize)) {
+            // A colisão com o distraction diminui a pontuação
+            m_score -= 1;
+            // Reseta ou remove o distraction após a colisão
+            distraction.m_position = glm::vec3(-1000.0f, -1000.0f, 0.0f); // Exemplo de remoção do distraction
+        }
+    }
 }
 
 // Renderiza a janela
@@ -126,28 +170,27 @@ void Window::onResize(glm::ivec2 const &size) {
 // Eventos de clique do mouse
 // TODO: Incluir toque na tela
 void Window::onEvent(SDL_Event const &event) {
-  if (event.type == SDL_MOUSEBUTTONDOWN &&
-      event.button.button == SDL_BUTTON_LEFT) {
-    if (!m_gameOver) {
-      // Converte a posição do clique para coordenadas normalizadas
-      auto const clickPos = glm::vec3{
-          (event.button.x / static_cast<float>(m_viewportSize.x)) * 2.0f - 1.0f,
-          -((event.button.y / static_cast<float>(m_viewportSize.y)) * 2.0f -
-            1.0f),
-          0.0f};
+  // if (event.type == SDL_MOUSEBUTTONDOWN &&
+  //     event.button.button == SDL_BUTTON_LEFT) {
+  //   if (!m_gameOver) {
+  //     // Converte a posição do clique para coordenadas normalizadas
+  //     auto const clickPos = glm::vec3{
+  //         (event.button.x / static_cast<float>(m_viewportSize.x)) * 2.0f - 1.0f,
+  //         -((event.button.y / static_cast<float>(m_viewportSize.y)) * 2.0f -
+  //           1.0f),
+  //         0.0f};
 
-      // Verifica cliques em targets ou distractions
-      if (m_objects.checkClickOnObject(clickPos, m_objects.m_viewMatrix,
-                                       m_objects.m_projMatrix,
-                                       m_objects.m_targetObjects)) {
-        m_score += 1; // Pontuação aumenta para cliques corretos
-      } else if (m_objects.checkClickOnObject(clickPos, m_objects.m_viewMatrix,
-                                              m_objects.m_projMatrix,
-                                              m_objects.m_distractionObjects)) {
-        m_score -= 1; // Pontuação diminui para cliques incorretos
-      }
-    }
-  }
+  //     // Verifica cliques em targets ou distractions
+  //     if (m_objects.checkCollisionWithNet(m_objects.m_net.m_position, 2.0f,
+  //                                         m_objects.m_targetObjects, 2.0f)) {
+  //       m_score += 1; // Pontuação aumenta para cliques corretos
+  //     } else if (m_objects.checkCollisionWithNet(
+  //                    m_objects.m_net.m_position, 2.0f,
+  //                    m_objects.m_targetObjects, 2.0f)) {
+  //       m_score -= 1; // Pontuação diminui para cliques incorretos
+  //     }
+  //   }
+  // }
 
   if (event.type == SDL_KEYDOWN) {
     switch (event.key.keysym.sym) {
@@ -167,8 +210,10 @@ void Window::onEvent(SDL_Event const &event) {
   }
 
   // Limites para evitar que o astronauta saia da tela
-  m_objects.m_net.m_position.x = std::clamp(m_objects.m_net.m_position.x, -0.5f, 0.5f);
-  m_objects.m_net.m_position.y = std::clamp(m_objects.m_net.m_position.y, -0.5f, 0.5f);
+  m_objects.m_net.m_position.x =
+      std::clamp(m_objects.m_net.m_position.x, -0.5f, 0.5f);
+  m_objects.m_net.m_position.y =
+      std::clamp(m_objects.m_net.m_position.y, -0.5f, 0.5f);
 }
 
 // Inicializa os objetos do jogo em posições aleatórias

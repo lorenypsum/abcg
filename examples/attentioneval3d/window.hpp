@@ -33,6 +33,7 @@ public:
   void updateTimeDisplay();
   void resetGame();
   void startGame();
+  void detectCollisions();
 
 
 private:

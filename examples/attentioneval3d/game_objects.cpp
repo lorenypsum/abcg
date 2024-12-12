@@ -3,6 +3,8 @@
 #include <glm/gtc/random.hpp>
 #include <glm/gtx/fast_trigonometry.hpp>
 #include <iostream>
+#include <stdio.h>
+#include <unicode/unistr.h>
 
 // Cria Entidades do Jogo
 void GameEntities::create() {
@@ -37,6 +39,7 @@ void GameEntities::create() {
                "maps/w-feathers.png", "maps/normal.jpg"); // Cria objeto alvo
   createObject(m_program_2, m_netModel, assetsPath, "wicker_basket.obj",
                "maps/wood.jpg", "maps/normal.jpg"); // Cria objeto alvo
+               
 
   float x = 0.0f;
   float y = -0.3f; // Mantém Y fixo
@@ -222,7 +225,7 @@ void GameEntities::renderObject(GLuint &program, Model &m_model,
         glm::translate(modelMatrix, scObject.m_position); // Posição do objeto
     modelMatrix = glm::scale(modelMatrix, glm::vec3(0.7f)); // Escala do objeto
     modelMatrix = glm::rotate(modelMatrix, m_angle,
-                              scObject.m_rotationAxis); // Rotação do objeto
+                              scObject.m_rotationAxis); // Rotação do objeto                         
 
     // Aplica variáveis uniformes para o modelo
     abcg::glUniformMatrix4fv(modelMatrixLoc, 1, GL_FALSE, &modelMatrix[0][0]);
@@ -309,48 +312,71 @@ void GameEntities::renderNet(GLuint &program, Model &m_model,
   }
 }
 
-// Verifica se um objeto de cena foi clicado
-bool GameEntities::checkClickOnObject(
-    glm::vec3 const &clickPos, glm::mat4 const &viewMatrix,
-    glm::mat4 const &projMatrix, std::vector<SceneObject> &m_sceneObjects) {
 
-  // Verifica se o clique atingiu um objeto de cena
-  for (auto &sceneObject : m_sceneObjects) {
+// // Verifica se um objeto de cena foi clicado e o remove
+// bool GameEntities::checkClickOnObject(
+//     glm::vec3 const &clickPos, glm::mat4 const &viewMatrix,
+//     glm::mat4 const &projMatrix, std::vector<SceneObject> &m_sceneObjects) {
 
-    glm::vec3 sceneObjectPosition =
-        sceneObject.m_position; // Posição 3D do objeto de cena (pássaro)
+//   // Iterador para percorrer e remover objetos
+//   for (auto it = m_sceneObjects.begin(); it != m_sceneObjects.end(); ++it) {
+//     auto &sceneObject = *it;
 
-    // Converte a posição do objeto de cena para o espaço da tela
-    glm::vec4 sceneObjectClipSpace =
-        projMatrix * viewMatrix * glm::vec4(sceneObjectPosition, 1.0f);
-    // Normaliza no espaço de recorte
-    sceneObjectClipSpace /= sceneObjectClipSpace.w;
+//     glm::vec3 sceneObjectPosition =
+//         sceneObject.m_position; // Posição 3D do objeto de cena (pássaro)
 
-    // A posição do objeto que está em -1 a 1 é escalada para o tamanho da tela
-    glm::vec2 sceneObjectScreenPos = {
-        (sceneObjectClipSpace.x * 0.5f + 0.5f) * m_viewportSize.x,
-        (1.0f - (sceneObjectClipSpace.y * 0.5f + 0.5f)) * m_viewportSize.y};
+//     // Converte a posição do objeto de cena para o espaço da tela
+//     glm::vec4 sceneObjectClipSpace =
+//         projMatrix * viewMatrix * glm::vec4(sceneObjectPosition, 1.0f);
+//     // Normaliza no espaço de recorte
+//     sceneObjectClipSpace /= sceneObjectClipSpace.w;
 
-    // Distância no espaço da tela (clique projetado em 2D)
-    float halfSize = 300.0f; // Tamanho do objeto em pixels na tela
-    if (glm::distance(glm::vec3(clickPos.x, clickPos.y, clickPos.z),
-                      glm::vec3(sceneObjectScreenPos, 0.0f)) <= halfSize) {
-      // TODO: Remover objeto clicado
-      // Reposiciona objeto clicada
-      randomizeSceneObject(sceneObject, // sceneObject
-                           -15.0f,      // minX
-                           15.0f,       // maxX
-                           0.0f,        // minY
-                           15.0f,       // maxY
-                           -50.0f,      // minZ
-                           0.0f         // maxZ
-      );
-      // Clique reconhecido
-      return true;
+//     // A posição do objeto que está em -1 a 1 é escalada para o tamanho da tela
+//     glm::vec2 sceneObjectScreenPos = {
+//         (sceneObjectClipSpace.x * 0.5f + 0.5f) * m_viewportSize.x,
+//         (1.0f - (sceneObjectClipSpace.y * 0.5f + 0.5f)) * m_viewportSize.y};
+
+//     // Distância no espaço da tela (clique projetado em 2D)
+//     float halfSize = 300.0f; // Tamanho do objeto em pixels na tela
+//     if (glm::distance(glm::vec3(clickPos.x, clickPos.y, clickPos.z),
+//                       glm::vec3(sceneObjectScreenPos, 0.0f)) <= halfSize) {
+//       // Remove o objeto clicado da cena
+//       return true; // Clique reconhecido
+//     }
+//   }
+
+//   // Nenhum objeto na cena foi clicado
+//   return false;
+// }
+
+bool GameEntities::checkCollisionWithNet(
+    glm::vec3 const &netPosition, float netRadius,
+    std::vector<SceneObject> &m_sceneObjects, float objectRadius) { 
+    // Para esse caso, netRadius pode ser visto como a "largura" da rede na direção X, Y, Z
+    // Como você tem formas não esféricas, vamos usar uma abordagem AABB
+
+    for (auto &sceneObject : m_sceneObjects) {
+        glm::vec3 sceneObjectPosition = sceneObject.m_position;
+        
+        // Definir a caixa delimitadora para o objeto de cena, baseando-se no centro e no raio
+        glm::vec3 minBound = sceneObjectPosition - glm::vec3(objectRadius);
+        glm::vec3 maxBound = sceneObjectPosition + glm::vec3(objectRadius);
+        
+        // Definir a caixa delimitadora para a rede (semelhante)
+        glm::vec3 netMinBound = netPosition - glm::vec3(netRadius);
+        glm::vec3 netMaxBound = netPosition + glm::vec3(netRadius);
+
+        // Verificar se há sobreposição entre as caixas AABB
+        if (minBound.x <= netMaxBound.x && maxBound.x >= netMinBound.x &&
+            minBound.y <= netMaxBound.y && maxBound.y >= netMinBound.y &&
+            minBound.z <= netMaxBound.z && maxBound.z >= netMinBound.z) {
+            // Se as caixas AABB se sobrepõem, há colisão
+            return true;
+        }
     }
-  }
-  // Nenhum objeto na cena foi clicado
-  return false;
+
+    // Nenhuma colisão detectada
+    return false;
 }
 
 // Atualiza objetos de cena

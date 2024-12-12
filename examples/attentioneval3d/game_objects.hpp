@@ -26,13 +26,14 @@ public:
   struct SceneObject {
     glm::vec3 m_position{};
     glm::vec3 m_rotationAxis{};
+    float m_scale{1.0f};
+    float m_size{1.0f};
   };
 
   // Estrutura de um objeto do jogo
   struct GameObject {
     float m_angularVelocity{};
     float m_rotation{0.0f};
-    float m_scale{};
     bool checkClick(glm::vec3 const &clickPos) const;
   };
 
@@ -76,11 +77,14 @@ public:
   void setupSceneObjects(std::vector<SceneObject> &m_sceneObjects, float minX,
                          float maxX, float minY, float maxY, float minZ,
                          float maxZ);
-  void createObject(GLuint &program, Model &m_model, const std::string &assetsPath,
-                    const std::string &objPath,
-                    const std::string &texturePaths, const std::string &normalPath);
-  void renderObject(GLuint &program, Model &m_model, std::vector<SceneObject> &m_sceneObjects);
-  void renderNet(GLuint &program, Model &m_model, std::vector<SceneObject> &m_scObjects);
+  void createObject(GLuint &program, Model &m_model,
+                    const std::string &assetsPath, const std::string &objPath,
+                    const std::string &texturePaths,
+                    const std::string &normalPath);
+  void renderObject(GLuint &program, Model &m_model,
+                    std::vector<SceneObject> &m_sceneObjects);
+  void renderNet(GLuint &program, Model &m_model,
+                 std::vector<SceneObject> &m_scObjects);
   void randomizeSceneObject(SceneObject &sceneObject, float minX, float maxX,
                             float minY, float maxY, float minZ, float maxZ);
   void updateObjects(float deltaTime);
@@ -88,7 +92,9 @@ public:
                           glm::mat4 const &viewMatrix,
                           glm::mat4 const &projMatrix,
                           std::vector<SceneObject> &m_sceneObjects);
-  void removeObject(std::list<GameObject>::iterator it);
+  bool checkCollisionWithNet(glm::vec3 const &netPosition, float netRadius,
+                             std::vector<SceneObject> &m_sceneObjects,
+                             float objectRadius);
   void loadObj(std::string_view path, bool standardize = true);
 
   // Definição matrizes de projeção e visão
