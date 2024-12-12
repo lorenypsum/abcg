@@ -36,6 +36,13 @@ public:
     bool checkClick(glm::vec3 const &clickPos) const;
   };
 
+  struct Net {
+    glm::vec3 m_position{};
+    glm::vec3 m_rotationAxis{};
+  };
+
+  Net m_net;
+
   // Vetores de objetos de cena
   std::vector<SceneObject> m_distractionObjects = std::vector<SceneObject>(20);
   std::vector<SceneObject> m_targetObjects = std::vector<SceneObject>(30);
@@ -101,15 +108,10 @@ private:
   Model m_targetModel;
   Model m_netModel;
 
-  struct Net {
-    glm::vec3 m_position{};
-    glm::vec3 m_rotationAxis{};
-  };
-
-  Net m_net;
   // Lista de objetos do jogo
   std::list<GameObject> m_distractions;
   std::list<GameObject> m_targets;
+  std::list<GameObject> m_nets;
 
   // Programa de shader
   GLuint m_program{};
