@@ -137,7 +137,7 @@ public:
 
   // Variáveis
   std::default_random_engine m_randomEngine;
-  float m_FOV{30.0f};
+  float m_FOV{50.0f};
 
 private:
   // Modelos
