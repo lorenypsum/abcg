@@ -379,7 +379,6 @@ void GameEntities::renderSkybox(GLuint &program) {
   abcg::glFrontFace(GL_CW);
   abcg::glDepthFunc(GL_LEQUAL);
   abcg::glDrawArrays(GL_TRIANGLES, 0, m_skyPositions.size());
-  abcg::glDepthFunc(GL_LESS);
 
   abcg::glBindVertexArray(0);
   abcg::glUseProgram(0);
