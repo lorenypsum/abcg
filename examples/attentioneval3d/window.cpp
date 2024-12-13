@@ -71,43 +71,84 @@ void Window::onUpdate() {
 
 // Função para detectar colisões
 void Window::detectCollisions() {
-    // A rede possui uma posição e um tamanho (vamos assumir um raio ou largura e altura)
-    glm::vec3 netPosition = m_objects.m_net.m_position; 
-    float netSize = 1.0f; // Tamanho da rede, pode ser ajustado
+  // A rede possui uma posição e um tamanho (vamos assumir um raio ou largura e
+  // altura)
+  glm::vec3 netPosition = m_objects.m_net.m_position;
+  float netSize = 1.0f; // Tamanho da rede, pode ser ajustado
 
-    // Detecta colisões com targets
-    for (auto &target : m_objects.m_targetObjects) {
-        glm::vec3 targetPosition = target.m_position;
-        float targetSize = target.m_size; // Tamanho do target, pode ser ajustado
+  // Detecta colisões com targets
+  for (auto &target : m_objects.m_targetObjects) {
+    glm::vec3 targetPosition = target.m_position;
+    float targetSize = target.m_size; // Tamanho do target, pode ser ajustado
 
-        // Distância entre a rede e o target
-        float distance = glm::distance(netPosition, targetPosition);
+    // Distância entre a rede e o target
+    float distance = glm::distance(netPosition, targetPosition);
 
-        // Se a distância for menor que a soma dos raios, houve uma colisão
-        if (distance < (netSize + targetSize)) {
-            // A colisão com o target aumenta a pontuação
-            m_score += 1;
-            // Reseta ou remove o target após a colisão
-            target.m_position = glm::vec3(-1000.0f, -1000.0f, 0.0f); // Exemplo de remoção do target
-        }
+    // Se a distância for menor que a soma dos raios, houve uma colisão
+    if (distance < (netSize + targetSize)) {
+      // A colisão com o target aumenta a pontuação
+      m_score += 1;
+      // Reseta ou remove o target após a colisão
+      target.m_position =
+          glm::vec3(-1000.0f, -1000.0f, 0.0f); // Exemplo de remoção do target
     }
+  }
 
-    // Detecta colisões com distractions
-    for (auto &distraction : m_objects.m_distractionObjects) {
-        glm::vec3 distractionPosition = distraction.m_position;
-        float distractionSize = distraction.m_size; // Tamanho do distraction, pode ser ajustado
+  // Detecta colisões com distractions
+  for (auto &distraction : m_objects.m_distractionObjects) {
+    glm::vec3 distractionPosition = distraction.m_position;
+    float distractionSize =
+        distraction.m_size; // Tamanho do distraction, pode ser ajustado
 
-        // Distância entre a rede e o distraction
-        float distance = glm::distance(netPosition, distractionPosition);
+    // Distância entre a rede e o distraction
+    float distance = glm::distance(netPosition, distractionPosition);
 
-        // Se a distância for menor que a soma dos raios, houve uma colisão
-        if (distance < (netSize + distractionSize)) {
-            // A colisão com o distraction diminui a pontuação
-            m_score -= 1;
-            // Reseta ou remove o distraction após a colisão
-            distraction.m_position = glm::vec3(-1000.0f, -1000.0f, 0.0f); // Exemplo de remoção do distraction
-        }
+    // Se a distância for menor que a soma dos raios, houve uma colisão
+    if (distance < (netSize + distractionSize)) {
+      // A colisão com o distraction diminui a pontuação
+      m_score -= 1;
+      // Reseta ou remove o distraction após a colisão
+      distraction.m_position = glm::vec3(
+          -1000.0f, -1000.0f, 0.0f); // Exemplo de remoção do distraction
     }
+  }
+
+  // Detecta colisões com distractions
+  for (auto &distraction : m_objects.m_distractionObjects1) {
+    glm::vec3 distractionPosition = distraction.m_position;
+    float distractionSize =
+        distraction.m_size; // Tamanho do distraction, pode ser ajustado
+
+    // Distância entre a rede e o distraction
+    float distance = glm::distance(netPosition, distractionPosition);
+
+    // Se a distância for menor que a soma dos raios, houve uma colisão
+    if (distance < (netSize + distractionSize)) {
+      // A colisão com o distraction diminui a pontuação
+      m_score -= 1;
+      // Reseta ou remove o distraction após a colisão
+      distraction.m_position = glm::vec3(
+          -1000.0f, -1000.0f, 0.0f); // Exemplo de remoção do distraction
+    }
+  }
+  // Detecta colisões com distractions
+  for (auto &distraction : m_objects.m_distractionObjects2) {
+    glm::vec3 distractionPosition = distraction.m_position;
+    float distractionSize =
+        distraction.m_size; // Tamanho do distraction, pode ser ajustado
+
+    // Distância entre a rede e o distraction
+    float distance = glm::distance(netPosition, distractionPosition);
+
+    // Se a distância for menor que a soma dos raios, houve uma colisão
+    if (distance < (netSize + distractionSize)) {
+      // A colisão com o distraction diminui a pontuação
+      m_score -= 1;
+      // Reseta ou remove o distraction após a colisão
+      distraction.m_position = glm::vec3(
+          -1000.0f, -1000.0f, 0.0f); // Exemplo de remoção do distraction
+    }
+  }
 }
 
 // Renderiza a janela

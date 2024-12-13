@@ -47,6 +47,8 @@ public:
 
   // Vetores de objetos de cena
   std::vector<SceneObject> m_distractionObjects = std::vector<SceneObject>(10);
+  std::vector<SceneObject> m_distractionObjects1 = std::vector<SceneObject>(10);
+  std::vector<SceneObject> m_distractionObjects2 = std::vector<SceneObject>(10);
   std::vector<SceneObject> m_targetObjects = std::vector<SceneObject>(15);
   std::vector<SceneObject> m_netObjects = std::vector<SceneObject>(1);
 
@@ -142,6 +144,8 @@ public:
 private:
   // Modelos
   Model m_distractionModel;
+  Model m_distractionModel1;
+  Model m_distractionModel2;
   Model m_targetModel;
   Model m_netModel;
   Model m_skyModel;
@@ -152,6 +156,8 @@ private:
 
   // Lista de objetos do jogo
   std::list<GameObject> m_distractions;
+  std::list<GameObject> m_distractions1;
+  std::list<GameObject> m_distractions2;
   std::list<GameObject> m_targets;
   std::list<GameObject> m_nets;
 

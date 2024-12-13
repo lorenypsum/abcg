@@ -43,10 +43,16 @@ void GameEntities::create() {
 
   createSkybox(m_skyProgram); // Cria skybox
   createObject(m_program, m_distractionModel, assetsPath, "bird.obj",
-               "maps/b-feathers.png",
+               "maps/pink.jpg",
+               "maps/texture.jpg"); // Cria objeto de distração
+  createObject(m_program, m_distractionModel1, assetsPath, "bird.obj",
+               "maps/beige.jpg",
+               "maps/texture.jpg"); // Cria objeto de distração
+  createObject(m_program, m_distractionModel2, assetsPath, "bird.obj",
+               "maps/red.jpg",
                "maps/texture.jpg"); // Cria objeto de distração
   createObject(m_program, m_targetModel, assetsPath, "bird.obj",
-               "maps/w-feathers.png", "maps/texture.jpg"); // Cria objeto alvo
+               "maps/white.jpg", "maps/texture.jpg"); // Cria objeto alvo
   createObject(m_program_2, m_netModel, assetsPath, "wicker_basket.obj",
                "maps/wood.jpg", "maps/normal.jpg"); // Cria objeto alvo
 
@@ -60,16 +66,34 @@ void GameEntities::create() {
   setupSceneObjects(m_distractionObjects, // m_sceneObjects
                     -15.0f,               // minX
                     15.0f,                // maxX
-                    -15.0f,                 // minY
+                    -15.0f,               // minY
                     15.0f,                // maxY
                     -50.0f,               // minZ
                     0.0f                  // maxZ
   );                                      // Configura objetos de distração
 
+  setupSceneObjects(m_distractionObjects1, // m_sceneObjects
+                    -15.0f,                // minX
+                    15.0f,                 // maxX
+                    -15.0f,                // minY
+                    15.0f,                 // maxY
+                    -50.0f,                // minZ
+                    0.0f                   // maxZ
+  );                                       // Configura objetos de distração
+
+  setupSceneObjects(m_distractionObjects2, // m_sceneObjects
+                    -15.0f,                // minX
+                    15.0f,                 // maxX
+                    -15.0f,                // minY
+                    15.0f,                 // maxY
+                    -50.0f,                // minZ
+                    0.0f                   // maxZ
+  );                                       // Configura objetos de distração
+
   setupSceneObjects(m_targetObjects, // m_sceneObjects
                     -15.0f,          // minX
                     15.0f,           // maxX
-                    -5.0f,            // minY
+                    -5.0f,           // minY
                     15.0f,           // maxY
                     -50.0f,          // minZ
                     0.0f             // maxZ
@@ -82,15 +106,41 @@ void GameEntities::update(float deltaTime) {
   updateSceneObjects(m_distractionObjects, // m_sceneObjects
                      deltaTime,            // deltaTime
                      15.0f,                // incZ
-                     0.0f,                // incX
+                     0.0f,                 // incX
                      1.0f,                 // incY
                      -50.0f,               // posZ
                      -15.0f,               // minX
                      15.0f,                // maxX
-                     -5.0f,                 // minY
+                     -5.0f,                // minY
                      25.0f,                // maxY
                      -100.0f,              // minZ
                      0.0f                  // maxZ
+  );
+  updateSceneObjects(m_distractionObjects1, // m_sceneObjects
+                     deltaTime,             // deltaTime
+                     15.0f,                 // incZ
+                     2.0f,                  // incX
+                     1.0f,                  // incY
+                     -50.0f,                // posZ
+                     -15.0f,                // minX
+                     15.0f,                 // maxX
+                     -5.0f,                 // minY
+                     25.0f,                 // maxY
+                     -100.0f,               // minZ
+                     0.0f                   // maxZ
+  );
+  updateSceneObjects(m_distractionObjects2, // m_sceneObjects
+                     deltaTime,             // deltaTime
+                     15.0f,                 // incZ
+                     -2.0f,                  // incX
+                     1.0f,                  // incY
+                     -50.0f,                // posZ
+                     -15.0f,                // minX
+                     15.0f,                 // maxX
+                     -5.0f,                 // minY
+                     25.0f,                 // maxY
+                     -100.0f,               // minZ
+                     0.0f                   // maxZ
   );
   // Atualiza objetos de cena de alvo
   updateSceneObjects(m_targetObjects, // m_sceneObjects
@@ -101,7 +151,7 @@ void GameEntities::update(float deltaTime) {
                      -50.0f,          // posZ
                      -15.0f,          // minX
                      15.0f,           // maxX
-                     -5.0f,            // minY
+                     -5.0f,           // minY
                      15.0f,           // maxY
                      -50.0f,          // minZ
                      0.0f             // maxZ
@@ -218,6 +268,8 @@ void GameEntities::paint() {
   // Renderiza objetos de cena
   renderSkybox(m_skyProgram);
   renderObject(m_program, m_distractionModel, m_distractionObjects);
+  renderObject(m_program, m_distractionModel1, m_distractionObjects1);
+  renderObject(m_program, m_distractionModel2, m_distractionObjects2);
   renderObject(m_program, m_targetModel, m_targetObjects);
   renderNet(m_program_2, m_netModel, m_netObjects);
 
@@ -503,6 +555,8 @@ void GameEntities::paintUI() {
 // Finaliza objetos de cena
 void GameEntities::destroy() {
   m_distractionModel.destroy();
+  m_distractionModel1.destroy();
+  m_distractionModel2.destroy();
   m_targetModel.destroy();
   m_netModel.destroy();
   abcg::glDeleteProgram(m_program);
