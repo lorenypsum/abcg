@@ -60,7 +60,7 @@ void GameEntities::create() {
   setupSceneObjects(m_distractionObjects, // m_sceneObjects
                     -15.0f,               // minX
                     15.0f,                // maxX
-                    0.0f,                 // minY
+                    -15.0f,                 // minY
                     15.0f,                // maxY
                     -50.0f,               // minZ
                     0.0f                  // maxZ
@@ -69,11 +69,43 @@ void GameEntities::create() {
   setupSceneObjects(m_targetObjects, // m_sceneObjects
                     -15.0f,          // minX
                     15.0f,           // maxX
-                    0.0f,            // minY
+                    -5.0f,            // minY
                     15.0f,           // maxY
                     -50.0f,          // minZ
                     0.0f             // maxZ
   );                                 // Configura objetos alvo
+}
+
+// Atualiza objetos de cena
+void GameEntities::update(float deltaTime) {
+  // Atualiza objetos de cena de distração
+  updateSceneObjects(m_distractionObjects, // m_sceneObjects
+                     deltaTime,            // deltaTime
+                     15.0f,                // incZ
+                     0.0f,                // incX
+                     1.0f,                 // incY
+                     -50.0f,               // posZ
+                     -15.0f,               // minX
+                     15.0f,                // maxX
+                     -5.0f,                 // minY
+                     25.0f,                // maxY
+                     -100.0f,              // minZ
+                     0.0f                  // maxZ
+  );
+  // Atualiza objetos de cena de alvo
+  updateSceneObjects(m_targetObjects, // m_sceneObjects
+                     deltaTime,       // deltaTime
+                     10.0f,           // incZ
+                     0.0f,            // incX
+                     0.0f,            // incY
+                     -50.0f,          // posZ
+                     -15.0f,          // minX
+                     15.0f,           // maxX
+                     -5.0f,            // minY
+                     15.0f,           // maxY
+                     -50.0f,          // minZ
+                     0.0f             // maxZ
+  );
 }
 
 void GameEntities::createSkybox(GLuint &program) {
@@ -418,38 +450,6 @@ bool GameEntities::checkCollisionWithNet(
   return false;
 }
 
-// Atualiza objetos de cena
-void GameEntities::update(float deltaTime) {
-  // Atualiza objetos de cena de distração
-  updateSceneObjects(m_distractionObjects, // m_sceneObjects
-                     deltaTime,            // deltaTime
-                     15.0f,                // incZ
-                     -1.0f,                // incX
-                     0.0f,                 // incY
-                     -50.0f,               // posZ
-                     -15.0f,               // minX
-                     15.0f,                // maxX
-                     0.0f,                 // minY
-                     25.0f,                // maxY
-                     -100.0f,              // minZ
-                     0.0f                  // maxZ
-  );
-  // Atualiza objetos de cena de alvo
-  updateSceneObjects(m_targetObjects, // m_sceneObjects
-                     deltaTime,       // deltaTime
-                     10.0f,           // incZ
-                     0.0f,            // incX
-                     0.0f,            // incY
-                     -50.0f,          // posZ
-                     -15.0f,          // minX
-                     15.0f,           // maxX
-                     0.0f,            // minY
-                     15.0f,           // maxY
-                     -50.0f,          // minZ
-                     0.0f             // maxZ
-  );
-}
-
 // Renderiza UI
 // TODO: Ter uma matriz de projeção diferente para o cenário 3D
 void GameEntities::paintUI() {
@@ -487,13 +487,12 @@ void GameEntities::paintUI() {
         m_projMatrix =
             glm::perspective(glm::radians(m_FOV), aspect, 0.05f,
                              100.0f); // Matriz de projeção de perspectiva
-
-        ImGui::SliderFloat("Zoom", &m_viewMatrix[3][2], -10.0f, 10.0f);
+        ImGui::SliderFloat("Size", &m_viewMatrix[3][2], -10.0f, 10.0f);
       } else {
         m_projMatrix =
             glm::perspective(glm::radians(m_FOV), aspect, 0.01f,
                              100.0f); // Matriz de projeção de perspectiv
-        ImGui::SliderFloat("FOV", &m_FOV, 5.0f, 179.0f, "%.0f degrees");
+        ImGui::SliderFloat("View", &m_FOV, 5.0f, 179.0f, "%.0f degrees");
       }
       ImGui::PopItemWidth(); // Finaliza configurações do widget
     }

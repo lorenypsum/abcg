@@ -46,8 +46,8 @@ public:
   Net m_net;
 
   // Vetores de objetos de cena
-  std::vector<SceneObject> m_distractionObjects = std::vector<SceneObject>(20);
-  std::vector<SceneObject> m_targetObjects = std::vector<SceneObject>(30);
+  std::vector<SceneObject> m_distractionObjects = std::vector<SceneObject>(10);
+  std::vector<SceneObject> m_targetObjects = std::vector<SceneObject>(15);
   std::vector<SceneObject> m_netObjects = std::vector<SceneObject>(1);
 
   // Número de triângulos
