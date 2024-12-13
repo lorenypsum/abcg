@@ -258,11 +258,11 @@ void Model::loadObj(std::string_view path, bool standardize) {
     m_Kd = {mat.diffuse[0], mat.diffuse[1], mat.diffuse[2], 1};
     m_Ks = {mat.specular[0], mat.specular[1], mat.specular[2], 1};
     m_shininess = mat.shininess;
-    // if (!mat.normal_texname.empty()) {
-    //   loadNormalTexture(basePath + mat.normal_texname);
-    // } else if (!mat.bump_texname.empty()) {
-    //   loadNormalTexture(basePath + mat.bump_texname);
-    // }
+    if (!mat.normal_texname.empty()) {
+      loadNormalTexture(basePath + mat.normal_texname);
+    } else if (!mat.bump_texname.empty()) {
+      loadNormalTexture(basePath + mat.bump_texname);
+    }
     if (!mat.diffuse_texname.empty())
       loadDiffuseTexture(basePath + mat.diffuse_texname);
 
@@ -316,11 +316,6 @@ void Model::render(int numTriangles) const {
   // Define parâmetros de repetição de textura
   abcg::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   abcg::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-  // Define parâmetros de minificação e magnificação para a textura cúbica
-  abcg::glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
-  abcg::glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
-
 
   // Calcula o número de índices a serem desenhados
   auto const numIndices{(numTriangles < 0) ? m_indices.size()
