@@ -1,4 +1,3 @@
-// Vertex Shader
 #version 300 es
 
 layout(location = 0) in vec3 inPosition;
@@ -9,16 +8,8 @@ uniform mat4 viewMatrix;
 uniform mat4 projMatrix;
 
 void main() {
-    fragTexCoord = normalize(inPosition); // Pass normalized coordinates to the fragment shader
+  fragTexCoord = inPosition;
 
-    // Ensure viewMatrix does not translate the cubemap, keeping it sharp
-    mat4 viewMatrixNoTranslation = mat4(
-        vec4(viewMatrix[0].xyz, 0.0),
-        vec4(viewMatrix[1].xyz, 0.0),
-        vec4(viewMatrix[2].xyz, 0.0),
-        vec4(0.0, 0.0, 0.0, 1.0)
-    );
-
-    vec4 P = projMatrix * viewMatrixNoTranslation * vec4(inPosition, 1.0);
-    gl_Position = P.xyww;
+  vec4 P = projMatrix * viewMatrix * vec4(inPosition, 1.0);
+  gl_Position = P.xyww;
 }
