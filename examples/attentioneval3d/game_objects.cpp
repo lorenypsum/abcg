@@ -79,7 +79,7 @@ void GameEntities::create() {
 void GameEntities::createSkybox(GLuint &program) {
   auto const assetsPath{abcg::Application::getAssetsPath()};
 
-  m_skyModel.loadCubeTexture(assetsPath + "maps/cubi/");
+  m_skyModel.loadCubeTexture(assetsPath + "maps/cube/");
 
   // Generate VBO
   abcg::glGenBuffers(1, &m_skyVBO);
