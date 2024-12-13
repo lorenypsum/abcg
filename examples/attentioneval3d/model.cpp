@@ -317,6 +317,11 @@ void Model::render(int numTriangles) const {
   abcg::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   abcg::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
+  // Define parâmetros de minificação e magnificação para a textura cúbica
+  abcg::glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+  abcg::glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+
+
   // Calcula o número de índices a serem desenhados
   auto const numIndices{(numTriangles < 0) ? m_indices.size()
                                            : numTriangles * 3};

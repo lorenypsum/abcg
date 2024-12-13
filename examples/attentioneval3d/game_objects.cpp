@@ -1,11 +1,11 @@
 #include "game_objects.hpp"
+#include "imfilebrowser.h"
 #include <SDL_image.h>
 #include <glm/gtc/random.hpp>
 #include <glm/gtx/fast_trigonometry.hpp>
 #include <iostream>
 #include <stdio.h>
 #include <unicode/unistr.h>
-#include "imfilebrowser.h"
 
 // Cria Entidades do Jogo
 void GameEntities::create() {
@@ -28,14 +28,13 @@ void GameEntities::create() {
        {.source = assetsPath + "shaders/normalmapping.frag",
         .stage = abcg::ShaderStage::Fragment}}); // Programa de shader
 
-      // Create skybox program
+  // Create skybox program
   // Configurações de luz
   m_skyProgram = abcg::createOpenGLProgram(
       {{.source = assetsPath + "shaders/skybox.vert",
         .stage = abcg::ShaderStage::Vertex},
        {.source = assetsPath + "shaders/skybox.frag",
-        .stage = abcg::ShaderStage::Fragment}}); // Programa de shader      
-
+        .stage = abcg::ShaderStage::Fragment}}); // Programa de shader
 
   // Camera em posição inicial
   glm::vec3 const eye{0.0f, 0.0f, 0.0f}; // Posição da câmera (origem)
@@ -86,7 +85,7 @@ void GameEntities::createSkybox(GLuint &program) {
   abcg::glGenBuffers(1, &m_skyVBO);
   abcg::glBindBuffer(GL_ARRAY_BUFFER, m_skyVBO);
   abcg::glBufferData(GL_ARRAY_BUFFER, sizeof(m_skyPositions),
-                     m_skyPositions.data(), GL_DYNAMIC_DRAW);
+                     m_skyPositions.data(), GL_STATIC_DRAW);
   abcg::glBindBuffer(GL_ARRAY_BUFFER, 0);
 
   // Get location of attributes in the program
@@ -189,7 +188,6 @@ void GameEntities::paint() {
   renderObject(m_program, m_distractionModel, m_distractionObjects);
   renderObject(m_program, m_targetModel, m_targetObjects);
   renderNet(m_program_2, m_netModel, m_netObjects);
-  
 
   // Finaliza
   abcg::glUseProgram(0);
@@ -359,10 +357,8 @@ void GameEntities::renderNet(GLuint &program, Model &m_model,
 void GameEntities::renderSkybox(GLuint &program) {
   abcg::glUseProgram(program);
 
-  auto const viewMatrixLoc{
-      abcg::glGetUniformLocation(program, "viewMatrix")};
-  auto const projMatrixLoc{
-      abcg::glGetUniformLocation(program, "projMatrix")};
+  auto const viewMatrixLoc{abcg::glGetUniformLocation(program, "viewMatrix")};
+  auto const projMatrixLoc{abcg::glGetUniformLocation(program, "projMatrix")};
   auto const skyTexLoc{abcg::glGetUniformLocation(program, "skyTex")};
 
   auto const viewMatrix{m_trackBallLight.getRotation()};
@@ -379,7 +375,7 @@ void GameEntities::renderSkybox(GLuint &program) {
   abcg::glFrontFace(GL_CW);
   abcg::glDepthFunc(GL_LEQUAL);
   abcg::glDrawArrays(GL_TRIANGLES, 0, m_skyPositions.size());
-
+  abcg::glDepthFunc(GL_LESS);
   abcg::glBindVertexArray(0);
   abcg::glUseProgram(0);
 }
