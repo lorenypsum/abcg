@@ -312,43 +312,6 @@ void GameEntities::renderNet(GLuint &program, Model &m_model,
   }
 }
 
-
-// // Verifica se um objeto de cena foi clicado e o remove
-// bool GameEntities::checkClickOnObject(
-//     glm::vec3 const &clickPos, glm::mat4 const &viewMatrix,
-//     glm::mat4 const &projMatrix, std::vector<SceneObject> &m_sceneObjects) {
-
-//   // Iterador para percorrer e remover objetos
-//   for (auto it = m_sceneObjects.begin(); it != m_sceneObjects.end(); ++it) {
-//     auto &sceneObject = *it;
-
-//     glm::vec3 sceneObjectPosition =
-//         sceneObject.m_position; // Posição 3D do objeto de cena (pássaro)
-
-//     // Converte a posição do objeto de cena para o espaço da tela
-//     glm::vec4 sceneObjectClipSpace =
-//         projMatrix * viewMatrix * glm::vec4(sceneObjectPosition, 1.0f);
-//     // Normaliza no espaço de recorte
-//     sceneObjectClipSpace /= sceneObjectClipSpace.w;
-
-//     // A posição do objeto que está em -1 a 1 é escalada para o tamanho da tela
-//     glm::vec2 sceneObjectScreenPos = {
-//         (sceneObjectClipSpace.x * 0.5f + 0.5f) * m_viewportSize.x,
-//         (1.0f - (sceneObjectClipSpace.y * 0.5f + 0.5f)) * m_viewportSize.y};
-
-//     // Distância no espaço da tela (clique projetado em 2D)
-//     float halfSize = 300.0f; // Tamanho do objeto em pixels na tela
-//     if (glm::distance(glm::vec3(clickPos.x, clickPos.y, clickPos.z),
-//                       glm::vec3(sceneObjectScreenPos, 0.0f)) <= halfSize) {
-//       // Remove o objeto clicado da cena
-//       return true; // Clique reconhecido
-//     }
-//   }
-
-//   // Nenhum objeto na cena foi clicado
-//   return false;
-// }
-
 bool GameEntities::checkCollisionWithNet(
     glm::vec3 const &netPosition, float netRadius,
     std::vector<SceneObject> &m_sceneObjects, float objectRadius) { 

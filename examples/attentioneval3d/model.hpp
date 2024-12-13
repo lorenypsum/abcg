@@ -15,7 +15,7 @@ struct Vertex {
 // Classe que representa um modelo 3D
 class Model {
 public:
-  // void loadCubeTexture(std::string const &path);
+  void loadCubeTexture(std::string const &path);
   void loadNormalTexture(std::string_view path);
 
   // Funções de configuração do modelo
@@ -42,7 +42,7 @@ public:
 private:
   // VAO, VBO e EBO
   GLuint m_normalTexture{};
-  // GLuint m_cubeTexture{};
+  GLuint m_cubeTexture{};
   GLuint m_diffuseTexture{};
   GLuint m_VAO{};
   GLuint m_VBO{};

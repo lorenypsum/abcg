@@ -136,16 +136,15 @@ void Model::createBuffers() {
   abcg::glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-// TODO: Usar textura de cubo para configuração de ambiente
-// void Model::loadCubeTexture(std::string const &path) {
-//   if (!std::filesystem::exists(path))
-//     return;
+void Model::loadCubeTexture(std::string const &path) {
+  if (!std::filesystem::exists(path))
+    return;
 
-//   abcg::glDeleteTextures(1, &m_cubeTexture);
-//   m_cubeTexture = abcg::loadOpenGLCubemap(
-//       {.paths = {path + "posx.jpg", path + "negx.jpg", path + "posy.jpg",
-//                  path + "negy.jpg", path + "posz.jpg", path + "negz.jpg"}});
-// }
+  abcg::glDeleteTextures(1, &m_cubeTexture);
+  m_cubeTexture = abcg::loadOpenGLCubemap(
+      {.paths = {path + "posx.jpg", path + "negx.jpg", path + "posy.jpg",
+                 path + "negy.jpg", path + "posz.jpg", path + "negz.jpg"}});
+}
 
 void Model::loadNormalTexture(std::string_view path) {
   if (!std::filesystem::exists(path))
@@ -302,6 +301,14 @@ void Model::render(int numTriangles) const {
   abcg::glActiveTexture(GL_TEXTURE0);
   abcg::glBindTexture(GL_TEXTURE_2D, m_diffuseTexture);
 
+  // Ativa e vincula a textura normal
+  abcg::glActiveTexture(GL_TEXTURE1);
+  abcg::glBindTexture(GL_TEXTURE_2D, m_normalTexture);
+
+  // Ativa e vincula a textura para o ambiente cúbico
+  abcg::glActiveTexture(GL_TEXTURE2);
+  abcg::glBindTexture(GL_TEXTURE_CUBE_MAP, m_cubeTexture);
+
   // Define parâmetros de minificação e magnificação
   abcg::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   abcg::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -397,8 +404,8 @@ void Model::standardize() {
 // Destrói buffers
 void Model::destroy() {
   // Deleta texturas e buffers
-  // abcg::glDeleteTextures(1, &m_cubeTexture);
-  // abcg::glDeleteTextures(1, &m_normalTexture);
+  abcg::glDeleteTextures(1, &m_cubeTexture);
+  abcg::glDeleteTextures(1, &m_normalTexture);
   abcg::glDeleteTextures(1, &m_diffuseTexture);
   abcg::glDeleteBuffers(1, &m_EBO);
   abcg::glDeleteBuffers(1, &m_VBO);
