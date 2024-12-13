@@ -464,8 +464,8 @@ void GameEntities::paintUI() {
       ImGui::PushItemWidth(120);         // Largura do item
       static std::size_t currentIndex{}; // Índice atual
       // Itens do combo
-      std::vector<std::string> const comboItems{"Treinamento",
-                                                "Vôo dos Pássaros"};
+      std::vector<std::string> const comboItems{"Vôo dos Pássaros",
+                                                "Cenário 3D"}; // Itens do combo
       // Cria combo
       if (ImGui::BeginCombo("Projeção", comboItems.at(currentIndex).c_str())) {
         for (auto const index : iter::range(comboItems.size())) {
@@ -485,14 +485,15 @@ void GameEntities::paintUI() {
                         gsl::narrow<float>(m_viewportSize.y)};
       if (currentIndex == 0) {
         m_projMatrix =
-            glm::perspective(glm::radians(m_FOV), aspect, 0.01f,
+            glm::perspective(glm::radians(m_FOV), aspect, 0.05f,
                              100.0f); // Matriz de projeção de perspectiva
 
         ImGui::SliderFloat("FOV", &m_FOV, 5.0f, 179.0f, "%.0f degrees");
       } else {
         m_projMatrix =
-            glm::ortho(-20.0f * aspect, 20.0f * aspect, -20.0f, 20.0f, 0.01f,
-                       100.0f); // Matriz de projeção ortográfica
+            glm::perspective(glm::radians(m_FOV), aspect, 0.01f,
+                             100.0f); // Matriz de projeção de perspectiva
+        ImGui::SliderFloat("FOV", &m_FOV, 5.0f, 179.0f, "%.0f degrees");
       }
       ImGui::PopItemWidth(); // Finaliza configurações do widget
     }
