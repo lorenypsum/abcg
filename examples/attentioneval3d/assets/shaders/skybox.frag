@@ -1,3 +1,4 @@
+// Fragment Shader
 #version 300 es
 
 precision mediump float;
@@ -8,4 +9,7 @@ out vec4 outColor;
 
 uniform samplerCube skyTex;
 
-void main() { outColor = texture(skyTex, fragTexCoord); }
+void main() {
+    // Directly sample the cubemap texture with normalized coordinates
+    outColor = texture(skyTex, fragTexCoord);
+}

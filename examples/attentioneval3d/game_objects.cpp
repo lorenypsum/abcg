@@ -80,13 +80,13 @@ void GameEntities::create() {
 void GameEntities::createSkybox(GLuint &program) {
   auto const assetsPath{abcg::Application::getAssetsPath()};
 
-  m_skyModel.loadCubeTexture(assetsPath + "maps/cube/");
+  m_skyModel.loadCubeTexture(assetsPath + "maps/cubi/");
 
   // Generate VBO
   abcg::glGenBuffers(1, &m_skyVBO);
   abcg::glBindBuffer(GL_ARRAY_BUFFER, m_skyVBO);
   abcg::glBufferData(GL_ARRAY_BUFFER, sizeof(m_skyPositions),
-                     m_skyPositions.data(), GL_STATIC_DRAW);
+                     m_skyPositions.data(), GL_DYNAMIC_DRAW);
   abcg::glBindBuffer(GL_ARRAY_BUFFER, 0);
 
   // Get location of attributes in the program
@@ -101,7 +101,7 @@ void GameEntities::createSkybox(GLuint &program) {
 
   abcg::glBindBuffer(GL_ARRAY_BUFFER, m_skyVBO);
   abcg::glEnableVertexAttribArray(positionAttribute);
-  abcg::glVertexAttribPointer(positionAttribute, 3, GL_FLOAT, GL_FALSE, 0,
+  abcg::glVertexAttribPointer(positionAttribute, 3, GL_FLOAT, GL_TRUE, 0,
                               nullptr);
   abcg::glBindBuffer(GL_ARRAY_BUFFER, 0);
 
