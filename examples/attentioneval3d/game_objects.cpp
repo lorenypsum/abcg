@@ -28,6 +28,13 @@ void GameEntities::create() {
        {.source = assetsPath + "shaders/normalmapping.frag",
         .stage = abcg::ShaderStage::Fragment}}); // Programa de shader
 
+      // Create skybox program
+  // Configurações de luz
+  m_skyProgram = abcg::createOpenGLProgram(
+      {{.source = assetsPath + "shaders/skybox.vert",
+        .stage = abcg::ShaderStage::Vertex},
+       {.source = assetsPath + "shaders/skybox.frag",
+        .stage = abcg::ShaderStage::Fragment}}); // Programa de shader      
 
 
   // Camera em posição inicial
@@ -35,12 +42,12 @@ void GameEntities::create() {
   glm::vec3 const at{0.0f, 0.0f, -1.0f}; // Olhar da câmera (eixo z)
   glm::vec3 const up{0.0f, 1.0f, 0.0f};  // Vetor up da câmera (eixo y)
 
-  createSkybox(); // Cria skybox
+  createSkybox(m_skyProgram); // Cria skybox
   createObject(m_program, m_distractionModel, assetsPath, "bird.obj",
                "maps/b-feathers.png",
-               "maps/normal.jpg"); // Cria objeto de distração
+               "maps/texture.jpg"); // Cria objeto de distração
   createObject(m_program, m_targetModel, assetsPath, "bird.obj",
-               "maps/w-feathers.png", "maps/normal.jpg"); // Cria objeto alvo
+               "maps/w-feathers.png", "maps/texture.jpg"); // Cria objeto alvo
   createObject(m_program_2, m_netModel, assetsPath, "wicker_basket.obj",
                "maps/wood.jpg", "maps/normal.jpg"); // Cria objeto alvo
 
@@ -70,18 +77,10 @@ void GameEntities::create() {
   );                                 // Configura objetos alvo
 }
 
-void GameEntities::createSkybox() {
+void GameEntities::createSkybox(GLuint &program) {
   auto const assetsPath{abcg::Application::getAssetsPath()};
 
-  m_model.loadCubeTexture(assetsPath + "maps/cube/");
-
-    // Create skybox program
-  // Configurações de luz
-  m_skyProgram = abcg::createOpenGLProgram(
-      {{.source = assetsPath + "shaders/skybox.vert",
-        .stage = abcg::ShaderStage::Vertex},
-       {.source = assetsPath + "shaders/skybox.frag",
-        .stage = abcg::ShaderStage::Fragment}}); // Programa de shader
+  m_skyModel.loadCubeTexture(assetsPath + "maps/cube/");
 
   // Generate VBO
   abcg::glGenBuffers(1, &m_skyVBO);
@@ -92,7 +91,7 @@ void GameEntities::createSkybox() {
 
   // Get location of attributes in the program
   auto const positionAttribute{
-      abcg::glGetAttribLocation(m_skyProgram, "inPosition")};
+      abcg::glGetAttribLocation(program, "inPosition")};
 
   // Create VAO
   abcg::glGenVertexArrays(1, &m_skyVAO);
@@ -186,7 +185,7 @@ void GameEntities::paint() {
   abcg::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Limpa a tela
 
   // Renderiza objetos de cena
-  renderSkybox();
+  renderSkybox(m_skyProgram);
   renderObject(m_program, m_distractionModel, m_distractionObjects);
   renderObject(m_program, m_targetModel, m_targetObjects);
   renderNet(m_program_2, m_netModel, m_netObjects);
@@ -357,14 +356,14 @@ void GameEntities::renderNet(GLuint &program, Model &m_model,
   }
 }
 
-void GameEntities::renderSkybox() {
-  abcg::glUseProgram(m_skyProgram);
+void GameEntities::renderSkybox(GLuint &program) {
+  abcg::glUseProgram(program);
 
   auto const viewMatrixLoc{
-      abcg::glGetUniformLocation(m_skyProgram, "viewMatrix")};
+      abcg::glGetUniformLocation(program, "viewMatrix")};
   auto const projMatrixLoc{
-      abcg::glGetUniformLocation(m_skyProgram, "projMatrix")};
-  auto const skyTexLoc{abcg::glGetUniformLocation(m_skyProgram, "skyTex")};
+      abcg::glGetUniformLocation(program, "projMatrix")};
+  auto const skyTexLoc{abcg::glGetUniformLocation(program, "skyTex")};
 
   auto const viewMatrix{m_trackBallLight.getRotation()};
   abcg::glUniformMatrix4fv(viewMatrixLoc, 1, GL_FALSE, &viewMatrix[0][0]);
@@ -374,7 +373,7 @@ void GameEntities::renderSkybox() {
   abcg::glBindVertexArray(m_skyVAO);
 
   abcg::glActiveTexture(GL_TEXTURE0);
-  abcg::glBindTexture(GL_TEXTURE_CUBE_MAP, m_model.getCubeTexture());
+  abcg::glBindTexture(GL_TEXTURE_CUBE_MAP, m_skyModel.getCubeTexture());
 
   abcg::glEnable(GL_CULL_FACE);
   abcg::glFrontFace(GL_CW);
@@ -386,8 +385,8 @@ void GameEntities::renderSkybox() {
   abcg::glUseProgram(0);
 }
 
-void GameEntities::destroySkybox() const {
-  abcg::glDeleteProgram(m_skyProgram);
+void GameEntities::destroySkybox(GLuint &program) const {
+  abcg::glDeleteProgram(program);
   abcg::glDeleteBuffers(1, &m_skyVBO);
   abcg::glDeleteVertexArrays(1, &m_skyVAO);
 }

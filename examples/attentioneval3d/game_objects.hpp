@@ -99,9 +99,9 @@ public:
                              std::vector<SceneObject> &m_sceneObjects,
                              float objectRadius);
   void loadObj(std::string_view path, bool standardize = true);
-  void createSkybox();
-  void renderSkybox();
-  void destroySkybox() const;
+  void createSkybox(GLuint &program);
+  void renderSkybox(GLuint &program);
+  void destroySkybox(GLuint &program) const;
 
   // Skybox
   GLuint m_skyVAO{};
@@ -144,7 +144,7 @@ private:
   Model m_distractionModel;
   Model m_targetModel;
   Model m_netModel;
-  Model m_model;
+  Model m_skyModel;
 
   TrackBall m_trackBallModel;
   TrackBall m_trackBallLight;

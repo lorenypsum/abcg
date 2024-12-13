@@ -171,27 +171,6 @@ void Window::onResize(glm::ivec2 const &size) {
 // Eventos de clique do mouse
 // TODO: Incluir toque na tela
 void Window::onEvent(SDL_Event const &event) {
-  // if (event.type == SDL_MOUSEBUTTONDOWN &&
-  //     event.button.button == SDL_BUTTON_LEFT) {
-  //   if (!m_gameOver) {
-  //     // Converte a posição do clique para coordenadas normalizadas
-  //     auto const clickPos = glm::vec3{
-  //         (event.button.x / static_cast<float>(m_viewportSize.x)) * 2.0f - 1.0f,
-  //         -((event.button.y / static_cast<float>(m_viewportSize.y)) * 2.0f -
-  //           1.0f),
-  //         0.0f};
-
-  //     // Verifica cliques em targets ou distractions
-  //     if (m_objects.checkCollisionWithNet(m_objects.m_net.m_position, 2.0f,
-  //                                         m_objects.m_targetObjects, 2.0f)) {
-  //       m_score += 1; // Pontuação aumenta para cliques corretos
-  //     } else if (m_objects.checkCollisionWithNet(
-  //                    m_objects.m_net.m_position, 2.0f,
-  //                    m_objects.m_targetObjects, 2.0f)) {
-  //       m_score -= 1; // Pontuação diminui para cliques incorretos
-  //     }
-  //   }
-  // }
 
   if (event.type == SDL_KEYDOWN) {
     switch (event.key.keysym.sym) {
