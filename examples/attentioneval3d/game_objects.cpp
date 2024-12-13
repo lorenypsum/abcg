@@ -312,6 +312,85 @@ void GameEntities::renderNet(GLuint &program, Model &m_model,
   }
 }
 
+// Renderiza rede da cena
+void GameEntities::renderScenery(GLuint &program, Model &m_model,
+                             std::vector<SceneObject> &m_scObjects) {
+  abcg::glViewport(0, 0, m_viewportSize.x, m_viewportSize.y); // Viewport
+
+  abcg::glUseProgram(program); // Usa o programa de shader
+
+  m_Ka = m_model.getKa();               // Coeficiente de reflexão ambiente
+  m_Kd = m_model.getKd();               // Coeficiente de reflexão difusa
+  m_Ks = m_model.getKs();               // Coeficiente de reflexão especular
+  m_shininess = m_model.getShininess(); // Brilho
+
+  // Atribui variáveis uniformes
+  auto const viewMatrixLoc{
+      abcg::glGetUniformLocation(program, "viewMatrix")}; // Matriz de visão
+  auto const projMatrixLoc{
+      abcg::glGetUniformLocation(program, "projMatrix")}; // Matriz de projeção
+  auto const modelMatrixLoc{
+      abcg::glGetUniformLocation(program, "modelMatrix")}; // Matriz de modelo
+  auto const normalMatrixLoc{
+      abcg::glGetUniformLocation(program, "normalMatrix")}; // Matriz normal
+  auto const lightDirLoc{
+      abcg::glGetUniformLocation(program, "lightDirWorldSpace")}; // Luz
+  auto const shininessLoc{
+      abcg::glGetUniformLocation(program, "shininess")}; // Brilho
+  auto const IaLoc{
+      abcg::glGetUniformLocation(program, "Ia")}; // Intensidade ambiente
+  auto const IdLoc{
+      abcg::glGetUniformLocation(program, "Id")}; // Intensidade difusa
+  auto const IsLoc{
+      abcg::glGetUniformLocation(program, "Is")}; // Intensidade especular
+  auto const KaLoc{
+      abcg::glGetUniformLocation(program, "Ka")}; // Coeficiente ambiente
+  auto const KdLoc{
+      abcg::glGetUniformLocation(program, "Kd")}; // Coeficiente difuso
+  auto const KsLoc{
+      abcg::glGetUniformLocation(program, "Ks")}; // Coeficiente especular
+  auto const diffuseTexLoc{
+      abcg::glGetUniformLocation(program, "diffuseTex")}; // Textura
+  auto const normalTexLoc{abcg::glGetUniformLocation(program, "normalTex")};
+  auto const lightDirRotated{
+      glm::vec4(0.0f, 0.0f, 1.0f, 1.0f)}; // Luz rotacionada
+
+  // Aplica variáveis uniformes
+  abcg::glUniformMatrix4fv(viewMatrixLoc, 1, GL_FALSE,
+                           &m_viewMatrix[0][0]); // Matriz de visão
+  abcg::glUniformMatrix4fv(projMatrixLoc, 1, GL_FALSE,
+                           &m_projMatrix[0][0]); // Matriz de projeção
+  abcg::glUniform1i(diffuseTexLoc, 0);           // Textura
+  abcg::glUniform1i(normalTexLoc, 1);
+  abcg::glUniform4fv(lightDirLoc, 1, &lightDirRotated.x); // Luz
+  abcg::glUniform4fv(IaLoc, 1, &m_Ia.x); // Intensidade ambiente
+  abcg::glUniform4fv(IdLoc, 1, &m_Id.x); // Intensidade difusa
+  abcg::glUniform4fv(IsLoc, 1, &m_Is.x); // Intensidade especular
+
+  // Aplica variáveis uniformes para o modelo de matriz de protótipo
+  glm::mat4 modelMatrixProt{1.0f}; // Matriz de modelo protótipo
+  abcg::glUniformMatrix4fv(modelMatrixLoc, 1, GL_FALSE,
+                           &modelMatrixProt[0][0]); // Matriz de modelo
+  abcg::glUniform4fv(KaLoc, 1, &m_Ka.x);            // Coeficiente ambiente
+  abcg::glUniform4fv(KdLoc, 1, &m_Kd.x);            // Coeficiente difuso
+  abcg::glUniform4fv(KsLoc, 1, &m_Ks.x);            // Coeficiente especular
+  abcg::glUniform1f(shininessLoc, m_shininess);     // Brilho
+
+  // Renderiza cada objeto de cena
+  for (auto &scObject : m_scObjects) {
+
+    // Computa a matriz de modelo para todos objeto de cena
+    glm::mat4 modelMatrix{1.0f}; // Matriz de modelo
+    modelMatrix = glm::translate(modelMatrix, m_net.m_position);
+    modelMatrix = glm::scale(modelMatrix, glm::vec3(0.2f)); // Ajusta o tamanho
+    modelMatrix = glm::rotate(modelMatrix, 11.0f, m_net.m_rotationAxis);
+
+    // Aplica variáveis uniformes para o modelo
+    abcg::glUniformMatrix4fv(modelMatrixLoc, 1, GL_FALSE, &modelMatrix[0][0]);
+    m_model.render();
+  }
+}
+
 bool GameEntities::checkCollisionWithNet(
     glm::vec3 const &netPosition, float netRadius,
     std::vector<SceneObject> &m_sceneObjects, float objectRadius) { 

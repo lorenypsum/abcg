@@ -85,6 +85,8 @@ public:
                     std::vector<SceneObject> &m_sceneObjects);
   void renderNet(GLuint &program, Model &m_model,
                  std::vector<SceneObject> &m_scObjects);
+  void renderScenery(GLuint &program, Model &m_model,
+                 std::vector<SceneObject> &m_scObjects);               
   void randomizeSceneObject(SceneObject &sceneObject, float minX, float maxX,
                             float minY, float maxY, float minZ, float maxZ);
   void updateObjects(float deltaTime);
