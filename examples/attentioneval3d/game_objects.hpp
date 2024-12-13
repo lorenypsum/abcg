@@ -4,6 +4,7 @@
 #include "abcgOpenGL.hpp"
 // #include "gamedata.hpp"
 #include "model.hpp"
+#include "trackball.hpp"
 #include <glm/vec2.hpp>
 #include <list>
 #include <random>
@@ -86,7 +87,7 @@ public:
   void renderNet(GLuint &program, Model &m_model,
                  std::vector<SceneObject> &m_scObjects);
   void renderScenery(GLuint &program, Model &m_model,
-                 std::vector<SceneObject> &m_scObjects);               
+                     std::vector<SceneObject> &m_scObjects);
   void randomizeSceneObject(SceneObject &sceneObject, float minX, float maxX,
                             float minY, float maxY, float minZ, float maxZ);
   void updateObjects(float deltaTime);
@@ -98,6 +99,36 @@ public:
                              std::vector<SceneObject> &m_sceneObjects,
                              float objectRadius);
   void loadObj(std::string_view path, bool standardize = true);
+  void createSkybox();
+  void renderSkybox();
+  void destroySkybox() const;
+
+  // Skybox
+  GLuint m_skyVAO{};
+  GLuint m_skyVBO{};
+  GLuint m_skyProgram{};
+
+  // clang-format off
+  std::array<glm::vec3, 36> const m_skyPositions{{
+      // Front
+      {-1, -1, +1}, {+1, -1, +1}, {+1, +1, +1},
+      {-1, -1, +1}, {+1, +1, +1}, {-1, +1, +1},
+      // Back
+      {+1, -1, -1}, {-1, -1, -1}, {-1, +1, -1},
+      {+1, -1, -1}, {-1, +1, -1}, {+1, +1, -1},
+      // Right
+      {+1, -1, -1}, {+1, +1, -1}, {+1, +1, +1},
+      {+1, -1, -1}, {+1, +1, +1}, {+1, -1, +1},
+      // Left
+      {-1, -1, +1}, {-1, +1, +1}, {-1, +1, -1},
+      {-1, -1, +1}, {-1, +1, -1}, {-1, -1, -1},
+      // Top
+      {-1, +1, +1}, {+1, +1, +1}, {+1, +1, -1},
+      {-1, +1, +1}, {+1, +1, -1}, {-1, +1, -1},
+      // Bottom
+      {-1, -1, -1}, {+1, -1, -1}, {+1, -1, +1},
+      {-1, -1, -1}, {+1, -1, +1}, {-1, -1, +1}}};
+  // clang-format on
 
   // Definição matrizes de projeção e visão
   glm::ivec2 m_viewportSize{};
@@ -113,6 +144,11 @@ private:
   Model m_distractionModel;
   Model m_targetModel;
   Model m_netModel;
+  Model m_model;
+
+  TrackBall m_trackBallModel;
+  TrackBall m_trackBallLight;
+
 
   // Lista de objetos do jogo
   std::list<GameObject> m_distractions;

@@ -37,7 +37,7 @@ public:
   [[nodiscard]] glm::vec4 getKs() const { return m_Ks; }
   [[nodiscard]] float getShininess() const { return m_shininess; }
   [[nodiscard]] bool isUVMapped() const { return m_hasTexCoords; }
-  // [[nodiscard]] GLuint getCubeTexture() const { return m_cubeTexture; }
+  [[nodiscard]] GLuint getCubeTexture() const { return m_cubeTexture; }
 
 private:
   // VAO, VBO e EBO

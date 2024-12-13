@@ -1,4 +1,5 @@
 #include "window.hpp"
+#include "imfilebrowser.h"
 
 // Converte um valor hexadecimal em um vetor de 3 componentes
 glm::vec3 hexToVec3(uint32_t hexValue) {

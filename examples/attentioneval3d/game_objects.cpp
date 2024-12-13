@@ -5,6 +5,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <unicode/unistr.h>
+#include "imfilebrowser.h"
 
 // Cria Entidades do Jogo
 void GameEntities::create() {
@@ -27,11 +28,14 @@ void GameEntities::create() {
        {.source = assetsPath + "shaders/normalmapping.frag",
         .stage = abcg::ShaderStage::Fragment}}); // Programa de shader
 
+
+
   // Camera em posição inicial
   glm::vec3 const eye{0.0f, 0.0f, 0.0f}; // Posição da câmera (origem)
   glm::vec3 const at{0.0f, 0.0f, -1.0f}; // Olhar da câmera (eixo z)
   glm::vec3 const up{0.0f, 1.0f, 0.0f};  // Vetor up da câmera (eixo y)
 
+  createSkybox(); // Cria skybox
   createObject(m_program, m_distractionModel, assetsPath, "bird.obj",
                "maps/b-feathers.png",
                "maps/normal.jpg"); // Cria objeto de distração
@@ -39,7 +43,6 @@ void GameEntities::create() {
                "maps/w-feathers.png", "maps/normal.jpg"); // Cria objeto alvo
   createObject(m_program_2, m_netModel, assetsPath, "wicker_basket.obj",
                "maps/wood.jpg", "maps/normal.jpg"); // Cria objeto alvo
-               
 
   float x = 0.0f;
   float y = -0.3f; // Mantém Y fixo
@@ -65,6 +68,46 @@ void GameEntities::create() {
                     -50.0f,          // minZ
                     0.0f             // maxZ
   );                                 // Configura objetos alvo
+}
+
+void GameEntities::createSkybox() {
+  auto const assetsPath{abcg::Application::getAssetsPath()};
+
+  m_model.loadCubeTexture(assetsPath + "maps/cube/");
+
+    // Create skybox program
+  // Configurações de luz
+  m_skyProgram = abcg::createOpenGLProgram(
+      {{.source = assetsPath + "shaders/skybox.vert",
+        .stage = abcg::ShaderStage::Vertex},
+       {.source = assetsPath + "shaders/skybox.frag",
+        .stage = abcg::ShaderStage::Fragment}}); // Programa de shader
+
+  // Generate VBO
+  abcg::glGenBuffers(1, &m_skyVBO);
+  abcg::glBindBuffer(GL_ARRAY_BUFFER, m_skyVBO);
+  abcg::glBufferData(GL_ARRAY_BUFFER, sizeof(m_skyPositions),
+                     m_skyPositions.data(), GL_STATIC_DRAW);
+  abcg::glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+  // Get location of attributes in the program
+  auto const positionAttribute{
+      abcg::glGetAttribLocation(m_skyProgram, "inPosition")};
+
+  // Create VAO
+  abcg::glGenVertexArrays(1, &m_skyVAO);
+
+  // Bind vertex attributes to current VAO
+  abcg::glBindVertexArray(m_skyVAO);
+
+  abcg::glBindBuffer(GL_ARRAY_BUFFER, m_skyVBO);
+  abcg::glEnableVertexAttribArray(positionAttribute);
+  abcg::glVertexAttribPointer(positionAttribute, 3, GL_FLOAT, GL_FALSE, 0,
+                              nullptr);
+  abcg::glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+  // End of binding to current VAO
+  abcg::glBindVertexArray(0);
 }
 
 // Cria um objeto de cena
@@ -143,9 +186,11 @@ void GameEntities::paint() {
   abcg::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Limpa a tela
 
   // Renderiza objetos de cena
+  renderSkybox();
   renderObject(m_program, m_distractionModel, m_distractionObjects);
   renderObject(m_program, m_targetModel, m_targetObjects);
   renderNet(m_program_2, m_netModel, m_netObjects);
+  
 
   // Finaliza
   abcg::glUseProgram(0);
@@ -225,7 +270,7 @@ void GameEntities::renderObject(GLuint &program, Model &m_model,
         glm::translate(modelMatrix, scObject.m_position); // Posição do objeto
     modelMatrix = glm::scale(modelMatrix, glm::vec3(0.7f)); // Escala do objeto
     modelMatrix = glm::rotate(modelMatrix, m_angle,
-                              scObject.m_rotationAxis); // Rotação do objeto                         
+                              scObject.m_rotationAxis); // Rotação do objeto
 
     // Aplica variáveis uniformes para o modelo
     abcg::glUniformMatrix4fv(modelMatrixLoc, 1, GL_FALSE, &modelMatrix[0][0]);
@@ -312,113 +357,71 @@ void GameEntities::renderNet(GLuint &program, Model &m_model,
   }
 }
 
-// Renderiza rede da cena
-void GameEntities::renderScenery(GLuint &program, Model &m_model,
-                             std::vector<SceneObject> &m_scObjects) {
-  abcg::glViewport(0, 0, m_viewportSize.x, m_viewportSize.y); // Viewport
+void GameEntities::renderSkybox() {
+  abcg::glUseProgram(m_skyProgram);
 
-  abcg::glUseProgram(program); // Usa o programa de shader
-
-  m_Ka = m_model.getKa();               // Coeficiente de reflexão ambiente
-  m_Kd = m_model.getKd();               // Coeficiente de reflexão difusa
-  m_Ks = m_model.getKs();               // Coeficiente de reflexão especular
-  m_shininess = m_model.getShininess(); // Brilho
-
-  // Atribui variáveis uniformes
   auto const viewMatrixLoc{
-      abcg::glGetUniformLocation(program, "viewMatrix")}; // Matriz de visão
+      abcg::glGetUniformLocation(m_skyProgram, "viewMatrix")};
   auto const projMatrixLoc{
-      abcg::glGetUniformLocation(program, "projMatrix")}; // Matriz de projeção
-  auto const modelMatrixLoc{
-      abcg::glGetUniformLocation(program, "modelMatrix")}; // Matriz de modelo
-  auto const normalMatrixLoc{
-      abcg::glGetUniformLocation(program, "normalMatrix")}; // Matriz normal
-  auto const lightDirLoc{
-      abcg::glGetUniformLocation(program, "lightDirWorldSpace")}; // Luz
-  auto const shininessLoc{
-      abcg::glGetUniformLocation(program, "shininess")}; // Brilho
-  auto const IaLoc{
-      abcg::glGetUniformLocation(program, "Ia")}; // Intensidade ambiente
-  auto const IdLoc{
-      abcg::glGetUniformLocation(program, "Id")}; // Intensidade difusa
-  auto const IsLoc{
-      abcg::glGetUniformLocation(program, "Is")}; // Intensidade especular
-  auto const KaLoc{
-      abcg::glGetUniformLocation(program, "Ka")}; // Coeficiente ambiente
-  auto const KdLoc{
-      abcg::glGetUniformLocation(program, "Kd")}; // Coeficiente difuso
-  auto const KsLoc{
-      abcg::glGetUniformLocation(program, "Ks")}; // Coeficiente especular
-  auto const diffuseTexLoc{
-      abcg::glGetUniformLocation(program, "diffuseTex")}; // Textura
-  auto const normalTexLoc{abcg::glGetUniformLocation(program, "normalTex")};
-  auto const lightDirRotated{
-      glm::vec4(0.0f, 0.0f, 1.0f, 1.0f)}; // Luz rotacionada
+      abcg::glGetUniformLocation(m_skyProgram, "projMatrix")};
+  auto const skyTexLoc{abcg::glGetUniformLocation(m_skyProgram, "skyTex")};
 
-  // Aplica variáveis uniformes
-  abcg::glUniformMatrix4fv(viewMatrixLoc, 1, GL_FALSE,
-                           &m_viewMatrix[0][0]); // Matriz de visão
-  abcg::glUniformMatrix4fv(projMatrixLoc, 1, GL_FALSE,
-                           &m_projMatrix[0][0]); // Matriz de projeção
-  abcg::glUniform1i(diffuseTexLoc, 0);           // Textura
-  abcg::glUniform1i(normalTexLoc, 1);
-  abcg::glUniform4fv(lightDirLoc, 1, &lightDirRotated.x); // Luz
-  abcg::glUniform4fv(IaLoc, 1, &m_Ia.x); // Intensidade ambiente
-  abcg::glUniform4fv(IdLoc, 1, &m_Id.x); // Intensidade difusa
-  abcg::glUniform4fv(IsLoc, 1, &m_Is.x); // Intensidade especular
+  auto const viewMatrix{m_trackBallLight.getRotation()};
+  abcg::glUniformMatrix4fv(viewMatrixLoc, 1, GL_FALSE, &viewMatrix[0][0]);
+  abcg::glUniformMatrix4fv(projMatrixLoc, 1, GL_FALSE, &m_projMatrix[0][0]);
+  abcg::glUniform1i(skyTexLoc, 0);
 
-  // Aplica variáveis uniformes para o modelo de matriz de protótipo
-  glm::mat4 modelMatrixProt{1.0f}; // Matriz de modelo protótipo
-  abcg::glUniformMatrix4fv(modelMatrixLoc, 1, GL_FALSE,
-                           &modelMatrixProt[0][0]); // Matriz de modelo
-  abcg::glUniform4fv(KaLoc, 1, &m_Ka.x);            // Coeficiente ambiente
-  abcg::glUniform4fv(KdLoc, 1, &m_Kd.x);            // Coeficiente difuso
-  abcg::glUniform4fv(KsLoc, 1, &m_Ks.x);            // Coeficiente especular
-  abcg::glUniform1f(shininessLoc, m_shininess);     // Brilho
+  abcg::glBindVertexArray(m_skyVAO);
 
-  // Renderiza cada objeto de cena
-  for (auto &scObject : m_scObjects) {
+  abcg::glActiveTexture(GL_TEXTURE0);
+  abcg::glBindTexture(GL_TEXTURE_CUBE_MAP, m_model.getCubeTexture());
 
-    // Computa a matriz de modelo para todos objeto de cena
-    glm::mat4 modelMatrix{1.0f}; // Matriz de modelo
-    modelMatrix = glm::translate(modelMatrix, m_net.m_position);
-    modelMatrix = glm::scale(modelMatrix, glm::vec3(0.2f)); // Ajusta o tamanho
-    modelMatrix = glm::rotate(modelMatrix, 11.0f, m_net.m_rotationAxis);
+  abcg::glEnable(GL_CULL_FACE);
+  abcg::glFrontFace(GL_CW);
+  abcg::glDepthFunc(GL_LEQUAL);
+  abcg::glDrawArrays(GL_TRIANGLES, 0, m_skyPositions.size());
+  abcg::glDepthFunc(GL_LESS);
 
-    // Aplica variáveis uniformes para o modelo
-    abcg::glUniformMatrix4fv(modelMatrixLoc, 1, GL_FALSE, &modelMatrix[0][0]);
-    m_model.render();
-  }
+  abcg::glBindVertexArray(0);
+  abcg::glUseProgram(0);
+}
+
+void GameEntities::destroySkybox() const {
+  abcg::glDeleteProgram(m_skyProgram);
+  abcg::glDeleteBuffers(1, &m_skyVBO);
+  abcg::glDeleteVertexArrays(1, &m_skyVAO);
 }
 
 bool GameEntities::checkCollisionWithNet(
     glm::vec3 const &netPosition, float netRadius,
-    std::vector<SceneObject> &m_sceneObjects, float objectRadius) { 
-    // Para esse caso, netRadius pode ser visto como a "largura" da rede na direção X, Y, Z
-    // Como você tem formas não esféricas, vamos usar uma abordagem AABB
+    std::vector<SceneObject> &m_sceneObjects, float objectRadius) {
+  // Para esse caso, netRadius pode ser visto como a "largura" da rede na
+  // direção X, Y, Z Como você tem formas não esféricas, vamos usar uma
+  // abordagem AABB
 
-    for (auto &sceneObject : m_sceneObjects) {
-        glm::vec3 sceneObjectPosition = sceneObject.m_position;
-        
-        // Definir a caixa delimitadora para o objeto de cena, baseando-se no centro e no raio
-        glm::vec3 minBound = sceneObjectPosition - glm::vec3(objectRadius);
-        glm::vec3 maxBound = sceneObjectPosition + glm::vec3(objectRadius);
-        
-        // Definir a caixa delimitadora para a rede (semelhante)
-        glm::vec3 netMinBound = netPosition - glm::vec3(netRadius);
-        glm::vec3 netMaxBound = netPosition + glm::vec3(netRadius);
+  for (auto &sceneObject : m_sceneObjects) {
+    glm::vec3 sceneObjectPosition = sceneObject.m_position;
 
-        // Verificar se há sobreposição entre as caixas AABB
-        if (minBound.x <= netMaxBound.x && maxBound.x >= netMinBound.x &&
-            minBound.y <= netMaxBound.y && maxBound.y >= netMinBound.y &&
-            minBound.z <= netMaxBound.z && maxBound.z >= netMinBound.z) {
-            // Se as caixas AABB se sobrepõem, há colisão
-            return true;
-        }
+    // Definir a caixa delimitadora para o objeto de cena, baseando-se no centro
+    // e no raio
+    glm::vec3 minBound = sceneObjectPosition - glm::vec3(objectRadius);
+    glm::vec3 maxBound = sceneObjectPosition + glm::vec3(objectRadius);
+
+    // Definir a caixa delimitadora para a rede (semelhante)
+    glm::vec3 netMinBound = netPosition - glm::vec3(netRadius);
+    glm::vec3 netMaxBound = netPosition + glm::vec3(netRadius);
+
+    // Verificar se há sobreposição entre as caixas AABB
+    if (minBound.x <= netMaxBound.x && maxBound.x >= netMinBound.x &&
+        minBound.y <= netMaxBound.y && maxBound.y >= netMinBound.y &&
+        minBound.z <= netMaxBound.z && maxBound.z >= netMinBound.z) {
+      // Se as caixas AABB se sobrepõem, há colisão
+      return true;
     }
+  }
 
-    // Nenhuma colisão detectada
-    return false;
+  // Nenhuma colisão detectada
+  return false;
 }
 
 // Atualiza objetos de cena
