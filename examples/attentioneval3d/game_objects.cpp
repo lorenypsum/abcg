@@ -488,11 +488,11 @@ void GameEntities::paintUI() {
             glm::perspective(glm::radians(m_FOV), aspect, 0.05f,
                              100.0f); // Matriz de projeção de perspectiva
 
-        ImGui::SliderFloat("FOV", &m_FOV, 5.0f, 179.0f, "%.0f degrees");
+        ImGui::SliderFloat("Zoom", &m_viewMatrix[3][2], -10.0f, 10.0f);
       } else {
         m_projMatrix =
             glm::perspective(glm::radians(m_FOV), aspect, 0.01f,
-                             100.0f); // Matriz de projeção de perspectiva
+                             100.0f); // Matriz de projeção de perspectiv
         ImGui::SliderFloat("FOV", &m_FOV, 5.0f, 179.0f, "%.0f degrees");
       }
       ImGui::PopItemWidth(); // Finaliza configurações do widget
