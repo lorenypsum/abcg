@@ -152,7 +152,6 @@ void Window::detectCollisions() {
 }
 
 // Renderiza a janela
-// TODO: Renderizar o chão/solo
 void Window::onPaint() { m_objects.paint(); }
 
 // Renderiza a interface do usuário
@@ -209,8 +208,7 @@ void Window::onResize(glm::ivec2 const &size) {
   m_objects.m_viewportSize = size;
 }
 
-// Eventos de clique do mouse
-// TODO: Incluir toque na tela
+// Eventos de movimentação do rede/cesto
 void Window::onEvent(SDL_Event const &event) {
 
   if (event.type == SDL_KEYDOWN) {
@@ -230,11 +228,11 @@ void Window::onEvent(SDL_Event const &event) {
     }
   }
 
-  // Limites para evitar que o astronauta saia da tela
+  // Limites para evitar que o cesto saia da tela
   m_objects.m_net.m_position.x =
-      std::clamp(m_objects.m_net.m_position.x, -0.5f, 0.5f);
+      std::clamp(m_objects.m_net.m_position.x, -0.8f, 0.8f);
   m_objects.m_net.m_position.y =
-      std::clamp(m_objects.m_net.m_position.y, -0.5f, 0.5f);
+      std::clamp(m_objects.m_net.m_position.y, -0.8f, 0.8f);
 }
 
 // Inicializa os objetos do jogo em posições aleatórias
@@ -283,12 +281,12 @@ void Window::updateTimeDisplay() {
 // Reinicia o jogo para o estado inicial
 void Window::resetGame() {
   if (m_restartDelay < 0) {
-    m_score = 0;
-    m_lastScore = 0;
-    m_newScore = 0;
-    m_gametime = 30;
-    m_gameOver = false;
-    m_restartDelay = 40;
+    m_score = 0; // Reseta a pontuação
+    m_lastScore = 0; // Reseta a pontuação anterior
+    m_newScore = 0; // Reseta a nova pontuação
+    m_gametime = 30; // Reseta o tempo de jogo
+    m_gameOver = false; // Reseta o estado de game over
+    m_restartDelay = 40; // Reseta o tempo de espera
     m_gameData.m_state = GameState::Start; // Começa do estado Start
     // Recria os objetos e reinicia o tempo de recarga
     m_lastReload = std::chrono::steady_clock::now();
@@ -298,10 +296,10 @@ void Window::resetGame() {
 
 // Reinicia o jogo para o estado inicial
 void Window::startGame() {
-  m_score = 0;
-  m_gametime = 30;
-  m_gameOver = false;
-  m_restartDelay = 40;
+  m_score = 0; // Pontuação inicial
+  m_gametime = 30; // Tempo de jogo inicial
+  m_gameOver = false; // Estado de game over inicial
+  m_restartDelay = 40; // Tempo de espera inicial
   m_gameData.m_state = GameState::Start; // Começa do estado Start
 
   // Recria os objetos e reinicia o tempo de recarga
