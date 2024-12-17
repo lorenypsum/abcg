@@ -403,6 +403,12 @@ A renderização é feita usando **OpenGL**:
 
   1. **Window::resetGame():** Reinicia a pontuação, o tempo e o estado do jogo, além de criar novamente os objetos do jogo.
 
+#### Classe Trackball
+
+	Esta classe não foi alterada em relação ao código fornecido originalmente.
+
+- **Trackball (trackball.hpp e trackball.cpp)**: implementa um trackball virtual para controlar a rotação dos objetos 3D.
+ 	1. Apenas mativemos a implementação original, e outras funções no projeto chamam funções dessa classe para realizar a rotação dos objetos.
 
 ## Avaliação do Projeto e Possíveis Melhorias
 
