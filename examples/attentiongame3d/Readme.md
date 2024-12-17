@@ -79,6 +79,14 @@ o resultado pode ser verificado abaixo:
 
 -- Falta acrescentar imagens (esperando mais respostas).
 
+![alt text](imagen.png)
+![alt text](imagen-1.png)
+![alt text](imagen-2.png)
+![alt text](imagen-3.png)
+![alt text](imagen-4.png)
+![alt text](imagen-5.png)
+![alt text](imagen-6.png)
+
 [Resultado](https://docs.google.com/forms/d/1hA7HiJLJCaGIad1HFRY20SkIu5C4w1KNj6MDwGKEL5U/edit#responses)
 
 ## Funcionalidades do jogo
