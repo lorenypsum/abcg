@@ -18,14 +18,14 @@ void GameEntities::create() {
       {{.source = assetsPath + "shaders/texture.vert",
         .stage = abcg::ShaderStage::Vertex},
        {.source = assetsPath + "shaders/texture.frag",
-        .stage = abcg::ShaderStage::Fragment}}); // Programa de shader
+        .stage = abcg::ShaderStage::Fragment}}); // Programa de shader de textura
 
   // Configurações de luz
   m_program_2 = abcg::createOpenGLProgram(
       {{.source = assetsPath + "shaders/normalmapping.vert",
         .stage = abcg::ShaderStage::Vertex},
        {.source = assetsPath + "shaders/normalmapping.frag",
-        .stage = abcg::ShaderStage::Fragment}}); // Programa de shader
+        .stage = abcg::ShaderStage::Fragment}}); // Programa de shader mapeamento normal de textura
 
   // Create skybox program
   // Configurações de luz
@@ -33,7 +33,7 @@ void GameEntities::create() {
       {{.source = assetsPath + "shaders/skybox.vert",
         .stage = abcg::ShaderStage::Vertex},
        {.source = assetsPath + "shaders/skybox.frag",
-        .stage = abcg::ShaderStage::Fragment}}); // Programa de shader
+        .stage = abcg::ShaderStage::Fragment}}); // Programa de shader de criação de skybox
 
   // Camera em posição inicial
   glm::vec3 const eye{0.0f, 0.0f, 0.0f}; // Posição da câmera (origem)
@@ -55,17 +55,17 @@ void GameEntities::create() {
   createObject(m_program_2, m_netModel, assetsPath, "wicker_basket.obj",
                "maps/wood.jpg", "maps/normal.jpg"); // Cria objeto alvo
 
-  float x = 0.0f;
+  float x = 0.0f; // Mantém X fixo
   float y = -0.3f; // Mantém Y fixo
   float z = -2.0f; // Mantém Z fixo
 
-  m_net.m_position = glm::vec3(x, y, z);
-  m_net.m_rotationAxis = glm::vec3(0.1f, 0.0f, 0.0f);
+  m_net.m_position = glm::vec3(x, y, z); // Posição da rede fixa no [inicio do jogo]
+  m_net.m_rotationAxis = glm::vec3(0.1f, 0.0f, 0.0f); // Eixo de rotação da rede fixo
 
   setupSceneObjects(m_distractionObjects, // m_sceneObjects
-                    -5.0f,               // minX
-                    5.0f,                // maxX
-                    0.0f,               // minY
+                    -5.0f,                // minX
+                    5.0f,                 // maxX
+                    0.0f,                 // minY
                     15.0f,                // maxY
                     -50.0f,               // minZ
                     0.0f                  // maxZ
@@ -78,7 +78,7 @@ void GameEntities::create() {
                     15.0f,                 // maxY
                     -50.0f,                // minZ
                     0.0f                   // maxZ
-  );                                       // Configura objetos de distração
+  );                                       // Configura objetos de distração 1
 
   setupSceneObjects(m_distractionObjects2, // m_sceneObjects
                     -15.0f,                // minX
@@ -87,13 +87,13 @@ void GameEntities::create() {
                     15.0f,                 // maxY
                     -50.0f,                // minZ
                     0.0f                   // maxZ
-  );                                       // Configura objetos de distração
+  );                                       // Configura objetos de distração 2
 
   setupSceneObjects(m_targetObjects, // m_sceneObjects
-                    -3.0f,          // minX
-                    3.0f,           // maxX
-                    0.0f,           // minY
-                    3.0f,           // maxY
+                    -3.0f,           // minX
+                    3.0f,            // maxX
+                    0.0f,            // minY
+                    3.0f,            // maxY
                     -50.0f,          // minZ
                     0.0f             // maxZ
   );                                 // Configura objetos alvo
@@ -108,10 +108,10 @@ void GameEntities::update(float deltaTime) {
                      0.0f,                 // incX
                      1.0f,                 // incY
                      -50.0f,               // posZ
-                     -5.0f,               // minX
-                     5.0f,                // maxX
+                     -5.0f,                // minX
+                     5.0f,                 // maxX
                      -5.0f,                // minY
-                     5.0f,                // maxY
+                     5.0f,                 // maxY
                      -100.0f,              // minZ
                      0.0f                  // maxZ
   );
@@ -131,7 +131,7 @@ void GameEntities::update(float deltaTime) {
   updateSceneObjects(m_distractionObjects2, // m_sceneObjects
                      deltaTime,             // deltaTime
                      15.0f,                 // incZ
-                     -2.0f,                  // incX
+                     -2.0f,                 // incX
                      1.0f,                  // incY
                      -50.0f,                // posZ
                      -15.0f,                // minX
@@ -148,10 +148,10 @@ void GameEntities::update(float deltaTime) {
                      0.0f,            // incX
                      0.0f,            // incY
                      -50.0f,          // posZ
-                     -5.0f,          // minX
-                     5.0f,           // maxX
+                     -5.0f,           // minX
+                     5.0f,            // maxX
                      -5.0f,           // minY
-                     5.0f,           // maxY
+                     5.0f,            // maxY
                      -50.0f,          // minZ
                      0.0f             // maxZ
   );
@@ -160,23 +160,23 @@ void GameEntities::update(float deltaTime) {
 void GameEntities::createSkybox(GLuint &program) {
   auto const assetsPath{abcg::Application::getAssetsPath()};
 
-  m_skyModel.loadCubeTexture(assetsPath + "maps/cube/");
+  m_skyModel.loadCubeTexture(assetsPath + "maps/cube/"); // Textura do skybox
 
-  // Generate VBO
+  // Gera VBO
   abcg::glGenBuffers(1, &m_skyVBO);
   abcg::glBindBuffer(GL_ARRAY_BUFFER, m_skyVBO);
   abcg::glBufferData(GL_ARRAY_BUFFER, sizeof(m_skyPositions),
                      m_skyPositions.data(), GL_STATIC_DRAW);
   abcg::glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-  // Get location of attributes in the program
+  // Pega localização do atributo de posição
   auto const positionAttribute{
       abcg::glGetAttribLocation(program, "inPosition")};
 
-  // Create VAO
+  // Cria VAO
   abcg::glGenVertexArrays(1, &m_skyVAO);
 
-  // Bind vertex attributes to current VAO
+  // Vincula atributos de vértice ao VAO atual
   abcg::glBindVertexArray(m_skyVAO);
 
   abcg::glBindBuffer(GL_ARRAY_BUFFER, m_skyVBO);
@@ -185,7 +185,7 @@ void GameEntities::createSkybox(GLuint &program) {
                               nullptr);
   abcg::glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-  // End of binding to current VAO
+  // Termina a vinculação do VAO aos atributos de vértice
   abcg::glBindVertexArray(0);
 }
 
@@ -260,7 +260,7 @@ void GameEntities::randomizeSceneObject(SceneObject &sceneObject, float minX,
   sceneObject.m_rotationAxis = glm::sphericalRand(1.0f); // Eixo de rotação
 }
 
-// Renderiza objetos de cena
+// Pinta objetos de cena
 void GameEntities::paint() {
   abcg::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Limpa a tela
 
@@ -276,8 +276,7 @@ void GameEntities::paint() {
   abcg::glUseProgram(0);
 }
 
-// TODO: Renderizar solo/chão adequadamente
-// Renderiza objetos de cena
+// Renderiza objetos da cena (distração e alvo)
 void GameEntities::renderObject(GLuint &program, Model &m_model,
                                 std::vector<SceneObject> &m_scObjects) {
   abcg::glViewport(0, 0, m_viewportSize.x, m_viewportSize.y); // Viewport
@@ -356,7 +355,7 @@ void GameEntities::renderObject(GLuint &program, Model &m_model,
   }
 }
 
-// Renderiza rede da cena
+// Renderiza rede/cesto da cena
 void GameEntities::renderNet(GLuint &program, Model &m_model,
                              std::vector<SceneObject> &m_scObjects) {
   abcg::glViewport(0, 0, m_viewportSize.x, m_viewportSize.y); // Viewport
@@ -425,9 +424,9 @@ void GameEntities::renderNet(GLuint &program, Model &m_model,
     glm::mat4 modelMatrix{1.0f}; // Matriz de modelo
     modelMatrix = glm::translate(modelMatrix, m_net.m_position);
     modelMatrix = glm::scale(modelMatrix, glm::vec3(0.2f)); // Ajusta o tamanho
-    modelMatrix = glm::rotate(modelMatrix, 11.0f, m_net.m_rotationAxis);
-    scObject.m_rotationAxis = m_net.m_rotationAxis;
-    scObject.m_position = m_net.m_position;
+    modelMatrix = glm::rotate(modelMatrix, 11.0f, m_net.m_rotationAxis); // Ajusta Rotação
+    scObject.m_rotationAxis = m_net.m_rotationAxis; //Aplique a rotação do objeto cesto
+    scObject.m_position = m_net.m_position; // Aplique a posição do objeto cesto
 
     // Aplica variáveis uniformes para o modelo
     abcg::glUniformMatrix4fv(modelMatrixLoc, 1, GL_FALSE, &modelMatrix[0][0]);
@@ -435,6 +434,7 @@ void GameEntities::renderNet(GLuint &program, Model &m_model,
   }
 }
 
+// Renderiza skybox
 void GameEntities::renderSkybox(GLuint &program) {
   abcg::glUseProgram(program);
 
@@ -461,12 +461,14 @@ void GameEntities::renderSkybox(GLuint &program) {
   abcg::glUseProgram(0);
 }
 
+// Destroi skybox
 void GameEntities::destroySkybox(GLuint &program) const {
   abcg::glDeleteProgram(program);
   abcg::glDeleteBuffers(1, &m_skyVBO);
   abcg::glDeleteVertexArrays(1, &m_skyVAO);
 }
 
+// Verifica colisão com a rede
 bool GameEntities::checkCollisionWithNet(
     glm::vec3 const &netPosition, float netRadius,
     std::vector<SceneObject> &m_sceneObjects, float objectRadius) {
@@ -497,7 +499,6 @@ bool GameEntities::checkCollisionWithNet(
 }
 
 // Renderiza UI
-// TODO: Ter uma matriz de projeção diferente para o cenário 3D
 void GameEntities::paintUI() {
   {
     auto const widgetSize{ImVec2(218, 62)}; // Variável do tamanho do widget

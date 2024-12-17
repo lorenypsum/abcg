@@ -2,7 +2,6 @@
 #define GAME_OBJECTS_HPP_
 
 #include "abcgOpenGL.hpp"
-// #include "gamedata.hpp"
 #include "model.hpp"
 #include "trackball.hpp"
 #include <glm/vec2.hpp>
@@ -38,6 +37,7 @@ public:
     bool checkClick(glm::vec3 const &clickPos) const;
   };
 
+// Estrutura de uma rede/cesto
   struct Net {
     glm::vec3 m_position{};
     glm::vec3 m_rotationAxis{};
@@ -150,9 +150,9 @@ private:
   Model m_netModel;
   Model m_skyModel;
 
+  // Trackball
   TrackBall m_trackBallModel;
   TrackBall m_trackBallLight;
-
 
   // Lista de objetos do jogo
   std::list<GameObject> m_distractions;
@@ -161,7 +161,7 @@ private:
   std::list<GameObject> m_targets;
   std::list<GameObject> m_nets;
 
-  // Programa de shader
+  // Programas de shader
   GLuint m_program{};
   GLuint m_program_2{};
   GLuint m_VAO{};
