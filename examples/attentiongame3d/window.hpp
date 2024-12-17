@@ -37,9 +37,9 @@ public:
 
 
 private:
-  // Programa de shader
-  GLuint m_program{};
-  GLuint m_program_obj{};
+  // // Programa de shader
+  // GLuint m_program{};
+  // GLuint m_program_obj{};
 
   // Variáveis de viewport
   glm::ivec2 m_viewportSize;
