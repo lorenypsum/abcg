@@ -426,6 +426,8 @@ void GameEntities::renderNet(GLuint &program, Model &m_model,
     modelMatrix = glm::translate(modelMatrix, m_net.m_position);
     modelMatrix = glm::scale(modelMatrix, glm::vec3(0.2f)); // Ajusta o tamanho
     modelMatrix = glm::rotate(modelMatrix, 11.0f, m_net.m_rotationAxis);
+    scObject.m_rotationAxis = m_net.m_rotationAxis;
+    scObject.m_position = m_net.m_position;
 
     // Aplica variáveis uniformes para o modelo
     abcg::glUniformMatrix4fv(modelMatrixLoc, 1, GL_FALSE, &modelMatrix[0][0]);
@@ -468,15 +470,12 @@ void GameEntities::destroySkybox(GLuint &program) const {
 bool GameEntities::checkCollisionWithNet(
     glm::vec3 const &netPosition, float netRadius,
     std::vector<SceneObject> &m_sceneObjects, float objectRadius) {
-  // Para esse caso, netRadius pode ser visto como a "largura" da rede na
-  // direção X, Y, Z Como você tem formas não esféricas, vamos usar uma
-  // abordagem AABB
 
   for (auto &sceneObject : m_sceneObjects) {
     glm::vec3 sceneObjectPosition = sceneObject.m_position;
 
-    // Definir a caixa delimitadora para o objeto de cena, baseando-se no centro
-    // e no raio
+    // Definição da caixa delimitadora para o objeto de cena, 
+    // baseando-se no centro e no raio
     glm::vec3 minBound = sceneObjectPosition - glm::vec3(objectRadius);
     glm::vec3 maxBound = sceneObjectPosition + glm::vec3(objectRadius);
 
