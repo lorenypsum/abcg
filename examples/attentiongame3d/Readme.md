@@ -343,7 +343,7 @@ A renderização é feita usando **OpenGL**:
 		1. Deleta o programa de shader de cada um dos modelos.
 		2. Deleta os buffers e VAO associados ao skybox.
 
-	12. GameEntities::update():** atualiza a lógica e estado dos objetos no jogo.
+	12. **GameEntities::update():** atualiza a lógica e estado dos objetos no jogo.
 		1. Atualiza posições e rotações de objetos de distração e alvo.
 		2. Movimenta os objetos no eixo Z para criar uma sensação de profundidade.
 
@@ -354,32 +354,60 @@ A renderização é feita usando **OpenGL**:
 
 	14. **Resumo**: este código é responsável por gerenciar toda a lógica de criação, movimentação, atualização e renderização das entidades do jogo. Ele utiliza recursos avançados de OpenGL, como shaders personalizados, texturas cúbicas para o skybox e mapeamento normal para melhorar a aparência dos modelos 3D.
 
-#### Classe Window
+#### Classe `Window`
+	Esta classe realiza as chamadas de função da criação, atualização e renderização dos objetos, além de manipular os eventos da janela. Também oferece uma estrutura para o controle do estado do jogo, pontuação, movimentação e interação com os objetos. Foi completamente modificada em relação ao código, a seguir, detalhamos suas funcionalidades:
 
-- **Renderização de Janela (window.hpp e window.cpp)**: 
+- **Janela do Jogo (window.hpp e window.cpp)**: gerencia a janela e lógica e interação dos objetos do jogo.
 
-1. **Configuração Inicial:**
-A cor de fundo é definida (skyblue) utilizando a função `glClearColor`. A fonte do texto é carregada a partir de um arquivo TTF. Objetos do jogo são inicializados, e o jogo começa no estado inicial (`GameState::Start`).
+**Funções de Criação e Inicialização (onCreate, initializeGameObjects, startGame):** a função `onCreate` é responsável por configurar o ambiente inicial, como a cor de fundo da janela, o carregamento de fontes, a configuração de um gerador de números aleatórios, e a inicialização dos objetos do jogo, chamando o método `create` de `m_objects`. A função `startGame` reinicia o jogo, configurando pontuação, tempo de jogo e o estado inicial.
 
-2. **Lógica de Jogo:**
-	- **Estados do Jogo**: O jogo pode estar nos estados Start, Playing, GameOver, ou Win.
-	- **Tempo e Pontuação**: O temporizador decrementa a cada segundo enquanto o estado é Playing. A pontuação aumenta ou diminui com base em cliques corretos ou incorretos.
-	- **Fim do Jogo**: O jogo termina (GameOver) quando o tempo chega a zero.
-    Se a pontuação atual exceder o recorde anterior, o estado muda para Win.
+  1. **Window::onCreate():**
+     - Inicializa a cor de fundo da janela (`abcg::glClearColor`). -- não utilizada mais, sendo substituída pelo skybox.
+     - Carrega a fonte do jogo.
+     - Configura o estado inicial do gerador de números aleatórios.
+     - Inicializa os objetos do jogo.
+     - Inicia o jogo com a função `startGame`.
 
-	3. **Eventos de Interação**
-		- **Clique do mouse**: Libera o movimento do cesto ou habilita as mudanças de configurações.
-		- **Toques nas setas direcionais**: Movimentam o cesto
+  2. **Window::initializeGameObjects():** Define o carregamento dos objetos do jogo, como os alvos e as distrações, em posições aleatórias.
 
-	4. **Renderização**
-Renderiza os objetos do jogo e uma interface do usuário usando ImGui para exibir a pontuação e o tempo restante.
+  3. **Window::startGame():** Configura o estado inicial do jogo (pontuação, tempo e estado), e chama a função de criação dos objetos do jogo.
 
-	5. **Reinicialização**
-Funções como `resetGame()` e `startGame()` permitem reiniciar o jogo para o estado inicial, com objetos reposicionados aleatoriamente e variáveis reiniciadas.
+- **Funções de Atualização (onUpdate, detectCollisions, checkGameStatus, updateTimeDisplay):**
+  Essas funções lidam com a atualização contínua do estado do jogo, incluindo a lógica de colisões e verificação do tempo.
+
+  1. **Window::onUpdate():**
+     - Calcula o tempo decorrido desde a última atualização.
+     - Atualiza os objetos de cena, como alvos e distrações, e a lógica do jogo, verificando o tempo restante e detectando colisões.
+
+  2. **Window::detectCollisions():** Detecta colisões entre a rede do jogador e os alvos ou distrações. A cada colisão, a pontuação é atualizada e os objetos são removidos ou reposicionados.
+
+  3. **Window::checkGameStatus():** Verifica o estado do jogo (se o tempo acabou, se o jogador ganhou ou perdeu, ou se ainda está em andamento).
+
+  4. **Window::updateTimeDisplay():** Atualiza a exibição de tempo na interface do usuário, marcando o fim do jogo quando o tempo se esgota.
+
+- **Funções de Renderização (onPaint, onPaintUI)():**
+  A função `onPaint` é responsável pela renderização dos objetos do jogo, enquanto a função `onPaintUI` cuida da renderização da interface do usuário, exibindo informações como a pontuação e o tempo restante.
+
+  1. **Window::onPaint():** Renderiza os objetos do jogo na janela, chamando as funções definidas em Game Objects.
+  
+  2. **Window::onPaintUI():** Renderiza a interface de usuário com informações sobre o estado do jogo, como a pontuação e o tempo restante. Utiliza o ImGui para criar uma interface gráfica.
+
+- **Funções de Eventos (onEvent, onResize):**
+  Essas funções lidam com a interação do usuário, incluindo movimentação da rede (cesto) e redimensionamento da janela.
+
+  1. **Window::onEvent():** Responde a eventos de teclado (setas para mover a rede), limitando os movimentos para dentro da janela.
+  
+  2. **Window::onResize():** Atualiza o tamanho da janela e o tamanho da área de visualização dos objetos.
+
+- **Função de Reinício (resetGame):** Reinicia o jogo para o estado inicial, resetando a pontuação, o tempo e recriando os objetos de jogo.
+
+  1. **Window::resetGame():** Reinicia a pontuação, o tempo e o estado do jogo, além de criar novamente os objetos do jogo.
+
 
 ## Avaliação do Projeto e Possíveis Melhorias
 
-O objetivo da atividade, que era obter uma aplicação didática funcional com gráficos 3D, usando os padrões e conceitos do curso (OpenGL, ABCG, etc), foi alcançado. Alguns problemas foram notados, como a presença de _bugs_ ao executar o jogo em um dos computadores da sala de aula, enquanto que o computador ao lado executava sem problemas. Foi assumido que o problema estava na configuração do computador em questão. 
+O objetivo da atividade, que era obter uma aplicação didática funcional com gráficos 3D, usando os padrões e conceitos do curso (OpenGL, ABCG, etc), foi alcançado. 
+
 Possíveis melhorias para a aplicação podem incluir:
 - **Controle do cesto pelo mouse**: Garantir maior agilidade e liberdade de movimento que as setas do teclado permitem.
 - **Opções de tempo de jogo**: Permitir ao usuário escolher diversas opções de tempo.
@@ -387,10 +415,11 @@ Possíveis melhorias para a aplicação podem incluir:
 - **Níveis de Dificuldade**: Implementar níveis de dificuldade progressivos, com mais objetos e distrações em níveis avançados.
 - **Sons e Efeitos Visuais**: Adicionar efeitos sonoros e visuais para tornar o jogo mais imersivo e envolvente.
 - **Feedback Visual**: Adicionar feedback visual para indicar acertos e erros.
-- **Bugs**: Maior atenção com as compatibilidades requeridas para evitar situações de *bugs* em diferentes sistemas operacionais e configurações.
+- **Bugs**: Colocar uma interface antes do início e no final do jogo.
 - **Reiniciar**: Adicionar um botão de reinício na tela após o término do jogo.
 
-No entanto, boa parte dessas melhorias já vão além do conteúdo da disciplina, e já tornariam o aplicativo menos próximo de uma versão didática e mais próximo de uma versão comercial. Assim, tendo em vista o objetivo desejado, o grupo considerou o resultado final plenamente satisfatório.
+No entanto, boa parte dessas melhorias já vão além do conteúdo da disciplina, e já tornariam o aplicativo menos próximo de uma versão didática e mais próximo de uma versão comercial. 
+Assim, tendo em vista o objetivo desejado, o grupo considerou o resultado final plenamente satisfatório.
 
 ## Instalação e Execução
 
