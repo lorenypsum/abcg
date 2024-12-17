@@ -232,6 +232,8 @@ Para compilar e executar o jogo:
 
 ## Referências
 - [Bird Object](https://www.cgtrader.com/items/3816085/download-page)
+- [Wicker Basket Object](https://www.cgtrader.com/free-3d-models/household/other/wicker-basket-0fad0b42-b8f4-45b4-930f-62d9499e6b60)
+- [Skybox](https://skybox.blockadelabs.com/345f1511b1568ea07e0edacafe02564a)
 - [Hbatagelo](https://hbatagelo.github.io/cg/)
 - [OpenGL](https://www.opengl.org/)
 - [SDL](https://www.libsdl.org/)
