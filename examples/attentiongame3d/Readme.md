@@ -15,6 +15,7 @@ Cada pássaro branco que atinge o cesto aumenta a pontuação, enquanto atingir 
 - [Motivação do Projeto](#motivação-do-projeto)
   - [Entrevistas com Educadores](#entrevistas-com-educadores)
   - [Consultoria Neuropsicológica](#consultoria-neuropsicológica)
+  - [Avaliação do resultado](#avaliação-do-resultado)
 - [Aspectos do Jogo](#aspectos-do-jogo)
 - [Estrutura do Código](#estrutura-do-código)
 - [Funcionalidades](#funcionalidades)
@@ -33,7 +34,7 @@ O projeto é uma continuação em 3D do projeto originado na Atividade 1 (Treina
 
 ### Entrevistas com educadores
 
-Nove educadores responderam nosso formulário, para muitos deles, a **falta de atenção e concentração** é a maior dificuldade enfrentada no ambiente escolar. Diante disso, ficou evidente a necessidade de criar uma ferramenta que auxiliasse no treinamento e desenvolvimento dessas habilidades cognitivas em um contexto interativo. Abaixo as respostas obtidas:
+Nove educadores responderam nosso [formulário](https://skybox.blockadelabs.com/345f1511b1568ea07e0edacafe02564a) , para muitos deles, a **falta de atenção e concentração** é a maior dificuldade enfrentada no ambiente escolar. Diante disso, ficou evidente a necessidade de criar uma ferramenta que auxiliasse no treinamento e desenvolvimento dessas habilidades cognitivas em um contexto interativo. Abaixo as respostas obtidas:
 
 ![alt text](image.png)
 ![alt text](image-1.png)
@@ -45,6 +46,8 @@ Nove educadores responderam nosso formulário, para muitos deles, a **falta de a
 ![alt text](image-8.png)
 ![alt text](image-9.png)
 
+[Resultado](https://docs.google.com/forms/d/1IAE4KtZw2pSLaoXtc2e_4C2onLBX11Kny89mkhgaCDM/edit#responses)
+
 ### Consultoria Neuropsicológica
 
 Para validar a proposta, uma neuropsicóloga especializada em treinamento cognitivo foi entrevistada e sugeriu uma série de ideias para o desenvolvimento do jogo, resumidas abaixo:
@@ -53,6 +56,13 @@ Para validar a proposta, uma neuropsicóloga especializada em treinamento cognit
 - **Objetos Únicos e Distrações Dinâmicas**: Outro ponto foi a inclusão de objetos que aparecem apenas uma vez em certos níveis, incentivando o jogador a desenvolver uma atenção seletiva para identificar rapidamente o que é relevante em meio a uma grande quantidade de estímulos visuais.
 
 Então, pensou-se em um jogo onde o jogador tem que se focar em uma tarefa específica, enquanto precisa evitar as distrações.  Essas sugestões foram simplificadas em um mvp (mínimo produto viável) e incorporadas ao projeto, dando origem ao **Caça ao Pombo Branco** na Atividade 1, e **Voo dos Pássaros** nas Atividades 2 e 3.
+
+### Avaliação do resultado
+Alguns usuários diversos, incluindo a neuropsicológa a quem consultamos durante o desenvolvimento responderam nosso [formulário de avaliação](https://docs.google.com/forms/d/e/1FAIpQLSfDd1byk0fjFMBKVXc6Ua6ZFz98xesOv3jOeVzAq-ku-3l5JQ/viewform), o resultado pode ser verificado abaixo:
+
+[Resultado](https://docs.google.com/forms/d/1hA7HiJLJCaGIad1HFRY20SkIu5C4w1KNj6MDwGKEL5U/edit#responses)
+
+Acrescentar Imagens
 
 ## Aspectos do jogo
 
