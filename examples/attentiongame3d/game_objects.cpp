@@ -63,9 +63,9 @@ void GameEntities::create() {
   m_net.m_rotationAxis = glm::vec3(0.1f, 0.0f, 0.0f);
 
   setupSceneObjects(m_distractionObjects, // m_sceneObjects
-                    -15.0f,               // minX
-                    15.0f,                // maxX
-                    -15.0f,               // minY
+                    -5.0f,               // minX
+                    5.0f,                // maxX
+                    0.0f,               // minY
                     15.0f,                // maxY
                     -50.0f,               // minZ
                     0.0f                  // maxZ
@@ -90,10 +90,10 @@ void GameEntities::create() {
   );                                       // Configura objetos de distração
 
   setupSceneObjects(m_targetObjects, // m_sceneObjects
-                    -15.0f,          // minX
-                    15.0f,           // maxX
-                    -5.0f,           // minY
-                    15.0f,           // maxY
+                    -3.0f,          // minX
+                    3.0f,           // maxX
+                    0.0f,           // minY
+                    3.0f,           // maxY
                     -50.0f,          // minZ
                     0.0f             // maxZ
   );                                 // Configura objetos alvo
@@ -108,10 +108,10 @@ void GameEntities::update(float deltaTime) {
                      0.0f,                 // incX
                      1.0f,                 // incY
                      -50.0f,               // posZ
-                     -15.0f,               // minX
-                     15.0f,                // maxX
+                     -5.0f,               // minX
+                     5.0f,                // maxX
                      -5.0f,                // minY
-                     25.0f,                // maxY
+                     5.0f,                // maxY
                      -100.0f,              // minZ
                      0.0f                  // maxZ
   );
@@ -148,10 +148,10 @@ void GameEntities::update(float deltaTime) {
                      0.0f,            // incX
                      0.0f,            // incY
                      -50.0f,          // posZ
-                     -15.0f,          // minX
-                     15.0f,           // maxX
+                     -5.0f,          // minX
+                     5.0f,           // maxX
                      -5.0f,           // minY
-                     15.0f,           // maxY
+                     5.0f,           // maxY
                      -50.0f,          // minZ
                      0.0f             // maxZ
   );
