@@ -296,8 +296,6 @@ void GameEntities::renderObject(GLuint &program, Model &m_model,
       abcg::glGetUniformLocation(program, "projMatrix")}; // Matriz de projeção
   auto const modelMatrixLoc{
       abcg::glGetUniformLocation(program, "modelMatrix")}; // Matriz de modelo
-  auto const normalMatrixLoc{
-      abcg::glGetUniformLocation(program, "normalMatrix")}; // Matriz normal
   auto const lightDirLoc{
       abcg::glGetUniformLocation(program, "lightDirWorldSpace")}; // Luz
   auto const shininessLoc{
@@ -377,8 +375,6 @@ void GameEntities::renderNet(GLuint &program, Model &m_model,
       abcg::glGetUniformLocation(program, "projMatrix")}; // Matriz de projeção
   auto const modelMatrixLoc{
       abcg::glGetUniformLocation(program, "modelMatrix")}; // Matriz de modelo
-  auto const normalMatrixLoc{
-      abcg::glGetUniformLocation(program, "normalMatrix")}; // Matriz normal
   auto const lightDirLoc{
       abcg::glGetUniformLocation(program, "lightDirWorldSpace")}; // Luz
   auto const shininessLoc{
